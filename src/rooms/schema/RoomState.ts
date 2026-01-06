@@ -155,11 +155,11 @@ export class RoomState extends Schema {
   reconstructPath(parents: Map<string, { x: number; y: number }>, endNode: { x: number; y: number }): { x: number; y: number }[] {
     const path = [endNode];
     let current = endNode;
-    let parent = parents.get(`${current.x}_${current.y} `)
+    let parent = parents.get(`${current.x}_${current.y}`)
 
     while (parent) {
       current = parent;
-      const key = `${current.x}_${current.y} `
+      const key = `${current.x}_${current.y}`
       parent = parents.get(key)
       path.push(current)
     }
@@ -177,7 +177,7 @@ export class RoomState extends Schema {
     queue.push(startNode);
 
     const visited = new Set<string>();
-    visited.add(`${startNode.x}_${startNode.y} `);
+    visited.add(`${startNode.x}_${startNode.y}`);
 
     const parents = new Map<string, { x: number, y: number }>();
     const delta = [{ x: 0, y: 1 }, { x: 0, y: -1 }, { x: 1, y: 0 }, { x: -1, y: 0 }];
@@ -188,10 +188,9 @@ export class RoomState extends Schema {
         return this.reconstructPath(parents, current);
       }
 
-
       for (const nextMove of delta) {
         let [nextX, nextY] = [current.x + nextMove.x, current.y + nextMove.y];
-        let nextKey: string = `${nextX}_${nextY} `
+        let nextKey: string = `${nextX}_${nextY}`
         if (visited.has(nextKey)) continue;
         if (!this.isWalkableForCapybara(nextX, nextY)) continue;
         if (!this.ventState.isOpenOrEmptyAt(nextX, nextY)) continue;
