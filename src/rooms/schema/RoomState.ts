@@ -5,7 +5,9 @@ import { CrateState } from "./CrateState.js";
 import { ButtonState } from "./ButtonState.js";
 import { DoorState } from "./DoorState.js";
 import { LaserState } from "./LaserState.js";
-import { Cable, CableState } from "./CableState.js";
+import { CableState } from "./CableState.js";
+import { VentState } from "./VentState.js";
+import { Capybara } from "./Capybara.js";
 
 export class RoomState extends Schema {
   @type(["string"]) grid = new ArraySchema<string>();
@@ -20,6 +22,8 @@ export class RoomState extends Schema {
   @type(ButtonState) buttonState: ButtonState = new ButtonState();
   @type(LaserState) laserState: LaserState = new LaserState();
   @type(CableState) cableState: CableState = new CableState();
+  @type(VentState) ventState: VentState = new VentState();
+  @type(Capybara) capybara: Capybara;
 
   loadRoomFromJson(jsonData: any) {
     try {
@@ -39,9 +43,11 @@ export class RoomState extends Schema {
           new Position().assign({ x: playerData.x, y: playerData.y }),
         );
       }
-    
+
+      this.ventState.spawnInitialVents();
+      this.spawnCapybara();
     } catch (error) {
-      throw `Error loading room data: ${error}`;
+      throw `Error loading room data: ${error} `;
     }
   }
 
@@ -75,7 +81,7 @@ export class RoomState extends Schema {
           mechanicData.activeDuration ?? 1000,
           mechanicData.inactiveDuration ?? 1000,
         );
-      } else if (mechanicType === "cable"){
+      } else if (mechanicType === "cable") {
         this.cableState.createCable(
           mechanicData.x,
           mechanicData.y,
@@ -83,7 +89,7 @@ export class RoomState extends Schema {
           mechanicData.safeMs ?? mechanicData.safeDuration,
           mechanicData.startDamaging ?? mechanicData.startDamage ?? false
         );
-        }
+      }
     }
   }
 
@@ -132,6 +138,73 @@ export class RoomState extends Schema {
     return true;
   }
 
+  isWalkableForCapybara(x: number, y: number): boolean {
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) return false;
+
+    const cell = this.getCellValue(x, y);
+
+    if (cell.startsWith("w")) return false;
+
+    if (this.crateState.getCrateAt(x, y)) return false;
+
+    if (!this.doorState.isOpenOrEmptyAt(x, y)) return false;
+
+    return true;
+  }
+
+  reconstructPath(parents: Map<string, { x: number; y: number }>, endNode: { x: number; y: number }): { x: number; y: number }[] {
+    const path = [endNode];
+    let current = endNode;
+    let parent = parents.get(`${current.x}_${current.y} `)
+
+    while (parent) {
+      current = parent;
+      const key = `${current.x}_${current.y} `
+      parent = parents.get(key)
+      path.push(current)
+    }
+
+    return path.reverse();
+  }
+
+  findPathToVent(): { x: number; y: number }[] | null {
+    const startNode = {
+      x: this.capybara.position.x,
+      y: this.capybara.position.y,
+    }
+
+    const queue: { x: number, y: number }[] = [];
+    queue.push(startNode);
+
+    const visited = new Set<string>();
+    visited.add(`${startNode.x}_${startNode.y} `);
+
+    const parents = new Map<string, { x: number, y: number }>();
+    const delta = [{ x: 0, y: 1 }, { x: 0, y: -1 }, { x: 1, y: 0 }, { x: -1, y: 0 }];
+
+    while (!(queue.length === 0)) {
+      let current = queue.shift()!;
+      if (this.ventState.getVentAt(current.x, current.y) && this.ventState.isOpenOrEmptyAt(current.x, current.y)) {
+        return this.reconstructPath(parents, current);
+      }
+
+
+      for (const nextMove of delta) {
+        let [nextX, nextY] = [current.x + nextMove.x, current.y + nextMove.y];
+        let nextKey: string = `${nextX}_${nextY} `
+        if (visited.has(nextKey)) continue;
+        if (!this.isWalkableForCapybara(nextX, nextY)) continue;
+        if (!this.ventState.isOpenOrEmptyAt(nextX, nextY)) continue;
+
+        visited.add(nextKey);
+        parents.set(nextKey, current);
+        queue.push({ x: nextX, y: nextY });
+      }
+    }
+    // console.log("no possible way :(")
+    return null
+  }
+
   spawnNewPlayer(sessionId: string, name: string = null) {
     this.playerState.createPlayer(sessionId, name);
     const player = this.playerState.players.get(sessionId);
@@ -174,155 +247,6 @@ export class RoomState extends Schema {
     }
 
     return false;
-  }
-
-  getMapInfo() {
-    return {
-      grid: this.getGridAs2DArray(),
-      width: this.width,
-      height: this.height,
-      players: Array.from(this.playerState.players.values()).map((player) => {
-        return {
-          index: player.index,
-          name: player.name,
-          x: player.position.x,
-          y: player.position.y,
-          sessionId: player.sessionId,
-        };
-      }),
-      crates: Array.from(this.crateState.crates.values()).map((crate) => {
-        return {
-          crateId: crate.id,
-          x: crate.position.x,
-          y: crate.position.y,
-        };
-      }),
-      cables: Array.from(this.cableState.cables.values()).map((cable) => {
-        return {
-          cableId: cable.id,
-          x: cable.position.x,
-          y: cable.position.y,
-          damage: cable.damage,
-          damageDuration: cable.damageDuration,
-          safeDuration: cable.safeDuration,
-          timer: cable.timer,
-        };
-      }),
-      doors: Array.from(this.doorState.doors.values()).map((door) => ({
-        doorId: door.id,
-        color: door.color,
-        x: door.position.x,
-        y: door.position.y,
-        open: door.open,
-      })),
-      buttons: Array.from(this.buttonState.buttons.values()).map((button) => ({
-        buttonId: button.id,
-        color: button.color,
-        x: button.position.x,
-        y: button.position.y,
-        pressed: button.pressed,
-      })),
-      lasers: Array.from(this.laserState.lasers.values()).map((laser) => ({
-        laserId: laser.id,
-        color: laser.color,
-        x: laser.position.x,
-        y: laser.position.y,
-        direction: laser.direction,
-        range: laser.maxRange,
-      })),
-    };
-  }
-
-  getGrid() {
-    return this.getGridAs2DArray();
-  }
-
-  getWidth() {
-    return this.width;
-  }
-
-  getHeight() {
-    return this.height;
-  }
-
-  getPlayerName(sessionId: string): string {
-    return this.playerState.getPlayerName(sessionId);
-  }
-
-  despawnCrate(id: string) {
-    this.crateState.removeCrate(id);
-  }
-
-// proxy so callers can pass cable timing / initial state
-  spawnCable(x: number, y: number, damageMs?: number, safeMs?: number, startDamaging?: boolean){
-    this.cableState.createCable(x, y, damageMs, safeMs, startDamaging);
-  }
-  despawnCable(id: string){
-    this.cableState.removeCable(id);
-  }
-
-  // expose toggles/moves for broadcasting
-  getAndClearToggledCables() {
-    return this.cableState.getAndClearToggledCables();
-  }
-
-  moveCrate(crateId: string, dx: number, dy: number): boolean {
-    const crate = this.crateState.crates.get(crateId);
-    if (!crate) return false;
-
-    const targetX = crate.position.x + dx;
-    const targetY = crate.position.y + dy;
-
-    if (!this.isWalkableForCrate(targetX, targetY)) return false;
-
-    const nextCrate = this.crateState.getCrateAt(targetX, targetY);
-    if (nextCrate && !this.moveCrate(nextCrate.id, dx, dy)) return false;
-
-    const oldX = crate.position.x;
-    const oldY = crate.position.y;
-
-    this.crateState.moveCratesBlock(oldX, oldY, targetX, targetY, dx, dy);
-
-    crate.position.x = targetX;
-    crate.position.y = targetY;
-
-    return true;
-  }
-
-  checkButtonPressed() {
-    const doorsAndButtonsToUpdate: {
-      doorId: string;
-      buttonId: string;
-      open: boolean;
-    }[] = [];
-
-    for (const button of this.buttonState.buttons.values()) {
-      const playerOnButton = [...this.playerState.players.values()].some(
-        (p) =>
-          p.position.x === button.position.x &&
-          p.position.y === button.position.y,
-      );
-
-      const crateOnButton = !!this.crateState.getCrateAt(
-        button.position.x,
-        button.position.y,
-      );
-
-      const door = this.doorState.doors.get(button.doorId);
-      if (!door) return;
-
-      const shouldOpen = playerOnButton || crateOnButton;
-      if (door.open !== shouldOpen) {
-        door.open = shouldOpen;
-        button.pressed = shouldOpen;
-        doorsAndButtonsToUpdate.push({
-          doorId: door.id,
-          buttonId: button.id,
-          open: door.open,
-        });
-      }
-    }
-    return doorsAndButtonsToUpdate;
   }
 
   updateLasers(deltaTime: number) {
@@ -414,5 +338,161 @@ export class RoomState extends Schema {
     }
 
     return { laserId, active: true, cratesDestroyed, range };
+  }
+
+  spawnCapybara() {
+    const startingPos = new Position();
+    startingPos.x = 3;
+    startingPos.y = 4;
+    this.capybara = new Capybara(startingPos.x, startingPos.y);
+  }
+
+  getMapInfo() {
+    return {
+      grid: this.getGridAs2DArray(),
+      width: this.width,
+      height: this.height,
+      players: Array.from(this.playerState.players.values()).map((player) => {
+        return {
+          index: player.index,
+          name: player.name,
+          x: player.position.x,
+          y: player.position.y,
+          sessionId: player.sessionId,
+        };
+      }),
+      crates: Array.from(this.crateState.crates.values()).map((crate) => {
+        return {
+          crateId: crate.id,
+          x: crate.position.x,
+          y: crate.position.y,
+        };
+      }),
+      cables: Array.from(this.cableState.cables.values()).map((cable) => {
+        return {
+          cableId: cable.id,
+          x: cable.position.x,
+          y: cable.position.y,
+          damage: cable.damage,
+          damageDuration: cable.damageDuration,
+          safeDuration: cable.safeDuration,
+          timer: cable.timer,
+        };
+      }),
+      doors: Array.from(this.doorState.doors.values()).map((door) => ({
+        doorId: door.id,
+        color: door.color,
+        x: door.position.x,
+        y: door.position.y,
+        open: door.open,
+      })),
+      buttons: Array.from(this.buttonState.buttons.values()).map((button) => ({
+        buttonId: button.id,
+        color: button.color,
+        x: button.position.x,
+        y: button.position.y,
+        pressed: button.pressed,
+      })),
+      lasers: Array.from(this.laserState.lasers.values()).map((laser) => ({
+        laserId: laser.id,
+        color: laser.color,
+        x: laser.position.x,
+        y: laser.position.y,
+        direction: laser.direction,
+        range: laser.maxRange,
+      })),
+    };
+  }
+
+  getGrid() {
+    return this.getGridAs2DArray();
+  }
+
+  getWidth() {
+    return this.width;
+  }
+
+  getHeight() {
+    return this.height;
+  }
+
+  getPlayerName(sessionId: string): string {
+    return this.playerState.getPlayerName(sessionId);
+  }
+
+  despawnCrate(id: string) {
+    this.crateState.removeCrate(id);
+  }
+
+  // proxy so callers can pass cable timing / initial state
+  spawnCable(x: number, y: number, damageMs?: number, safeMs?: number, startDamaging?: boolean) {
+    this.cableState.createCable(x, y, damageMs, safeMs, startDamaging);
+  }
+  despawnCable(id: string) {
+    this.cableState.removeCable(id);
+  }
+
+  // expose toggles/moves for broadcasting
+  getAndClearToggledCables() {
+    return this.cableState.getAndClearToggledCables();
+  }
+
+  moveCrate(crateId: string, dx: number, dy: number): boolean {
+    const crate = this.crateState.crates.get(crateId);
+    if (!crate) return false;
+
+    const targetX = crate.position.x + dx;
+    const targetY = crate.position.y + dy;
+
+    if (!this.isWalkableForCrate(targetX, targetY)) return false;
+
+    const nextCrate = this.crateState.getCrateAt(targetX, targetY);
+    if (nextCrate && !this.moveCrate(nextCrate.id, dx, dy)) return false;
+
+    const oldX = crate.position.x;
+    const oldY = crate.position.y;
+
+    this.crateState.moveCratesBlock(oldX, oldY, targetX, targetY, dx, dy);
+
+    crate.position.x = targetX;
+    crate.position.y = targetY;
+
+    return true;
+  }
+
+  checkButtonPressed() {
+    const doorsAndButtonsToUpdate: {
+      doorId: string;
+      buttonId: string;
+      open: boolean;
+    }[] = [];
+
+    for (const button of this.buttonState.buttons.values()) {
+      const playerOnButton = [...this.playerState.players.values()].some(
+        (p) =>
+          p.position.x === button.position.x &&
+          p.position.y === button.position.y,
+      );
+
+      const crateOnButton = !!this.crateState.getCrateAt(
+        button.position.x,
+        button.position.y,
+      );
+
+      const door = this.doorState.doors.get(button.doorId);
+      if (!door) return;
+
+      const shouldOpen = playerOnButton || crateOnButton;
+      if (door.open !== shouldOpen) {
+        door.open = shouldOpen;
+        button.pressed = shouldOpen;
+        doorsAndButtonsToUpdate.push({
+          doorId: door.id,
+          buttonId: button.id,
+          open: door.open,
+        });
+      }
+    }
+    return doorsAndButtonsToUpdate;
   }
 }
