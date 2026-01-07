@@ -286,12 +286,21 @@ export class RoomState extends Schema {
   }
 
   fireLaser(laserId: string): {
+    active: boolean;
     path: { x: number; y: number }[];
     cratesDestroyed: { crateId: string; x: number; y: number }[];
   } {
     const laser = this.laserState.getLaser(laserId);
     if (!laser) {
-      return { path: [], cratesDestroyed: [] };
+      return { active: false, path: [], cratesDestroyed: [] };
+    }
+
+    // Toggle the laser active state
+    laser.active = !laser.active;
+
+    // If turning off, return empty path
+    if (!laser.active) {
+      return { active: false, path: [], cratesDestroyed: [] };
     }
 
     const path: { x: number; y: number }[] = [];
@@ -337,7 +346,7 @@ export class RoomState extends Schema {
 
       path.push({ x: currentX, y: currentY });
 
-      // Check for crate at this position
+      // Check for crate at this position and destroy it
       const crate = this.crateState.getCrateAt(currentX, currentY);
       if (crate) {
         cratesDestroyed.push({
@@ -352,6 +361,6 @@ export class RoomState extends Schema {
       currentY += dy;
     }
 
-    return { path, cratesDestroyed };
+    return { active: true, path, cratesDestroyed };
   }
 }

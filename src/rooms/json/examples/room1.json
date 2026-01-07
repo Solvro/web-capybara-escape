@@ -97,7 +97,7 @@
       "type": "button",
       "id": "button-red-1",
       "x": 1,
-      "y": 5,
+      "y": 6,
       "color": "#FF3B30",
       "doorId": "door-red-1"
     },
@@ -112,21 +112,29 @@
       "type": "laser",
       "id": "laser-1",
       "x": 1,
-      "y": 3,
+      "y": 5,
       "direction": "right",
       "range": 8
+    },
+    {
+      "type": "laser",
+      "id": "laser-2",
+      "x": 4,
+      "y": 1,
+      "direction": "down",
+      "range": 6
     }
   ],
   "entities": {
     "players": [
       { "x": 2, "y": 1 },
-      { "x": 5, "y": 5 }
+      { "x": 7, "y": 5 }
     ],
     "enemies": [],
     "capybara": { "x": 0, "y": 0 },
     "crates": [
       { "x": 4, "y": 5 },
-      { "x": 3, "y": 3 },
+      { "x": 5, "y": 5 },
       { "x": 4, "y": 3 }
     ]
   }
