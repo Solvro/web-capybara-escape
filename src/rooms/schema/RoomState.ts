@@ -4,6 +4,7 @@ import { PlayerState } from "./PlayerState.js";
 import { CrateState } from "./CrateState.js";
 import { ButtonState } from "./ButtonState.js";
 import { DoorState } from "./DoorState.js";
+import { LaserState } from "./LaserState.js";
 
 export class RoomState extends Schema {
   @type(["string"]) grid = new ArraySchema<string>();
@@ -16,6 +17,7 @@ export class RoomState extends Schema {
   @type(CrateState) crateState: CrateState = new CrateState();
   @type(DoorState) doorState: DoorState = new DoorState();
   @type(ButtonState) buttonState: ButtonState = new ButtonState();
+  @type(LaserState) laserState: LaserState = new LaserState();
 
   loadRoomFromJson(jsonData: any) {
     try {
@@ -58,6 +60,14 @@ export class RoomState extends Schema {
           mechanicData.x,
           mechanicData.y,
           mechanicData.doorId
+        );
+      } else if (mechanicType === "laser") {
+        this.laserState.createLaser(
+          mechanicData.id,
+          mechanicData.x,
+          mechanicData.y,
+          mechanicData.direction,
+          mechanicData.range ?? 10
         );
       }
     }
@@ -126,6 +136,7 @@ export class RoomState extends Schema {
     this.crateState.onRoomDispose();
     this.doorState.onRoomDispose();
     this.buttonState.onRoomDispose();
+    this.laserState.onRoomDispose();
   }
 
   movePlayer(sessionId: string, deltaX: number, deltaY: number): boolean {
@@ -184,6 +195,13 @@ export class RoomState extends Schema {
         x: button.position.x,
         y: button.position.y,
         pressed: button.pressed,
+      })),
+      lasers: Array.from(this.laserState.lasers.values()).map((laser) => ({
+        laserId: laser.id,
+        x: laser.position.x,
+        y: laser.position.y,
+        direction: laser.direction,
+        range: laser.range,
       })),
     };
   }
@@ -265,5 +283,75 @@ export class RoomState extends Schema {
       }
     }
     return doorsAndButtonsToUpdate;
+  }
+
+  fireLaser(laserId: string): {
+    path: { x: number; y: number }[];
+    cratesDestroyed: { crateId: string; x: number; y: number }[];
+  } {
+    const laser = this.laserState.getLaser(laserId);
+    if (!laser) {
+      return { path: [], cratesDestroyed: [] };
+    }
+
+    const path: { x: number; y: number }[] = [];
+    const cratesDestroyed: { crateId: string; x: number; y: number }[] = [];
+
+    let dx = 0;
+    let dy = 0;
+
+    switch (laser.direction) {
+      case "up":
+        dy = -1;
+        break;
+      case "down":
+        dy = 1;
+        break;
+      case "left":
+        dx = -1;
+        break;
+      case "right":
+        dx = 1;
+        break;
+    }
+
+    let currentX = laser.position.x + dx;
+    let currentY = laser.position.y + dy;
+
+    for (let i = 0; i < laser.range; i++) {
+      // Stop if out of bounds
+      if (
+        currentX < 0 ||
+        currentX >= this.width ||
+        currentY < 0 ||
+        currentY >= this.height
+      ) {
+        break;
+      }
+
+      // Stop if hit a wall
+      const cell = this.getCellValue(currentX, currentY);
+      if (cell.startsWith("w")) {
+        break;
+      }
+
+      path.push({ x: currentX, y: currentY });
+
+      // Check for crate at this position
+      const crate = this.crateState.getCrateAt(currentX, currentY);
+      if (crate) {
+        cratesDestroyed.push({
+          crateId: crate.id,
+          x: currentX,
+          y: currentY,
+        });
+        this.crateState.removeCrate(crate.id);
+      }
+
+      currentX += dx;
+      currentY += dy;
+    }
+
+    return { path, cratesDestroyed };
   }
 }

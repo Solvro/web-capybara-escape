@@ -107,6 +107,14 @@
       "y": 3,
       "damage": 1,
       "cooldownMs": 600
+    },
+    {
+      "type": "laser",
+      "id": "laser-1",
+      "x": 1,
+      "y": 3,
+      "direction": "right",
+      "range": 8
     }
   ],
   "entities": {
@@ -118,7 +126,8 @@
     "capybara": { "x": 0, "y": 0 },
     "crates": [
       { "x": 4, "y": 5 },
-      { "x": 3, "y": 3 }
+      { "x": 3, "y": 3 },
+      { "x": 4, "y": 3 }
     ]
   }
 }

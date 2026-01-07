@@ -52,6 +52,17 @@ export class GameRoom extends Room<RoomState> {
       console.log(this.state.getMapInfo());
       client.send("mapInfo", this.state.getMapInfo());
     });
+
+    this.onMessage("fireLaser", (client, message) => {
+      const result = this.state.fireLaser(message.laserId);
+      if (result.path.length > 0) {
+        this.broadcast("laserFired", {
+          laserId: message.laserId,
+          path: result.path,
+          cratesDestroyed: result.cratesDestroyed,
+        });
+      }
+    });
   }
 
   onJoin(client: Client, options: any) {
