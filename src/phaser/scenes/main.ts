@@ -34,6 +34,24 @@ import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
 import { SpeechBubble } from "../speech-bubbles/display-speech-bubble";
 
+const ASSETS_TILE_SIZE = 24;
+const SCALE_FACTOR = TILE_SIZE / ASSETS_TILE_SIZE;
+
+const TILE_MAPPING: Record<
+  string,
+  { frame: number; isTall?: boolean; frameSecond?: number }
+> = {
+  w1t: { frame: 0, frameSecond: 9, isTall: true },
+  w1: { frame: 0 },
+  w13: { frame: 8 },
+  w2t: { frame: 2, frameSecond: 4, isTall: true },
+  w2: { frame: 2 },
+  w3t: { frame: 3, frameSecond: 4, isTall: true },
+  w3: { frame: 3 },
+  w21: { frame: 7 },
+  f1: { frame: 5 },
+};
+
 export class Main extends Phaser.Scene {
   private room!: Room;
   private capybara: Capybara | null = null;
@@ -85,6 +103,10 @@ export class Main extends Phaser.Scene {
     this.load.image("door-closed", "images/doors/door-green-closed.png");
     this.load.image("laser-gun", "images/lasers/laser-gun.png");
     this.load.image("laser-line", "images/lasers/laser-horizontal-line.png");
+    this.load.spritesheet("tileset", "images/capybara-tileset.png", {
+      frameWidth: ASSETS_TILE_SIZE,
+      frameHeight: ASSETS_TILE_SIZE,
+    });
 
     // miscellaneous
     this.load.atlas(
@@ -106,8 +128,8 @@ export class Main extends Phaser.Scene {
         textureKey,
         `images/players/${String(index + 1)}.png`,
         {
-          frameWidth: 64,
-          frameHeight: 64,
+          frameWidth: TILE_SIZE,
+          frameHeight: TILE_SIZE,
         },
       );
     }
@@ -454,18 +476,31 @@ export class Main extends Phaser.Scene {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const tileType = grid[y][x];
+        const posX = x * TILE_SIZE + TILE_SIZE / 2;
+        const posY = y * TILE_SIZE + TILE_SIZE / 2;
 
-        this.add.image(
-          x * TILE_SIZE + TILE_SIZE / 2,
-          y * TILE_SIZE + TILE_SIZE / 2,
-          "ground",
-        );
+        const config = TILE_MAPPING[tileType];
 
-        this.add.image(
-          x * TILE_SIZE + TILE_SIZE / 2,
-          y * TILE_SIZE + TILE_SIZE / 2,
-          tileType,
-        );
+        if (tileType === "f1") {
+          this.add
+            .image(posX, posY, "tileset", config.frame)
+            .setScale(SCALE_FACTOR)
+            .setDepth(0);
+        }
+
+        if (tileType.startsWith("w")) {
+          this.add
+            .image(posX, posY, "tileset", config.frame)
+            .setScale(SCALE_FACTOR)
+            .setDepth(posY);
+
+          if (config.isTall ?? false) {
+            this.add
+              .image(posX, posY - TILE_SIZE, "tileset", config.frameSecond)
+              .setScale(SCALE_FACTOR)
+              .setDepth(posY);
+          }
+        }
       }
     }
   }

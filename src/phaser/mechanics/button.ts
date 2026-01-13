@@ -1,11 +1,13 @@
+import { ASSETS, SCALE_FACTOR } from "../lib/const";
 import { Mechanic } from "./mechanic";
 
 export class Button extends Mechanic {
   public readonly buttonId: string;
   public readonly color: string;
   private pressed: boolean;
-  private pressedTextureKey: string;
-  private releasedTextureKey: string;
+  private pressedFrameKey: number;
+  private releasedFrameKey: number;
+  private baseSprite: Phaser.GameObjects.Sprite;
 
   constructor(
     scene: Phaser.Scene,
@@ -14,15 +16,24 @@ export class Button extends Mechanic {
     buttonId: string,
     color: string,
     pressed = false,
-    pressedTextureKey = "button-pressed",
-    releasedTextureKey = "button-released",
+    pressedFrameKey = ASSETS.BUTTON_PRESSED,
+    releasedFrameKey = ASSETS.BUTTON_RELEASED,
   ) {
-    super(scene, x, y, pressed ? pressedTextureKey : releasedTextureKey);
+    super(scene, x, y, pressed ? pressedFrameKey : releasedFrameKey);
     this.buttonId = buttonId;
     this.color = color;
     this.pressed = pressed;
-    this.pressedTextureKey = pressedTextureKey;
-    this.releasedTextureKey = releasedTextureKey;
+    this.pressedFrameKey = pressedFrameKey;
+    this.releasedFrameKey = releasedFrameKey;
+
+    this.baseSprite = this.scene.add.sprite(
+      0,
+      0,
+      "tileset",
+      ASSETS.BUTTON_BASE,
+    );
+    this.baseSprite.setScale(SCALE_FACTOR);
+    this.add(this.baseSprite);
   }
 
   public get id(): string {
@@ -35,9 +46,9 @@ export class Button extends Mechanic {
 
   public set isPressed(value: boolean) {
     this.pressed = value;
-    const textureKey = this.pressed
-      ? this.pressedTextureKey
-      : this.releasedTextureKey;
-    this.changeTexture(textureKey);
+    const frameKey = this.pressed
+      ? this.pressedFrameKey
+      : this.releasedFrameKey;
+    this.setFrame(frameKey);
   }
 }

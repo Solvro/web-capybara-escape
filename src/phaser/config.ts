@@ -5,7 +5,7 @@ import { Main } from "./scenes/main";
 export const phaserConfig: Phaser.Types.Core.GameConfig = {
   type: AUTO,
   width: 640,
-  height: 448,
+  height: 64 * 8.5,
   pixelArt: true,
   render: {
     antialias: false,
@@ -14,7 +14,7 @@ export const phaserConfig: Phaser.Types.Core.GameConfig = {
     roundPixels: true,
   },
   parent: "game-container",
-  backgroundColor: "#000000",
+  backgroundColor: "#2f0d68",
   scene: [Main],
   scale: {
     mode: Phaser.Scale.ScaleModes.FIT,

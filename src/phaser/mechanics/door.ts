@@ -1,10 +1,11 @@
+import { ASSETS } from "../lib/const";
 import { Mechanic } from "./mechanic";
 
 export class Door extends Mechanic {
   public readonly doorId: string;
   public readonly color: string;
-  private openTextureKey: string;
-  private closedTextureKey: string;
+  private openFrameKey: number;
+  private closedFrameKey: number;
   private open: boolean;
 
   constructor(
@@ -14,15 +15,15 @@ export class Door extends Mechanic {
     doorId: string,
     color: string,
     open = false,
-    openTextureKey = "door-open",
-    closedTextureKey = "door-closed",
+    openFrameKey = ASSETS.DOOR_OPEN,
+    closedFrameKey = ASSETS.DOOR_CLOSED,
   ) {
-    super(scene, x, y, open ? openTextureKey : closedTextureKey);
+    super(scene, x, y, open ? openFrameKey : closedFrameKey);
     this.doorId = doorId;
     this.color = color;
     this.open = open;
-    this.openTextureKey = openTextureKey;
-    this.closedTextureKey = closedTextureKey;
+    this.openFrameKey = openFrameKey;
+    this.closedFrameKey = closedFrameKey;
   }
 
   public get id(): string {
@@ -35,7 +36,7 @@ export class Door extends Mechanic {
 
   public set isOpen(value: boolean) {
     this.open = value;
-    const textureKey = this.open ? this.openTextureKey : this.closedTextureKey;
-    this.changeTexture(textureKey);
+    const frameKey = this.open ? this.openFrameKey : this.closedFrameKey;
+    this.setFrame(frameKey);
   }
 }
