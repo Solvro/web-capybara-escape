@@ -72,8 +72,17 @@ export class GameRoom extends Room<RoomState> {
       if (toggled.length > 0) {
         this.broadcast("cablesUpdate", { cables: toggled });
       }
+
+      this.state.updateCapybara();
+      if (this.state.capybara) {
+        this.broadcast("capybaraUpdate", {
+          x: this.state.capybara.position.x,
+          y: this.state.capybara.position.y,
+          state: this.state.capybara.state
+        });
+      }
     });
-    
+
     this.onMessage("generateLine", (client) => {
       this.broadcast("line", {
         sessionId: client.sessionId,

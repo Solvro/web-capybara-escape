@@ -25,6 +25,8 @@ export class RoomState extends Schema {
   @type(VentState) ventState: VentState = new VentState();
   @type(Capybara) capybara: Capybara;
 
+  private capybaraPath: { x: number; y: number }[] = [];
+
   loadRoomFromJson(jsonData: any) {
     try {
       this.width = jsonData.width;
@@ -202,6 +204,36 @@ export class RoomState extends Schema {
     }
     // console.log("no possible way :(")
     return null
+  }
+
+  updateCapybara() {
+    if (!this.capybara) return;
+
+    if (this.capybaraPath.length === 0) {
+      const path = this.findPathToVent();
+
+      if (path && path.length > 1) {
+        path.shift();
+        this.capybaraPath = path;
+      }
+    }
+
+    if (this.capybaraPath.length > 0) {
+      const nextStep = this.capybaraPath.shift();
+
+      if (nextStep) {
+        if (!this.isWalkableForCapybara(nextStep.x, nextStep.y) || !this.ventState.isOpenOrEmptyAt(nextStep.x, nextStep.y)) {
+          this.capybaraPath = [];
+          return;
+        }
+
+        this.capybara.position.x = nextStep.x;
+        this.capybara.position.y = nextStep.y;
+        this.capybara.state = "run";
+      }
+    } else {
+      this.capybara.state = "idle";
+    }
   }
 
   spawnNewPlayer(sessionId: string, name: string = null) {
@@ -400,6 +432,17 @@ export class RoomState extends Schema {
         direction: laser.direction,
         range: laser.maxRange,
       })),
+      vents: Array.from(this.ventState.vents.values()).map((vent) => ({
+        id: vent.id,
+        x: vent.position.x,
+        y: vent.position.y,
+        open: vent.open
+      })),
+      capybara: this.capybara ? {
+        x: this.capybara.position.x,
+        y: this.capybara.position.y,
+        state: this.capybara.state
+      } : null
     };
   }
 

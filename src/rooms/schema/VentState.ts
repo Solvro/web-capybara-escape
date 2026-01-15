@@ -70,11 +70,10 @@ export class VentState extends Schema {
     }
 
     spawnInitialVents() {
-        const vent1 = this.createVent(3, 4);
-        const vent2 = this.createVent(5, 11);
-        const vent3 = this.createVent(8, 2);
+        const vent1 = this.createVent(8, 1);
+        const vent2 = this.createVent(1, 2);
 
-        this.openVent(vent1.id)
+        this.openVent(vent1.id);
     }
     
 }
