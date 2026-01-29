@@ -26,6 +26,7 @@ import {
 } from "../lib/player-animators";
 import type { SpriteAnimator } from "../lib/sprite-animator";
 import { Button } from "../mechanics/button";
+import { Cable } from "../mechanics/cable";
 import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
 
@@ -36,6 +37,7 @@ export class Main extends Phaser.Scene {
   private buttons = new Map<string, Button>();
   private doors = new Map<string, Door>();
   private lasers = new Map<string, Laser>();
+  private cables = new Map<string, Cable>();
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: {
     W: Phaser.Input.Keyboard.Key;
@@ -129,6 +131,20 @@ export class Main extends Phaser.Scene {
         for (const laser of message.lasers) {
           this.addLaser(laser);
         }
+
+        // add cables from server mapInfo
+        for (const cable of message.cables ?? []) {
+          if (this.cables.has(cable.cableId)) continue;
+          const c = new Cable(
+            this,
+            cable.x,
+            cable.y,
+            cable.cableId,
+            !!cable.damage,
+            cable.timer,
+          );
+          this.cables.set(cable.cableId, c);
+        }
       });
 
       room.onMessage("onAddPlayer", (message: MessageOnAddPlayer) => {
@@ -204,6 +220,44 @@ export class Main extends Phaser.Scene {
     } catch (error) {
       console.error("Error setting up Colyseus message handlers:", error);
     }
+
+    // forward Colyseus messages to this scene so mechaniki (np. kable) obsłużą je tak jak inne feature'y [DO ZMIANY PO UJEDNOLICENIU REPOZYTORIUM]
+    const room = this.game.registry.get("room");
+    if (room) {
+      const onMapInfo = (mapInfo: any) => this.events.emit("mapInfo", mapInfo);
+      const onCables = (payload: any) => {
+        const list = payload?.cables ?? payload?.toggled ?? payload ?? [];
+        this.events.emit("cables:update", list);
+      };
+      const onPlayerDamaged = (p: any) => this.events.emit("player:damaged", p);
+
+      room.onMessage("mapInfo", onMapInfo);
+      room.onMessage("cablesUpdate", onCables);
+      room.onMessage("playerDamaged", onPlayerDamaged);
+
+      this.sys.events.once("shutdown", () => {
+        try {
+          room.offMessage("mapInfo", onMapInfo);
+          room.offMessage("cablesUpdate", onCables);
+          room.offMessage("playerDamaged", onPlayerDamaged);
+        } catch (e) {}
+      });
+    }
+
+    // react to cable toggles forwarded to this scene
+    this.events.on("cables:update", (list: any[]) => {
+      for (const t of list) {
+        const id = t.cableId ?? t.id;
+        if (!id) continue;
+        const cable = this.cables.get(id);
+        if (cable) {
+          cable.applyState(
+            !!t.damage,
+            typeof t.timer === "number" ? t.timer : cable.timer,
+          );
+        }
+      }
+    });
   }
 
   update(time: number) {
@@ -281,6 +335,19 @@ export class Main extends Phaser.Scene {
     );
     this.add.existing(door);
     this.doors.set(doorInfo.doorId, door);
+  }
+
+  private addCable(cableInfo: CableType) {
+    const cable = new Cable(
+      this,
+      cableInfo.x,
+      cableInfo.y,
+      cableInfo.cableId,
+      cableInfo.color,
+      cableInfo.pressed,
+    );
+    this.add.existing(cable);
+    this.cables.set(cableInfo.cableId, cable);
   }
 
   createMap(grid: string[][], width: number, height: number) {
