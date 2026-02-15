@@ -22,22 +22,13 @@ export class SpeechBubble {
   pickRandomLine(lineType: "positive" | "neutral" | "negative") {
     switch (lineType) {
       case "positive": {
-        console.log(
-          this.positive.at(Math.floor(Math.random() * this.positive.length))
-        );
-        break;
+        return this.positive.at(Math.floor(Math.random() * this.positive.length));
       }
       case "neutral": {
-        console.log(
-          this.neutral.at(Math.floor(Math.random() * this.neutral.length))
-        );
-        break;
+        return this.neutral.at(Math.floor(Math.random() * this.neutral.length));
       }
       case "negative": {
-        console.log(
-          this.negative.at(Math.floor(Math.random() * this.negative.length))
-        );
-        break;
+        return this.negative.at(Math.floor(Math.random() * this.negative.length));
       }
     }
   }
