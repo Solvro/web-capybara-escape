@@ -47,3 +47,8 @@ export interface MessageOnAddPlayer {
 export interface MessageOnRemovePlayer {
   sessionId: string;
 }
+
+export interface MessageGenerateLines {
+  sessionId: string;
+  text: string;
+}
