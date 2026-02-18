@@ -8,6 +8,7 @@ export class Button extends Mechanic {
   private pressedFrameKey: number;
   private releasedFrameKey: number;
   private baseSprite: Phaser.GameObjects.Sprite;
+  private borderSprite: Phaser.GameObjects.Sprite;
 
   constructor(
     scene: Phaser.Scene,
@@ -39,8 +40,23 @@ export class Button extends Mechanic {
       "tileset",
       ASSETS.BUTTON_BASE,
     );
+    this.borderSprite = this.scene.add.sprite(
+      0,
+      0,
+      "tileset",
+      ASSETS.POINT_BUTTON,
+    );
+
     this.baseSprite.setScale(SCALE_FACTOR);
+    this.borderSprite.setScale(SCALE_FACTOR);
+
+    this.borderSprite.setTint(
+      Phaser.Display.Color.HexStringToColor(color).color,
+    );
+    this.borderSprite.setVisible(this.pressed);
+
     this.add(this.baseSprite);
+    this.add(this.borderSprite);
     this.sendToBack(this.baseSprite);
   }
 
@@ -58,5 +74,6 @@ export class Button extends Mechanic {
       ? this.pressedFrameKey
       : this.releasedFrameKey;
     this.setFrame(frameKey);
+    this.borderSprite.setVisible(value);
   }
 }
