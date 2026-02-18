@@ -34,6 +34,7 @@ export class Button extends Mechanic {
     );
     this.baseSprite.setScale(SCALE_FACTOR);
     this.add(this.baseSprite);
+    this.sendToBack(this.baseSprite);
   }
 
   public get id(): string {
