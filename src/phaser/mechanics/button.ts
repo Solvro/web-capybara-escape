@@ -19,7 +19,14 @@ export class Button extends Mechanic {
     pressedFrameKey = ASSETS.BUTTON_PRESSED,
     releasedFrameKey = ASSETS.BUTTON_RELEASED,
   ) {
-    super(scene, x, y, pressed ? pressedFrameKey : releasedFrameKey);
+    super(
+      scene,
+      x,
+      y,
+      pressed ? pressedFrameKey : releasedFrameKey,
+      true,
+      color,
+    );
     this.buttonId = buttonId;
     this.color = color;
     this.pressed = pressed;

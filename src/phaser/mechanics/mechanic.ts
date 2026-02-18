@@ -10,6 +10,8 @@ export class Mechanic extends Phaser.GameObjects.Container {
     gridX: number,
     gridY: number,
     frameKey = ASSETS.DOOR_OPEN,
+    isColorized = false,
+    color = "#ffffff",
   ) {
     super(scene);
 
@@ -19,6 +21,11 @@ export class Mechanic extends Phaser.GameObjects.Container {
     this.sprite = this.scene.add.sprite(0, 0, "tileset", frameKey);
     this.sprite.setScale(SCALE_FACTOR);
     this.add(this.sprite);
+
+    if (isColorized) {
+      const colorInt = Phaser.Display.Color.HexStringToColor(color).color;
+      this.sprite.setTint(colorInt);
+    }
 
     this.setPosition(
       this.gridX * TILE_SIZE + TILE_SIZE / 2,

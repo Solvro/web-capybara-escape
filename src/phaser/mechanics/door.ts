@@ -18,7 +18,7 @@ export class Door extends Mechanic {
     openFrameKey = ASSETS.DOOR_OPEN,
     closedFrameKey = ASSETS.DOOR_CLOSED,
   ) {
-    super(scene, x, y, open ? openFrameKey : closedFrameKey);
+    super(scene, x, y, open ? openFrameKey : closedFrameKey, true, color);
     this.doorId = doorId;
     this.color = color;
     this.open = open;
