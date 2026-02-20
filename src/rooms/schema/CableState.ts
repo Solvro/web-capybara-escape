@@ -1,7 +1,5 @@
-import {type, Schema, MapSchema} from "@colyseus/schema";
-import {Position} from "./Position";
-import type { Direction} from "../../shared/utils/vectorUtils";
-import { getDirectionFromMoveVector } from "../../shared/utils/vectorUtils";
+import { type, Schema, MapSchema } from "@colyseus/schema";
+import { Position } from "./Position";
 
 export class Cable extends Schema{
     @type("string") id: string;
@@ -23,9 +21,7 @@ export class CableState extends Schema{
     private nextAvailableId: number = 0;
     
     private positionToCableId = new Map<string, string>()
-    private movedCableIds = new Set<string>();
-    private movedCableDirections = new Map<string, Direction>();
-     
+   
     
     private getPositionKey(x: number, y: number): string {
         return `${x}_${y}`;
@@ -87,8 +83,7 @@ export class CableState extends Schema{
         this.usedIds.clear();
         this.toggledCableIds.clear();
         this.positionToCableId.clear();
-        this.movedCableIds.clear();
-        this.movedCableDirections.clear();
+   
     }
     
     getCableAt(x: number, y: number){
@@ -96,55 +91,7 @@ export class CableState extends Schema{
         const cableId = this.positionToCableId.get(key);
         return cableId ? this.cables.get(cableId) : null;
     }
-    moveCableIndex(
-        cable: Cable,
-        oldX: number,
-        oldY: number,
-        dx: number,
-        dy: number
-    ){
-        const oldKey = this.getPositionKey(oldX, oldY);
-        this.positionToCableId.delete(oldKey);
-
-        this.movedCableIds.add(cable.id);
-        this.movedCableDirections.set(cable.id, getDirectionFromMoveVector(dx, dy));
-
-        const newKey = this.getPositionKey(oldX + dx, oldY + dy);
-        this.positionToCableId.set(newKey, cable.id);
-    }
-
-    moveCablesBlock(
-        oldX: number,
-        oldY: number,
-        targetX: number,
-        targetY: number,
-        dx: number,
-        dy: number
-    ): boolean {
-        while (oldX !== targetX || oldY !== targetY) {
-            targetX -= dx;
-            targetY -= dy;
-            const cable = this.getCableAt(targetX, targetY);
-            if (!cable) return false;
-            this.moveCableIndex(cable, targetX, targetY, dx, dy);
-        }
-        return true;
-    }
-    getAndClearMovedCables(): { cableId: string; direction: Direction }[]{
-        const movedCables: { cableId: string; direction: Direction }[] = [];
-        this.movedCableIds.forEach((cableId) => {
-            const cableDirection = this.movedCableDirections.get(cableId);
-            if (cableDirection){
-                movedCables.push({
-                    cableId: cableId,
-                    direction: cableDirection,
-                });
-            }
-        });
-        this.movedCableIds.clear();
-        this.movedCableDirections.clear();
-        return movedCables;
-    }
+   
 
     // returns array of toggled cables with useful info and clears internal set
     getAndClearToggledCables(): {

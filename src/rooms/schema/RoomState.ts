@@ -266,10 +266,6 @@ export class RoomState extends Schema {
     return this.cableState.getAndClearToggledCables();
   }
 
-  getAndClearMovedCables() {
-    return this.cableState.getAndClearMovedCables();
-  }
-
   moveCrate(crateId: string, dx: number, dy: number): boolean {
     const crate = this.crateState.crates.get(crateId);
     if (!crate) return false;
