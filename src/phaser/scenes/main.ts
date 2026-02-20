@@ -1,6 +1,11 @@
 import type { Room } from "colyseus.js";
 import * as Phaser from "phaser";
 
+import {
+  SIZE_MULTIPLIER,
+  TILE_SIZE,
+  TILE_SIZE_OLD,
+} from "../../constants/global";
 import type { Button as ButtonType } from "../../types/button";
 import type { Crate as CrateType } from "../../types/crate";
 import type { Door as DoorType } from "../../types/door";
@@ -19,7 +24,6 @@ import type { Player as PlayerType } from "../../types/player";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
-import { TILE_SIZE } from "../lib/const";
 import {
   PLAYER_TEXTURE_KEYS,
   createPlayerAnimators,
@@ -89,12 +93,6 @@ export class Main extends Phaser.Scene {
   preload() {
     this.load.setBaseURL(import.meta.env.BASE_URL);
 
-    // walls
-    this.load.image("w1", "images/walls/w1.png");
-
-    // floors
-    this.load.image("f1", "images/floors/f1.png");
-
     // game objects
     this.load.image("crate", "images/crate.png");
     this.load.image("button-released", "images/buttons/button-green.png");
@@ -104,8 +102,8 @@ export class Main extends Phaser.Scene {
     this.load.image("laser-gun", "images/lasers/laser-gun.png");
     this.load.image("laser-line", "images/lasers/laser-horizontal-line.png");
     this.load.spritesheet("tileset", "images/capybara-tileset.png", {
-      frameWidth: ASSETS_TILE_SIZE,
-      frameHeight: ASSETS_TILE_SIZE,
+      frameWidth: TILE_SIZE,
+      frameHeight: TILE_SIZE,
     });
 
     // miscellaneous
@@ -128,8 +126,8 @@ export class Main extends Phaser.Scene {
         textureKey,
         `images/players/${String(index + 1)}.png`,
         {
-          frameWidth: TILE_SIZE,
-          frameHeight: TILE_SIZE,
+          frameWidth: TILE_SIZE_OLD,
+          frameHeight: TILE_SIZE_OLD,
         },
       );
     }
@@ -211,7 +209,7 @@ export class Main extends Phaser.Scene {
           name: message.playerName,
           x: message.position.x,
           y: message.position.y,
-          index: message.index, // what is this for?
+          index: message.index,
           isLocal: message.sessionId === this.room.sessionId,
         });
       });
@@ -476,28 +474,35 @@ export class Main extends Phaser.Scene {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const tileType = grid[y][x];
-        const posX = x * TILE_SIZE + TILE_SIZE / 2;
-        const posY = y * TILE_SIZE + TILE_SIZE / 2;
+        const posX =
+          x * TILE_SIZE * SIZE_MULTIPLIER + (TILE_SIZE * SIZE_MULTIPLIER) / 2;
+        const posY =
+          y * TILE_SIZE * SIZE_MULTIPLIER + (TILE_SIZE * SIZE_MULTIPLIER) / 2;
 
         const config = TILE_MAPPING[tileType];
 
         if (tileType === "f1") {
           this.add
             .image(posX, posY, "tileset", config.frame)
-            .setScale(SCALE_FACTOR)
-            .setDepth(0);
+            .setDepth(0)
+            .setScale(SIZE_MULTIPLIER);
         }
 
         if (tileType.startsWith("w")) {
           this.add
             .image(posX, posY, "tileset", config.frame)
-            .setScale(SCALE_FACTOR)
-            .setDepth(posY);
+            .setDepth(posY)
+            .setScale(SIZE_MULTIPLIER);
 
           if (config.isTall ?? false) {
             this.add
-              .image(posX, posY - TILE_SIZE, "tileset", config.frameSecond)
-              .setScale(SCALE_FACTOR)
+              .image(
+                posX,
+                posY - TILE_SIZE * SIZE_MULTIPLIER,
+                "tileset",
+                config.frameSecond,
+              )
+              .setScale(SIZE_MULTIPLIER)
               .setDepth(posY);
           }
         }

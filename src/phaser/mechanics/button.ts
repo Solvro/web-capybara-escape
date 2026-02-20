@@ -1,4 +1,5 @@
-import { ASSETS, SCALE_FACTOR } from "../lib/const";
+import { ASSETS } from "../../constants/blocks";
+import { SIZE_MULTIPLIER } from "../../constants/global";
 import { Mechanic } from "./mechanic";
 
 export class Button extends Mechanic {
@@ -34,21 +35,12 @@ export class Button extends Mechanic {
     this.pressedFrameKey = pressedFrameKey;
     this.releasedFrameKey = releasedFrameKey;
 
-    this.baseSprite = this.scene.add.sprite(
-      0,
-      0,
-      "tileset",
-      ASSETS.BUTTON_BASE,
-    );
-    this.borderSprite = this.scene.add.sprite(
-      0,
-      0,
-      "tileset",
-      ASSETS.POINT_BUTTON,
-    );
-
-    this.baseSprite.setScale(SCALE_FACTOR);
-    this.borderSprite.setScale(SCALE_FACTOR);
+    this.baseSprite = this.scene.add
+      .sprite(0, 0, "tileset", ASSETS.BUTTON_BASE)
+      .setScale(SIZE_MULTIPLIER);
+    this.borderSprite = this.scene.add
+      .sprite(0, 0, "tileset", ASSETS.POINT_BUTTON)
+      .setScale(SIZE_MULTIPLIER);
 
     this.borderSprite.setTint(
       Phaser.Display.Color.HexStringToColor(color).color,

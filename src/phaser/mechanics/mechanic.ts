@@ -1,4 +1,5 @@
-import { ASSETS, SCALE_FACTOR, TILE_SIZE } from "../lib/const";
+import { ASSETS } from "../../constants/blocks";
+import { SIZE_MULTIPLIER, TILE_SIZE } from "../../constants/global";
 
 export class Mechanic extends Phaser.GameObjects.Container {
   protected sprite: Phaser.GameObjects.Sprite;
@@ -18,8 +19,9 @@ export class Mechanic extends Phaser.GameObjects.Container {
     this.gridX = gridX;
     this.gridY = gridY;
 
-    this.sprite = this.scene.add.sprite(0, 0, "tileset", frameKey);
-    this.sprite.setScale(SCALE_FACTOR);
+    this.sprite = this.scene.add
+      .sprite(0, 0, "tileset", frameKey)
+      .setScale(SIZE_MULTIPLIER);
     this.add(this.sprite);
 
     if (isColorized) {
@@ -28,8 +30,10 @@ export class Mechanic extends Phaser.GameObjects.Container {
     }
 
     this.setPosition(
-      this.gridX * TILE_SIZE + TILE_SIZE / 2,
-      this.gridY * TILE_SIZE + TILE_SIZE / 2,
+      this.gridX * TILE_SIZE * SIZE_MULTIPLIER +
+        (TILE_SIZE * SIZE_MULTIPLIER) / 2,
+      this.gridY * TILE_SIZE * SIZE_MULTIPLIER +
+        (TILE_SIZE * SIZE_MULTIPLIER) / 2,
     );
 
     this.setDepth(this.y - 0.5);

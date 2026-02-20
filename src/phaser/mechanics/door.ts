@@ -1,4 +1,4 @@
-import { ASSETS } from "../lib/const";
+import { ASSETS } from "../../constants/blocks";
 import { Mechanic } from "./mechanic";
 
 export class Door extends Mechanic {

@@ -1,4 +1,8 @@
-import { SCALE_FACTOR, TILE_SIZE } from "../lib/const";
+import {
+  SCALE_FACTOR,
+  SIZE_MULTIPLIER,
+  TILE_SIZE,
+} from "../../constants/global";
 import type { SpriteAnimator } from "../lib/sprite-animator";
 
 export type Direction = "left" | "right" | "up" | "down";
@@ -23,14 +27,18 @@ export class Entity extends Phaser.GameObjects.Container {
     this.animator = animator;
 
     this.sprite = this.scene.add.sprite(0, 0, textureKey);
-    if (textureKey === "crate") {
-      this.sprite.setScale(SCALE_FACTOR);
+    if (textureKey !== "crate") {
+      this.sprite.setScale(SCALE_FACTOR * SIZE_MULTIPLIER);
+    } else {
+      this.sprite.setScale(SIZE_MULTIPLIER);
     }
     this.add(this.sprite);
 
     this.setPosition(
-      this.gridX * TILE_SIZE + TILE_SIZE / 2,
-      this.gridY * TILE_SIZE + TILE_SIZE / 2,
+      this.gridX * TILE_SIZE * SIZE_MULTIPLIER +
+        (TILE_SIZE * SIZE_MULTIPLIER) / 2,
+      this.gridY * TILE_SIZE * SIZE_MULTIPLIER +
+        (TILE_SIZE * SIZE_MULTIPLIER) / 2,
     );
 
     this.setDepth(this.y);
@@ -70,8 +78,12 @@ export class Entity extends Phaser.GameObjects.Container {
       }
     }
 
-    const targetX = this.gridX * TILE_SIZE + TILE_SIZE / 2;
-    const targetY = this.gridY * TILE_SIZE + TILE_SIZE / 2;
+    const targetX =
+      this.gridX * TILE_SIZE * SIZE_MULTIPLIER +
+      (TILE_SIZE * SIZE_MULTIPLIER) / 2;
+    const targetY =
+      this.gridY * TILE_SIZE * SIZE_MULTIPLIER +
+      (TILE_SIZE * SIZE_MULTIPLIER) / 2;
 
     this.playAnim(walkAnimName);
 
