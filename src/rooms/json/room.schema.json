@@ -95,7 +95,22 @@
         }
       ]
     },
-
+    "cable": {
+      "allOf": [
+        { "$ref": "#/$defs/pos"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+         "properties": {
+           "type": { "const": "cable" },
+           "damageMs": { "type": "integer" },
+           "safeMs": { "type": "integer" },
+           "startDamaging": { "type": "boolean" }
+         },
+         "required": ["type", "x", "y"]
+        }
+      ]
+    },
     "spikes": {
       "allOf": [
         { "$ref": "#/$defs/pos" },

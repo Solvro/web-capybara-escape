@@ -5,6 +5,7 @@ import { CrateState } from "./CrateState.js";
 import { ButtonState } from "./ButtonState.js";
 import { DoorState } from "./DoorState.js";
 import { LaserState } from "./LaserState.js";
+import { Cable, CableState } from "./CableState.js";
 
 export class RoomState extends Schema {
   @type(["string"]) grid = new ArraySchema<string>();
@@ -18,6 +19,7 @@ export class RoomState extends Schema {
   @type(DoorState) doorState: DoorState = new DoorState();
   @type(ButtonState) buttonState: ButtonState = new ButtonState();
   @type(LaserState) laserState: LaserState = new LaserState();
+  @type(CableState) cableState: CableState = new CableState();
 
   loadRoomFromJson(jsonData: any) {
     try {
@@ -37,6 +39,15 @@ export class RoomState extends Schema {
           new Position().assign({ x: playerData.x, y: playerData.y }),
         );
       }
+      for (const cableData of jsonData.entities.cables) {
++          this.spawnCable(
++            cableData.x,
++            cableData.y,
++            cableData.damageMs ?? cableData.damage,
++            cableData.safeMs ?? cableData.safeDuration,
++            cableData.startDamaging ?? cableData.startDamage ?? false
++          );
++        }
     } catch (error) {
       throw `Error loading room data: ${error}`;
     }
@@ -140,6 +151,7 @@ export class RoomState extends Schema {
     this.doorState.onRoomDispose();
     this.buttonState.onRoomDispose();
     this.laserState.onRoomDispose();
+    this.cableState.onRoomDispose();
   }
 
   movePlayer(sessionId: string, deltaX: number, deltaY: number): boolean {
@@ -185,6 +197,17 @@ export class RoomState extends Schema {
           y: crate.position.y,
         };
       }),
+      cables: Array.from(this.cableState.cables.values()).map((cable) => {
+        return {
+          cableId: cable.id,
+          x: cable.position.x,
+          y: cable.position.y,
+          damage: cable.damage,
+          damageDuration: cable.damageDuration,
+          safeDuration: cable.safeDuration,
+          timer: cable.timer,
+        };
+      }),
       doors: Array.from(this.doorState.doors.values()).map((door) => ({
         doorId: door.id,
         color: door.color,
@@ -228,6 +251,23 @@ export class RoomState extends Schema {
 
   despawnCrate(id: string) {
     this.crateState.removeCrate(id);
+  }
+
+// proxy so callers can pass cable timing / initial state
+  spawnCable(x: number, y: number, damageMs?: number, safeMs?: number, startDamaging?: boolean){
+    this.cableState.createCable(x, y, damageMs, safeMs, startDamaging);
+  }
+  despawnCable(id: string){
+    this.cableState.removeCable(id);
+  }
+
+  // expose toggles/moves for broadcasting
+  getAndClearToggledCables() {
+    return this.cableState.getAndClearToggledCables();
+  }
+
+  getAndClearMovedCables() {
+    return this.cableState.getAndClearMovedCables();
   }
 
   moveCrate(crateId: string, dx: number, dy: number): boolean {

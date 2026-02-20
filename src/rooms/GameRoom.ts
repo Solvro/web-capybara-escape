@@ -45,6 +45,14 @@ export class GameRoom extends Room<RoomState> {
         this.broadcast("doorsAndButtonsUpdate", {
           doorsAndButtons: doorsAndButtonsToUpdate,
         });
+
+        if (this.state.cableState.doesDamageOrNotAt(newX, newY)) {
+          this.broadcast("playerDamaged", {
+            sessionId: client.sessionId,
+            x: newX,
+            y: newY,
+          });
+        }
       }
     });
 
@@ -58,6 +66,14 @@ export class GameRoom extends Room<RoomState> {
       console.log("Lasers updated:", result);
       if (result.length > 0) {
         this.broadcast("lasersUpdated", { lasers: result });
+      }
+    });
+    this.setSimulationInterval((delta: number) => {
+      this.state.cableState.timerMethod(delta);
+      const toggled =
+        (this.state.cableState as any).getAndClearToggledCables?.() ?? [];
+      if (toggled.length > 0) {
+        this.broadcast("cablesUpdate", { cables: toggled });
       }
     });
   }
