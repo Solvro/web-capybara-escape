@@ -58,7 +58,8 @@
         { "$ref": "#/$defs/door" },
         { "$ref": "#/$defs/button" },
         { "$ref": "#/$defs/spikes" },
-        { "$ref": "#/$defs/laser" }
+        { "$ref": "#/$defs/laser" },
+        { "$ref": "#/$defs/cable" }
       ]
     },
 
@@ -97,17 +98,17 @@
     },
     "cable": {
       "allOf": [
-        { "$ref": "#/$defs/pos"},
+        { "$ref": "#/$defs/pos" },
         {
           "type": "object",
           "additionalProperties": false,
-         "properties": {
-           "type": { "const": "cable" },
-           "damageMs": { "type": "integer" },
-           "safeMs": { "type": "integer" },
-           "startDamaging": { "type": "boolean" }
-         },
-         "required": ["type", "x", "y"]
+          "properties": {
+            "type": { "const": "cable" },
+            "damageMs": { "type": "integer" },
+            "safeMs": { "type": "integer" },
+            "startDamaging": { "type": "boolean" }
+          },
+          "required": ["type", "x", "y"]
         }
       ]
     },
@@ -157,6 +158,7 @@
     },
 
     "enemy": {
+      // cables are handled via mechanics (see _loadMechanics)
       "allOf": [
         { "$ref": "#/$defs/pos" },
         {

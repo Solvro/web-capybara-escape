@@ -39,15 +39,7 @@ export class RoomState extends Schema {
           new Position().assign({ x: playerData.x, y: playerData.y }),
         );
       }
-      for (const cableData of jsonData.entities.cables) {
-+          this.spawnCable(
-+            cableData.x,
-+            cableData.y,
-+            cableData.damageMs ?? cableData.damage,
-+            cableData.safeMs ?? cableData.safeDuration,
-+            cableData.startDamaging ?? cableData.startDamage ?? false
-+          );
-+        }
+    
     } catch (error) {
       throw `Error loading room data: ${error}`;
     }
@@ -83,7 +75,15 @@ export class RoomState extends Schema {
           mechanicData.activeDuration ?? 1000,
           mechanicData.inactiveDuration ?? 1000,
         );
-      }
+      } else if (mechanicType === "cable"){
+        this.cableState.createCable(
+          mechanicData.x,
+          mechanicData.y,
+          mechanicData.damageMs ?? mechanicData.damage,
+          mechanicData.safeMs ?? mechanicData.safeDuration,
+          mechanicData.startDamaging ?? mechanicData.startDamage ?? false
+        );
+        }
     }
   }
 

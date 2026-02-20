@@ -129,6 +129,22 @@
       "range": 6,
       "inactiveDuration": 200,
       "activeDuration": 1000
+    },
+    {
+      "type": "cable",
+      "x": 6,
+      "y": 4,
+      "damageMs": 200,
+      "safeMs": 1000,
+      "startDamaging": true
+    },
+    {
+      "type": "cable",
+      "x": 8,
+      "y": 5,
+      "damageMs": 3000,
+      "safeMs": 2000,
+      "startDamaging": false
     }
   ],
   "entities": {
