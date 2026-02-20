@@ -20,7 +20,7 @@ export class GameRoom extends Room<RoomState> {
       const oldY = player.position.y;
 
       const { dx: deltaX, dy: deltaY } = getMoveVectorFromDirection(
-        message.direction
+        message.direction,
       );
 
       if (this.state.movePlayer(client.sessionId, deltaX, deltaY)) {
@@ -49,18 +49,16 @@ export class GameRoom extends Room<RoomState> {
     });
 
     this.onMessage("getMapInfo", (client) => {
-      console.log(this.state.getMapInfo());
+      // console.log(this.state.getMapInfo());
       client.send("mapInfo", this.state.getMapInfo());
     });
 
-    this.onMessage("fireLaser", (client, message) => {
-      const result = this.state.fireLaser(message.laserId);
-      this.broadcast("laserFired", {
-        laserId: message.laserId,
-        active: result.active,
-        path: result.path,
-        cratesDestroyed: result.cratesDestroyed,
-      });
+    this.setSimulationInterval((deltaTime) => {
+      const result = this.state.updateLasers(deltaTime);
+      console.log("Lasers updated:", result);
+      if (result.length > 0) {
+        this.broadcast("lasersUpdated", { lasers: result });
+      }
     });
   }
 

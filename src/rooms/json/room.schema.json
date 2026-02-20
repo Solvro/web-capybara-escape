@@ -57,7 +57,8 @@
       "oneOf": [
         { "$ref": "#/$defs/door" },
         { "$ref": "#/$defs/button" },
-        { "$ref": "#/$defs/spikes" }
+        { "$ref": "#/$defs/spikes" },
+        { "$ref": "#/$defs/laser" }
       ]
     },
 
@@ -73,7 +74,7 @@
             "color": { "$ref": "#/$defs/hexColor" },
             "active": { "type": "boolean" }
           },
-          "required": ["type", "x", "y", "id", "color", "active"]
+          "required": ["type", "id", "color", "active"]
         }
       ]
     },
@@ -90,7 +91,7 @@
             "color": { "$ref": "#/$defs/hexColor" },
             "doorId": { "type": "string", "minLength": 1 }
           },
-          "required": ["type", "x", "y", "id", "color", "doorId"]
+          "required": ["type", "id", "color", "doorId"]
         }
       ]
     },
@@ -104,7 +105,38 @@
           "properties": {
             "type": { "const": "spikes" }
           },
-          "required": ["type", "x", "y"]
+          "required": ["type"]
+        }
+      ]
+    },
+
+    "laser": {
+      "allOf": [
+        { "$ref": "#/$defs/pos" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "laser" },
+            "id": { "type": "string", "minLength": 1 },
+            "color": { "$ref": "#/$defs/hexColor" },
+            "direction": {
+              "type": "string",
+              "enum": ["up", "down", "left", "right"]
+            },
+            "range": { "type": "integer", "minimum": 1 },
+            "inactiveDuration": { "type": "integer", "minimum": 0 },
+            "activeDuration": { "type": "integer", "minimum": 0 }
+          },
+          "required": [
+            "type",
+            "id",
+            "color",
+            "direction",
+            "range",
+            "inactiveDuration",
+            "activeDuration"
+          ]
         }
       ]
     },
@@ -118,7 +150,7 @@
           "properties": {
             "type": { "type": "string", "minLength": 1 }
           },
-          "required": ["x", "y", "type"]
+          "required": ["type"]
         }
       ]
     },

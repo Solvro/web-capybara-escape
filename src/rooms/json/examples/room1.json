@@ -111,18 +111,24 @@
     {
       "type": "laser",
       "id": "laser-1",
+      "color": "#007AFF",
       "x": 1,
       "y": 5,
       "direction": "right",
-      "range": 8
+      "range": 8,
+      "inactiveDuration": 200,
+      "activeDuration": 400
     },
     {
       "type": "laser",
       "id": "laser-2",
+      "color": "#FF00FF",
       "x": 4,
       "y": 1,
       "direction": "down",
-      "range": 6
+      "range": 6,
+      "inactiveDuration": 200,
+      "activeDuration": 1000
     }
   ],
   "entities": {
