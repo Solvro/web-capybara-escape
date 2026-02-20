@@ -1,6 +1,7 @@
 import type { Button } from "../types/button";
 import type { Crate } from "../types/crate";
 import type { Door } from "../types/door";
+import type { Laser } from "../types/laser";
 import type { Player } from "../types/player";
 
 export interface MessageMapInfo {
@@ -11,10 +12,20 @@ export interface MessageMapInfo {
   crates: Crate[];
   doors: Door[];
   buttons: Button[];
+  lasers: Laser[];
 }
 
 export interface MessageCratesUpdate {
   crates: { crateId: number; direction: "left" | "right" | "up" | "down" }[];
+}
+
+export interface MessageLasersUpdated {
+  lasers: {
+    laserId: string;
+    active: boolean;
+    cratesDestroyed: Crate[];
+    range: number;
+  }[];
 }
 
 export interface MessageDoorsAndButtonsUpdate {

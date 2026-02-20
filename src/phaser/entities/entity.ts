@@ -82,4 +82,9 @@ export class Entity extends Phaser.GameObjects.Container {
       },
     });
   }
+
+  destroy(): void {
+    this.sprite.destroy();
+    super.destroy();
+  }
 }

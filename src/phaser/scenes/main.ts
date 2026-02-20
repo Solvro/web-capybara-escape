@@ -4,9 +4,11 @@ import * as Phaser from "phaser";
 import type { Button as ButtonType } from "../../types/button";
 import type { Crate as CrateType } from "../../types/crate";
 import type { Door as DoorType } from "../../types/door";
+import type { Laser as LaserType } from "../../types/laser";
 import type {
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
+  MessageLasersUpdated,
   MessageMapInfo,
   MessageOnAddPlayer,
   MessageOnRemovePlayer,
@@ -25,6 +27,7 @@ import {
 import type { SpriteAnimator } from "../lib/sprite-animator";
 import { Button } from "../mechanics/button";
 import { Door } from "../mechanics/door";
+import { Laser } from "../mechanics/laser";
 
 export class Main extends Phaser.Scene {
   private room!: Room;
@@ -32,6 +35,7 @@ export class Main extends Phaser.Scene {
   private crates = new Map<number, Crate>();
   private buttons = new Map<string, Button>();
   private doors = new Map<string, Door>();
+  private lasers = new Map<string, Laser>();
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: {
     W: Phaser.Input.Keyboard.Key;
@@ -67,6 +71,8 @@ export class Main extends Phaser.Scene {
     this.load.image("button-pressed", "images/buttons/button-red.png");
     this.load.image("door-open", "images/doors/door-green-open.png");
     this.load.image("door-closed", "images/doors/door-green-closed.png");
+    this.load.image("laser-gun", "images/lasers/laser-gun.png");
+    this.load.image("laser-line", "images/lasers/laser-horizontal-line.png");
 
     for (const [index, textureKey] of PLAYER_TEXTURE_KEYS.entries()) {
       this.load.spritesheet(
@@ -119,6 +125,10 @@ export class Main extends Phaser.Scene {
         for (const door of message.doors) {
           this.addDoor(door);
         }
+
+        for (const lasers of message.lasers) {
+          this.addLaser(lasers);
+        }
       });
 
       room.onMessage("onAddPlayer", (message: MessageOnAddPlayer) => {
@@ -152,6 +162,22 @@ export class Main extends Phaser.Scene {
           const crate = this.crates.get(crateUpdate.crateId);
           if (crate !== undefined) {
             crate.move(crateUpdate.direction);
+          }
+        }
+      });
+
+      room.onMessage("lasersUpdated", (message: MessageLasersUpdated) => {
+        for (const laserUpdate of message.lasers) {
+          const laser = this.lasers.get(laserUpdate.laserId);
+          if (laser !== undefined) {
+            for (const crate of laserUpdate.cratesDestroyed) {
+              const crateSprite = this.crates.get(crate.crateId);
+              if (crateSprite !== undefined) {
+                crateSprite.destroy();
+                this.crates.delete(crate.crateId);
+              }
+            }
+            laser.launch(laserUpdate.active, laserUpdate.range);
           }
         }
       });
@@ -215,6 +241,22 @@ export class Main extends Phaser.Scene {
     this.crates.set(crateInfo.crateId, crate);
   }
 
+  private addLaser(laserInfo: LaserType) {
+    const laser = new Laser(
+      this,
+      laserInfo.x,
+      laserInfo.y,
+      laserInfo.laserId,
+      laserInfo.direction,
+      laserInfo.range,
+      laserInfo.color,
+    );
+    console.log("Adding laser:", laserInfo);
+    this.add.existing(laser);
+    this.lasers.set(laserInfo.laserId, laser);
+    laser.launch(false, laserInfo.range);
+  }
+
   private addButton(buttonInfo: ButtonType) {
     const button = new Button(
       this,
@@ -242,7 +284,7 @@ export class Main extends Phaser.Scene {
   }
 
   createMap(grid: string[][], width: number, height: number) {
-    console.log(grid);
+    // console.log(grid);
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const tileType = grid[y][x];
