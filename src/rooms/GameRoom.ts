@@ -77,7 +77,7 @@ export class GameRoom extends Room<RoomState> {
     this.onMessage("generateLine", (client) => {
       this.broadcast("line", {
         sessionId: client.sessionId,
-        text: (new SpeechBubble).pickRandomLine("neutral")
+        text: SpeechBubble.getInstance().pickRandomLine("neutral")
       });
     })
   }

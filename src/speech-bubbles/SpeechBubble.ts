@@ -1,35 +1,33 @@
 import jsonLines from "./textLines.json";
 
 export class SpeechBubble {
-  private positive: string[];
-  private neutral: string[];
-  private negative: string[];
+  private static instance: SpeechBubble;
+  private lineTypeMap: Map<string, string[]>;
 
-  constructor() {
+  private constructor() {
     this.loadLinesFromJson();
   }
 
-  loadLinesFromJson() {
+  private loadLinesFromJson() {
     try {
-      this.positive = jsonLines.positive;
-      this.neutral = jsonLines.neutral;
-      this.negative = jsonLines.negative;
+      this.lineTypeMap = new Map<string, string[]>([
+        ["positive", jsonLines.positive],
+        ["neutral", jsonLines.neutral],
+        ["negative", jsonLines.negative],
+      ]);
     } catch (error) {
       throw `Error loading text lines: ${error}`;
     }
   }
 
   pickRandomLine(lineType: "positive" | "neutral" | "negative") {
-    switch (lineType) {
-      case "positive": {
-        return this.positive.at(Math.floor(Math.random() * this.positive.length));
-      }
-      case "neutral": {
-        return this.neutral.at(Math.floor(Math.random() * this.neutral.length));
-      }
-      case "negative": {
-        return this.negative.at(Math.floor(Math.random() * this.negative.length));
-      }
+    return this.lineTypeMap.get(lineType).at(Math.floor(Math.random() * this.lineTypeMap.get(lineType).length));
+  }
+
+  static getInstance(){
+    if(!SpeechBubble.instance){
+      SpeechBubble.instance = new SpeechBubble();
     }
+    return SpeechBubble.instance;
   }
 }
