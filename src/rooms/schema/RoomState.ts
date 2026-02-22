@@ -204,16 +204,6 @@ export class RoomState extends Schema {
         if (!this.isWalkableForCapybara(nextX, nextY)) continue;
         if (!this.ventState.isOpenOrEmptyAt(nextX, nextY)) continue;
 
-<<<<<<< HEAD
-=======
-      for (const nextMove of delta) {
-        let [nextX, nextY] = [current.x + nextMove.x, current.y + nextMove.y];
-        let nextKey: string = `${nextX}_${nextY}`
-        if (visited.has(nextKey)) continue;
-        if (!this.isWalkableForCapybara(nextX, nextY)) continue;
-        if (!this.ventState.isOpenOrEmptyAt(nextX, nextY)) continue;
-
->>>>>>> 3e7923c (chore: replace hardcoded vent values with .json level generating)
         visited.add(nextKey);
         parents.set(nextKey, current);
         queue.push({ x: nextX, y: nextY });
