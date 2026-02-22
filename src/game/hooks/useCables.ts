@@ -56,7 +56,7 @@ export function useCables(room: Room | null) {
     if (!room) return;
     room.onMessage("mapInfo", applyMapInfo);
     room.onMessage("cablesUpdate", applyCablesUpdate);
-    room.onMessage("playerDamaged", (payload: any) => {
+    room.onMessage("playerDamaged", () => {
       // opcjonalnie: efekt kliencki (np. flash) - tutaj tylko log
       // console.log("playerDamaged", payload);
     });
@@ -68,8 +68,11 @@ export function useCables(room: Room | null) {
 
     return () => {
       try {
-        room?.offMessage("mapInfo", applyMapInfo);
-        room?.offMessage("cablesUpdate", applyCablesUpdate);
+        const maybeRoom = room as Room & {
+          offMessage?: (type: string, cb: (...args: any[]) => void) => void;
+        };
+        maybeRoom.offMessage?.("mapInfo", applyMapInfo);
+        maybeRoom.offMessage?.("cablesUpdate", applyCablesUpdate);
       } catch (e) {}
     };
   }, [room, applyMapInfo, applyCablesUpdate]);

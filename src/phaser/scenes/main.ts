@@ -8,14 +8,15 @@ import type { Laser as LaserType } from "../../types/laser";
 import type {
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
-  MessageLasersUpdate,
   MessageGenerateLines,
+  MessageLasersUpdate,
   MessageMapInfo,
   MessageOnAddPlayer,
   MessageOnRemovePlayer,
   MessagePositionUpdate,
 } from "../../types/messages";
 import type { Player as PlayerType } from "../../types/player";
+import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
 import { TILE_SIZE } from "../lib/const";
@@ -30,16 +31,19 @@ import { Button } from "../mechanics/button";
 import { Cable } from "../mechanics/cable";
 import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
+import { Vent } from "../mechanics/vent";
 import { SpeechBubble } from "../speech-bubbles/display-speech-bubble";
 
 export class Main extends Phaser.Scene {
   private room!: Room;
+  private capybara: Capybara | null = null;
   private players = new Map<string, Player>();
   private crates = new Map<number, Crate>();
   private buttons = new Map<string, Button>();
   private doors = new Map<string, Door>();
   private lasers = new Map<string, Laser>();
   private cables = new Map<string, Cable>();
+  private vents = new Map<number, Vent>();
   private speechBubbles = new Map<string, SpeechBubble>();
   private bubbleTimer!: Phaser.Time.TimerEvent;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -88,6 +92,13 @@ export class Main extends Phaser.Scene {
       "images/speech-bubble-sprite-sheet.png",
       "data/speech-bubble-data.json",
     );
+
+    // vents
+    this.load.image("vent-open", "images/vent/vent-open.png");
+    this.load.image("vent-closed", "images/vent/vent-closed.png");
+
+    // capybara
+    this.load.image("capybara", "images/capybara/back_1.png");
 
     // player textures
     for (const [index, textureKey] of PLAYER_TEXTURE_KEYS.entries()) {
@@ -160,6 +171,16 @@ export class Main extends Phaser.Scene {
           );
           this.cables.set(cable.cableId, c);
         }
+
+        if (message.vents) {
+          for (const vent of message.vents) {
+            this.addVent(vent);
+          }
+        }
+
+        if (message.capybara) {
+          this.addCapybara(message.capybara);
+        }
       });
 
       room.onMessage("onAddPlayer", (message: MessageOnAddPlayer) => {
@@ -227,6 +248,24 @@ export class Main extends Phaser.Scene {
             if (button !== undefined) {
               button.isPressed = element.open;
             }
+          }
+        },
+      );
+      room.onMessage("line", (message: MessageGenerateLines) => {
+        const player = this.players.get(message.sessionId);
+        if (player !== undefined) {
+          this.displayBubble(message.text, player, message.sessionId);
+        }
+      });
+
+      room.onMessage(
+        "capybaraUpdate",
+        (message: { x: number; y: number; state: string }) => {
+          if (this.capybara) {
+            this.capybara.setPosition(
+              message.x * TILE_SIZE + TILE_SIZE / 2,
+              message.y * TILE_SIZE + TILE_SIZE / 2,
+            );
           }
         },
       );
@@ -384,17 +423,30 @@ export class Main extends Phaser.Scene {
     this.doors.set(doorInfo.doorId, door);
   }
 
-  private addCable(cableInfo: CableType) {
-    const cable = new Cable(
+  private addVent(ventInfo: {
+    id: number;
+    x: number;
+    y: number;
+    open: boolean;
+  }) {
+    const vent = new Vent(
       this,
-      cableInfo.x,
-      cableInfo.y,
-      cableInfo.cableId,
-      cableInfo.color,
-      cableInfo.pressed,
+      ventInfo.x,
+      ventInfo.y,
+      ventInfo.id,
+      ventInfo.open,
     );
-    this.add.existing(cable);
-    this.cables.set(cableInfo.cableId, cable);
+    this.add.existing(vent);
+    this.vents.set(ventInfo.id, vent);
+  }
+
+  private addCapybara(capybaraInfo: { x: number; y: number }) {
+    if (this.capybara) {
+      this.capybara.destroy();
+    }
+
+    this.capybara = new Capybara(this, capybaraInfo.x, capybaraInfo.y);
+    this.add.existing(this.capybara);
   }
 
   createMap(grid: string[][], width: number, height: number) {
