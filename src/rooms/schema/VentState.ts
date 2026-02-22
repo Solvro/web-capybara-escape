@@ -19,15 +19,16 @@ export class VentState extends Schema {
         return `${x}_${y}`;
     }
 
-    createVent(x: number, y: number): Vent {
+    createVent(x: number, y: number, open: boolean = false): Vent {
         const id = this.nextAvailableId++;
         this.usedIDs.add(id);
 
         const vent = new Vent();
         vent.id = id;
         vent.position = new Position();
-        vent.position.x = x;
-        vent.position.y = y;
+    vent.position.x = x;
+    vent.position.y = y;
+    vent.open = open;
 
         this.vents.set(vent.id.toString(), vent)
         const key = this.getPositionKey(x, y);

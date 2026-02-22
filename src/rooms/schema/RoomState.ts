@@ -46,7 +46,7 @@ export class RoomState extends Schema {
         );
       }
       for (const ventData of jsonData.entities.vents ?? []) {
-        this.ventState.createVent(ventData.x, ventData.y);
+        this.ventState.createVent(ventData.x, ventData.y, !!ventData.open);
       }
 
       if (jsonData.entities.capybara) {
