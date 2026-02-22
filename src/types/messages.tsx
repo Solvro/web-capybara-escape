@@ -19,7 +19,7 @@ export interface MessageCratesUpdate {
   crates: { crateId: number; direction: "left" | "right" | "up" | "down" }[];
 }
 
-export interface MessageLasersUpdated {
+export interface MessageLasersUpdate {
   lasers: {
     laserId: string;
     active: boolean;

@@ -8,7 +8,7 @@ import type { Laser as LaserType } from "../../types/laser";
 import type {
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
-  MessageLasersUpdated,
+  MessageLasersUpdate,
   MessageMapInfo,
   MessageOnAddPlayer,
   MessageOnRemovePlayer,
@@ -126,8 +126,8 @@ export class Main extends Phaser.Scene {
           this.addDoor(door);
         }
 
-        for (const lasers of message.lasers) {
-          this.addLaser(lasers);
+        for (const laser of message.lasers) {
+          this.addLaser(laser);
         }
       });
 
@@ -166,7 +166,7 @@ export class Main extends Phaser.Scene {
         }
       });
 
-      room.onMessage("lasersUpdated", (message: MessageLasersUpdated) => {
+      room.onMessage("lasersUpdated", (message: MessageLasersUpdate) => {
         for (const laserUpdate of message.lasers) {
           const laser = this.lasers.get(laserUpdate.laserId);
           if (laser !== undefined) {
@@ -251,7 +251,7 @@ export class Main extends Phaser.Scene {
       laserInfo.range,
       laserInfo.color,
     );
-    console.log("Adding laser:", laserInfo);
+    // console.log("Adding laser:", laserInfo);
     this.add.existing(laser);
     this.lasers.set(laserInfo.laserId, laser);
     laser.launch(false, laserInfo.range);
