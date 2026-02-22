@@ -63,15 +63,11 @@ export class GameRoom extends Room<RoomState> {
 
     this.setSimulationInterval((deltaTime) => {
       const result = this.state.updateLasers(deltaTime);
-      console.log("Lasers updated:", result);
       if (result.length > 0) {
         this.broadcast("lasersUpdated", { lasers: result });
       }
-    });
-    this.setSimulationInterval((delta: number) => {
-      this.state.cableState.timerMethod(delta);
-      const toggled =
-        (this.state.cableState as any).getAndClearToggledCables?.() ?? [];
+      this.state.cableState.timerMethod(deltaTime);
+      const toggled = this.state.cableState.getAndClearToggledCables?.() ?? [];
       if (toggled.length > 0) {
         this.broadcast("cablesUpdate", { cables: toggled });
       }
