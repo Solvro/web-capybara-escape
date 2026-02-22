@@ -1,7 +1,7 @@
 import {
+  CELL_SIZE,
   SCALE_FACTOR,
   SIZE_MULTIPLIER,
-  TILE_SIZE,
 } from "../../constants/global";
 import type { SpriteAnimator } from "../lib/sprite-animator";
 
@@ -35,10 +35,8 @@ export class Entity extends Phaser.GameObjects.Container {
     this.add(this.sprite);
 
     this.setPosition(
-      this.gridX * TILE_SIZE * SIZE_MULTIPLIER +
-        (TILE_SIZE * SIZE_MULTIPLIER) / 2,
-      this.gridY * TILE_SIZE * SIZE_MULTIPLIER +
-        (TILE_SIZE * SIZE_MULTIPLIER) / 2,
+      this.gridX * CELL_SIZE + CELL_SIZE / 2,
+      this.gridY * CELL_SIZE + CELL_SIZE / 2,
     );
 
     this.setDepth(this.y);
@@ -78,12 +76,8 @@ export class Entity extends Phaser.GameObjects.Container {
       }
     }
 
-    const targetX =
-      this.gridX * TILE_SIZE * SIZE_MULTIPLIER +
-      (TILE_SIZE * SIZE_MULTIPLIER) / 2;
-    const targetY =
-      this.gridY * TILE_SIZE * SIZE_MULTIPLIER +
-      (TILE_SIZE * SIZE_MULTIPLIER) / 2;
+    const targetX = this.gridX * CELL_SIZE + CELL_SIZE / 2;
+    const targetY = this.gridY * CELL_SIZE + CELL_SIZE / 2;
 
     this.playAnim(walkAnimName);
 

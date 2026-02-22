@@ -2,6 +2,7 @@ import type { Room } from "colyseus.js";
 import * as Phaser from "phaser";
 
 import {
+  CELL_SIZE,
   SIZE_MULTIPLIER,
   TILE_SIZE,
   TILE_SIZE_OLD,
@@ -41,6 +42,7 @@ import { SpeechBubble } from "../speech-bubbles/display-speech-bubble";
 const ASSETS_TILE_SIZE = 24;
 const SCALE_FACTOR = TILE_SIZE / ASSETS_TILE_SIZE;
 
+// Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)
 const TILE_MAPPING: Record<
   string,
   { frame: number; isTall?: boolean; frameSecond?: number }
@@ -474,13 +476,12 @@ export class Main extends Phaser.Scene {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const tileType = grid[y][x];
-        const posX =
-          x * TILE_SIZE * SIZE_MULTIPLIER + (TILE_SIZE * SIZE_MULTIPLIER) / 2;
-        const posY =
-          y * TILE_SIZE * SIZE_MULTIPLIER + (TILE_SIZE * SIZE_MULTIPLIER) / 2;
+        const posX = x * CELL_SIZE + CELL_SIZE / 2;
+        const posY = y * CELL_SIZE + CELL_SIZE / 2;
 
         const config = TILE_MAPPING[tileType];
 
+        // if floor detected, add floor tile
         if (tileType === "f1") {
           this.add
             .image(posX, posY, "tileset", config.frame)
@@ -488,6 +489,7 @@ export class Main extends Phaser.Scene {
             .setScale(SIZE_MULTIPLIER);
         }
 
+        // if wall detected, add wall tile (and second 0.5 tile if tall)
         if (tileType.startsWith("w")) {
           this.add
             .image(posX, posY, "tileset", config.frame)
@@ -496,12 +498,7 @@ export class Main extends Phaser.Scene {
 
           if (config.isTall ?? false) {
             this.add
-              .image(
-                posX,
-                posY - TILE_SIZE * SIZE_MULTIPLIER,
-                "tileset",
-                config.frameSecond,
-              )
+              .image(posX, posY - CELL_SIZE, "tileset", config.frameSecond)
               .setScale(SIZE_MULTIPLIER)
               .setDepth(posY);
           }
