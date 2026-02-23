@@ -39,23 +39,20 @@ import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
 import { SpeechBubble } from "../speech-bubbles/display-speech-bubble";
 
-const ASSETS_TILE_SIZE = 24;
-const SCALE_FACTOR = TILE_SIZE / ASSETS_TILE_SIZE;
-
 // Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)
 const TILE_MAPPING: Record<
   string,
   { frame: number; isTall?: boolean; frameSecond?: number }
 > = {
-  w1t: { frame: 0, frameSecond: 9, isTall: true },
+  w1t: { frame: 0, frameSecond: 10, isTall: true },
   w1: { frame: 0 },
-  w13: { frame: 8 },
+  w13: { frame: 9 },
   w2t: { frame: 2, frameSecond: 4, isTall: true },
   w2: { frame: 2 },
   w3t: { frame: 3, frameSecond: 4, isTall: true },
   w3: { frame: 3 },
-  w21: { frame: 7 },
-  f1: { frame: 5 },
+  w21: { frame: 8 },
+  f1: { frame: 6 },
 };
 
 export class Main extends Phaser.Scene {
@@ -285,8 +282,8 @@ export class Main extends Phaser.Scene {
         (message: { x: number; y: number; state: string }) => {
           if (this.capybara) {
             this.capybara.setPosition(
-              message.x * TILE_SIZE + TILE_SIZE / 2,
-              message.y * TILE_SIZE + TILE_SIZE / 2,
+              message.x * CELL_SIZE + CELL_SIZE / 2,
+              message.y * CELL_SIZE + CELL_SIZE / 2,
             );
           }
         },

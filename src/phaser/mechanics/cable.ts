@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import { TILE_SIZE } from "../lib/const";
+import { CELL_SIZE } from "../../constants/global";
 
 export class Cable extends Phaser.GameObjects.Container {
   public cableId: string;
@@ -17,7 +17,7 @@ export class Cable extends Phaser.GameObjects.Container {
     active = false,
     timer = 0,
   ) {
-    super(scene, x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2);
+    super(scene, x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2);
     this.cableId = cableId;
     this.isActive = active;
     this.timer = timer;
@@ -26,8 +26,8 @@ export class Cable extends Phaser.GameObjects.Container {
     this.core = scene.add.rectangle(
       0,
       0,
-      TILE_SIZE * 0.6,
-      TILE_SIZE * 0.6,
+      CELL_SIZE * 0.6,
+      CELL_SIZE * 0.6,
       0x2b3340,
     );
     this.core.setStrokeStyle(2, 0x111827);
@@ -37,8 +37,8 @@ export class Cable extends Phaser.GameObjects.Container {
     this.glow = scene.add.rectangle(
       0,
       0,
-      TILE_SIZE * 0.7,
-      TILE_SIZE * 0.7,
+      CELL_SIZE * 0.7,
+      CELL_SIZE * 0.7,
       0x00d4ff,
       0.0,
     );

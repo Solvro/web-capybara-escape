@@ -1,3 +1,4 @@
+import { ASSETS } from "../../constants/blocks";
 import { Mechanic } from "./mechanic";
 
 export class Vent extends Mechanic {
@@ -11,14 +12,13 @@ export class Vent extends Mechanic {
     id: number,
     isOpen: boolean,
   ) {
-    super(scene, x, y, isOpen ? "vent-open" : "vent-closed");
+    super(scene, x, y, isOpen ? ASSETS.VENT_OPEN : ASSETS.VENT_CLOSED);
     this.id = id;
     this._isOpen = isOpen;
   }
   public set isOpen(value: boolean) {
     this._isOpen = value;
-    this.changeTexture(value ? "vent-open" : "vent-closed");
-    this.id = this.id;
+    this.setFrame(value ? ASSETS.VENT_OPEN : ASSETS.VENT_CLOSED);
     this._isOpen = this.isOpen;
   }
 
