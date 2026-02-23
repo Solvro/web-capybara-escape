@@ -32,7 +32,7 @@ export class RoomState extends Schema {
       this.width = jsonData.width;
       this.height = jsonData.height;
 
-      this.grid = new ArraySchema<string>(...jsonData.layout);
+      this.grid = new ArraySchema<string>(...jsonData.layout.flat());
 
       this._loadMechanics(jsonData.mechanics);
 
@@ -53,8 +53,6 @@ export class RoomState extends Schema {
         const { x, y } = jsonData.entities.capybara;
         this.capybara = new Capybara(x, y);
       }
-
-
     } catch (error) {
       throw `Error loading room data: ${error} `;
     }
@@ -96,7 +94,7 @@ export class RoomState extends Schema {
           mechanicData.y,
           mechanicData.damageMs ?? mechanicData.damage,
           mechanicData.safeMs ?? mechanicData.safeDuration,
-          mechanicData.startDamaging ?? mechanicData.startDamage ?? false
+          mechanicData.startDamaging ?? mechanicData.startDamage ?? false,
         );
       }
     }
@@ -161,16 +159,19 @@ export class RoomState extends Schema {
     return true;
   }
 
-  reconstructPath(parents: Map<string, { x: number; y: number }>, endNode: { x: number; y: number }): { x: number; y: number }[] {
+  reconstructPath(
+    parents: Map<string, { x: number; y: number }>,
+    endNode: { x: number; y: number },
+  ): { x: number; y: number }[] {
     const path = [endNode];
     let current = endNode;
-    let parent = parents.get(`${current.x}_${current.y}`)
+    let parent = parents.get(`${current.x}_${current.y}`);
 
     while (parent) {
       current = parent;
-      const key = `${current.x}_${current.y}`
-      parent = parents.get(key)
-      path.push(current)
+      const key = `${current.x}_${current.y}`;
+      parent = parents.get(key);
+      path.push(current);
     }
 
     return path.reverse();
@@ -180,26 +181,34 @@ export class RoomState extends Schema {
     const startNode = {
       x: this.capybara.position.x,
       y: this.capybara.position.y,
-    }
+    };
 
-    const queue: { x: number, y: number }[] = [];
+    const queue: { x: number; y: number }[] = [];
     queue.push(startNode);
 
     const visited = new Set<string>();
     visited.add(`${startNode.x}_${startNode.y}`);
 
-    const parents = new Map<string, { x: number, y: number }>();
-    const delta = [{ x: 0, y: 1 }, { x: 0, y: -1 }, { x: 1, y: 0 }, { x: -1, y: 0 }];
+    const parents = new Map<string, { x: number; y: number }>();
+    const delta = [
+      { x: 0, y: 1 },
+      { x: 0, y: -1 },
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+    ];
 
     while (!(queue.length === 0)) {
       let current = queue.shift()!;
-      if (this.ventState.getVentAt(current.x, current.y) && this.ventState.isOpenOrEmptyAt(current.x, current.y)) {
+      if (
+        this.ventState.getVentAt(current.x, current.y) &&
+        this.ventState.isOpenOrEmptyAt(current.x, current.y)
+      ) {
         return this.reconstructPath(parents, current);
       }
 
       for (const nextMove of delta) {
         let [nextX, nextY] = [current.x + nextMove.x, current.y + nextMove.y];
-        let nextKey: string = `${nextX}_${nextY}`
+        let nextKey: string = `${nextX}_${nextY}`;
         if (visited.has(nextKey)) continue;
         if (!this.isWalkableForCapybara(nextX, nextY)) continue;
         if (!this.ventState.isOpenOrEmptyAt(nextX, nextY)) continue;
@@ -210,7 +219,7 @@ export class RoomState extends Schema {
       }
     }
     // console.log("no possible way :(")
-    return null
+    return null;
   }
 
   updateCapybara() {
@@ -229,7 +238,10 @@ export class RoomState extends Schema {
       const nextStep = this.capybaraPath.shift();
 
       if (nextStep) {
-        if (!this.isWalkableForCapybara(nextStep.x, nextStep.y) || !this.ventState.isOpenOrEmptyAt(nextStep.x, nextStep.y)) {
+        if (
+          !this.isWalkableForCapybara(nextStep.x, nextStep.y) ||
+          !this.ventState.isOpenOrEmptyAt(nextStep.x, nextStep.y)
+        ) {
           this.capybaraPath = [];
           return;
         }
@@ -443,13 +455,15 @@ export class RoomState extends Schema {
         id: vent.id,
         x: vent.position.x,
         y: vent.position.y,
-        open: vent.open
+        open: vent.open,
       })),
-      capybara: this.capybara ? {
-        x: this.capybara.position.x,
-        y: this.capybara.position.y,
-        state: this.capybara.state
-      } : null
+      capybara: this.capybara
+        ? {
+            x: this.capybara.position.x,
+            y: this.capybara.position.y,
+            state: this.capybara.state,
+          }
+        : null,
     };
   }
 
@@ -474,7 +488,13 @@ export class RoomState extends Schema {
   }
 
   // proxy so callers can pass cable timing / initial state
-  spawnCable(x: number, y: number, damageMs?: number, safeMs?: number, startDamaging?: boolean) {
+  spawnCable(
+    x: number,
+    y: number,
+    damageMs?: number,
+    safeMs?: number,
+    startDamaging?: boolean,
+  ) {
     this.cableState.createCable(x, y, damageMs, safeMs, startDamaging);
   }
   despawnCable(id: string) {

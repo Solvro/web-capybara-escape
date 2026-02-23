@@ -12,18 +12,21 @@
     "layout": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": ["type", "variant"],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": ["wall"]
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["type", "variant"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["wall"]
+            },
+            "variant": {
+              "type": "integer"
+            }
           },
-          "variant": {
-            "type": "integer"
-          }
-        },
-        "additionalProperties": false
+          "additionalProperties": false
+        }
       }
     },
 

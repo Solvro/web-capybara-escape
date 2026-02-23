@@ -1,7 +1,7 @@
 import { Room, Client } from "@colyseus/core";
 import { getMoveVectorFromDirection } from "../shared/utils/vectorUtils";
 import { RoomState } from "./schema/RoomState";
-import room from "./json/examples/room1.json";
+import room from "./json/examples/room2.json";
 import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
 // import room from "./json/examples/room2.json";
 // import room from "./json/examples/room3.json";
@@ -78,7 +78,7 @@ export class GameRoom extends Room<RoomState> {
         this.broadcast("capybaraUpdate", {
           x: this.state.capybara.position.x,
           y: this.state.capybara.position.y,
-          state: this.state.capybara.state
+          state: this.state.capybara.state,
         });
       }
     });
@@ -86,9 +86,9 @@ export class GameRoom extends Room<RoomState> {
     this.onMessage("generateLine", (client) => {
       this.broadcast("line", {
         sessionId: client.sessionId,
-        text: SpeechBubble.getInstance().pickRandomLine("neutral")
+        text: SpeechBubble.getInstance().pickRandomLine("neutral"),
       });
-    })
+    });
   }
 
   onJoin(client: Client, options: any) {
