@@ -1,0 +1,110 @@
+{
+  "maxClients": 2,
+  "width": 10,
+  "height": 8,
+  "layout": [
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["w1t", "w1t", "w2t", "w2t", "w1t", "w1t", "", "", "", ""],
+    ["w1t", "f1", "w2t", "w2t", "w2t", "w2t", "w2t", "w2t", "w1t", "w1t"],
+    ["f1", "f1", "w1t", "f1", "w1t", "w1t", "f1", "w1t", "f1", "w1t"],
+    ["w1t", "f1", "w1t", "f1", "w2t", "w1t", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "w2t", "w1t", "f1", "w2t", "w1t", "w1t"],
+    ["w1t", "w1t", "w1t", "f1", "w2t", "", "", "", "", ""],
+    ["f1", "f1", "f1", "f1", "f1", "", "", "", "", ""]
+  ],
+  "mechanics": [
+    {
+      "type": "door",
+      "x": 1,
+      "y": 4,
+      "id": "door-red-1",
+      "color": "#FF3B30",
+      "active": false
+    },
+    {
+      "type": "laser",
+      "id": "laser-1",
+      "color": "#007AFF",
+      "x": 3,
+      "y": 7,
+      "direction": "up",
+      "range": 8,
+      "inactiveDuration": 200,
+      "activeDuration": 400
+    },
+    {
+      "type": "laser",
+      "id": "laser-2",
+      "color": "#FF00FF",
+      "x": 6,
+      "y": 4,
+      "direction": "right",
+      "range": 6,
+      "inactiveDuration": 200,
+      "activeDuration": 1000
+    },
+    {
+      "type": "cable",
+      "x": 6,
+      "y": 5,
+      "damageMs": 200,
+      "safeMs": 1000,
+      "startDamaging": true
+    },
+    {
+      "type": "door",
+      "x": 3,
+      "y": 6,
+      "id": "door-green-1",
+      "color": "#33cc33",
+      "active": false
+    },
+    {
+      "type": "button",
+      "id": "button-red-1",
+      "x": 8,
+      "y": 3,
+      "color": "#FF3B30",
+      "doorId": "door-red-1"
+    },
+    {
+      "type": "button",
+      "id": "button-green-1",
+      "x": 3,
+      "y": 3,
+      "color": "#33cc33",
+      "doorId": "door-green-1"
+    },
+    {
+      "type": "spikes",
+      "x": 5,
+      "y": 3,
+      "damage": 1,
+      "cooldownMs": 600
+    }
+  ],
+  "entities": {
+    "players": [
+      { "x": 1, "y": 2 },
+      { "x": 6, "y": 4 }
+    ],
+    "enemies": [],
+    "capybara": { "x": 0, "y": 5 },
+    "crates": [
+      { "x": 7, "y": 4 },
+      { "x": 3, "y": 4 }
+    ],
+    "vents": [
+      {
+        "x": 1,
+        "y": 3,
+        "open": false
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "open": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "room.schema.json",
+  "title": "Room",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "maxClients": { "type": "integer", "minimum": 1 },
+    "width": { "type": "integer", "minimum": 1 },
+    "height": { "type": "integer", "minimum": 1 },
+
+    "layout": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["type", "variant"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["wall"]
+            },
+            "variant": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+
+    "mechanics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/mechanic" },
+      "default": []
+    },
+
+    "entities": { "$ref": "#/$defs/entities" }
+  },
+  "required": ["width", "height", "layout", "mechanics", "entities"],
+
+  "$defs": {
+    "pos": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "integer", "minimum": 0 },
+        "y": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["x", "y"]
+    },
+
+    "hexColor": {
+      "type": "string",
+      "pattern": "^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+    },
+
+    "mechanic": {
+      "oneOf": [
+        { "$ref": "#/$defs/door" },
+        { "$ref": "#/$defs/button" },
+        { "$ref": "#/$defs/spikes" },
+        { "$ref": "#/$defs/laser" },
+        { "$ref": "#/$defs/cable" }
+      ]
+    },
+
+    "door": {
+      "allOf": [
+        { "$ref": "#/$defs/pos" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "door" },
+            "id": { "type": "string", "minLength": 1 },
+            "color": { "$ref": "#/$defs/hexColor" },
+            "active": { "type": "boolean" }
+          },
+          "required": ["type", "id", "color", "active"]
+        }
+      ]
+    },
+
+    "button": {
+      "allOf": [
+        { "$ref": "#/$defs/pos" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "button" },
+            "id": { "type": "string", "minLength": 1 },
+            "color": { "$ref": "#/$defs/hexColor" },
+            "doorId": { "type": "string", "minLength": 1 }
+          },
+          "required": ["type", "id", "color", "doorId"]
+        }
+      ]
+    },
+    "cable": {
+      "allOf": [
+        { "$ref": "#/$defs/pos" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "cable" },
+            "damageMs": { "type": "integer" },
+            "safeMs": { "type": "integer" },
+            "startDamaging": { "type": "boolean" }
+          },
+          "required": ["type", "x", "y"]
+        }
+      ]
+    },
+    "spikes": {
+      "allOf": [
+        { "$ref": "#/$defs/pos" },
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "type": { "const": "spikes" }
+          },
+          "required": ["type"]
+        }
+      ]
+    },
+
+    "laser": {
+      "allOf": [
+        { "$ref": "#/$defs/pos" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "laser" },
+            "id": { "type": "string", "minLength": 1 },
+            "color": { "$ref": "#/$defs/hexColor" },
+            "direction": {
+              "type": "string",
+              "enum": ["up", "down", "left", "right"]
+            },
+            "range": { "type": "integer", "minimum": 1 },
+            "inactiveDuration": { "type": "integer", "minimum": 0 },
+            "activeDuration": { "type": "integer", "minimum": 0 }
+          },
+          "required": [
+            "type",
+            "id",
+            "color",
+            "direction",
+            "range",
+            "inactiveDuration",
+            "activeDuration"
+          ]
+        }
+      ]
+    },
+
+    "enemy": {
+      // cables are handled via mechanics (see _loadMechanics)
+      "allOf": [
+        { "$ref": "#/$defs/pos" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "type": "string", "minLength": 1 }
+          },
+          "required": ["type"]
+        }
+      ]
+    },
+
+    "entities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "players": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pos" },
+          "default": []
+        },
+        "enemies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/enemy" },
+          "default": []
+        },
+        "capybara": { "$ref": "#/$defs/pos" },
+        "crates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pos" },
+          "default": []
+        }
+      },
+      "required": ["players", "enemies", "capybara", "crates"]
+    }
+  }
+}

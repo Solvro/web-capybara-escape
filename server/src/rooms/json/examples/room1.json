@@ -1,0 +1,60 @@
+{
+  "maxClients": 2,
+  "width": 10,
+  "height": 8,
+  "layout": [
+    ["", "", "", "", "", "", "", "", "", ""],
+    ["w1t", "w1t", "w2t", "w2t", "w1t", "w1t", "", "", "", ""],
+    ["w1t", "f1", "w2t", "w2t", "w2t", "w2t", "w2t", "w2t", "w1t", "w1t"],
+    ["f1", "f1", "w1t", "f1", "w1t", "w1t", "f1", "w1t", "f1", "w1t"],
+    ["w1t", "f1", "w1t", "f1", "w2t", "w1t", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "w2t", "w1t", "f1", "w2t", "w1t", "w1t"],
+    ["w1t", "w1t", "w1t", "f1", "w2t", "", "", "", "", ""],
+    ["f1", "f1", "f1", "f1", "f1", "", "", "", "", ""]
+  ],
+  "mechanics": [
+    {
+      "type": "door",
+      "x": 1,
+      "y": 4,
+      "id": "door-red-1",
+      "color": "#FF3B30",
+      "active": false
+    },
+    {
+      "type": "door",
+      "x": 3,
+      "y": 6,
+      "id": "door-green-1",
+      "color": "#33cc33",
+      "active": false
+    },
+    {
+      "type": "button",
+      "id": "button-red-1",
+      "x": 8,
+      "y": 3,
+      "color": "#FF3B30",
+      "doorId": "door-red-1"
+    },
+    {
+      "type": "button",
+      "id": "button-green-1",
+      "x": 3,
+      "y": 3,
+      "color": "#33cc33",
+      "doorId": "door-green-1"
+    }
+  ],
+  "entities": {
+    "players": [
+      { "x": 1, "y": 2 },
+      { "x": 6, "y": 4 }
+    ],
+    "enemies": [],
+    "crates": [
+      { "x": 7, "y": 4 },
+      { "x": 3, "y": 4 }
+    ]
+  }
+}
