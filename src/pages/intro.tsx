@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../components/button";
@@ -24,6 +24,23 @@ export function Intro() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [countdown, setCountdown] = useState(3);
+
+  const handlePlay = useCallback(async () => {
+    if (name.trim() === "") {
+      setErrorMessage("Nazwa gracza nie może być pusta.");
+      setStatus("error");
+      return;
+    }
+
+    setStatus("loading");
+    try {
+      await connect(name.trim());
+      await navigate("/game");
+    } catch {
+      setErrorMessage("Nie udało się dołaczyć do gry. Spróbuj ponownie.");
+      setStatus("error");
+    }
+  }, [connect, name, navigate]);
 
   useEffect(() => {
     if (status !== "reconnecting") {
@@ -56,28 +73,29 @@ export function Intro() {
     };
   }, [status, navigate]);
 
+  useEffect(() => {
+    if (status === "reconnecting") {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && status !== "loading") {
+        void handlePlay();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handlePlay, status]);
+
   const handleCancelReconnection = async () => {
     localStorage.removeItem("reconnection");
     await disconnect();
     setStatus("idle");
     setCountdown(3);
-  };
-
-  const handlePlay = async () => {
-    if (name.trim() === "") {
-      setErrorMessage("Nazwa gracza nie może być pusta.");
-      setStatus("error");
-      return;
-    }
-
-    setStatus("loading");
-    try {
-      await connect(name.trim());
-      await navigate("/game");
-    } catch {
-      setErrorMessage("Nie udało się dołaczyć do gry. Spróbuj ponownie.");
-      setStatus("error");
-    }
   };
 
   return (
