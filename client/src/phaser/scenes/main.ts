@@ -37,7 +37,7 @@ import { Cable } from "../mechanics/cable";
 import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
-import { SpeechBubble } from "../speech-bubbles/display-speech-bubble";
+import { SpeechBubble } from "../speech-bubbles/speech-bubble";
 
 // Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)
 const TILE_MAPPING: Record<
