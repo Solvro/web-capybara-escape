@@ -1,71 +1,67 @@
 import * as Phaser from "phaser";
+import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 
-import { CELL_SIZE } from "../../constants/global";
-
+/**
+ * Phaser-side Cable mechanic.
+ * Constructor now accepts optional damageDuration and safeDuration to match server schema.
+ */
 export class Cable extends Phaser.GameObjects.Container {
   public cableId: string;
-  private core: Phaser.GameObjects.Rectangle;
-  private glow: Phaser.GameObjects.Rectangle;
-  public isActive: boolean = false;
-  public timer: number = 0;
+  public damage: boolean;
+  public timer: number;
+  public damageDuration: number;
+  public safeDuration: number;
+
+  private sprite: Phaser.GameObjects.Image;
 
   constructor(
     scene: Phaser.Scene,
-    x: number,
-    y: number,
-    cableId: string,
-    active = false,
-    timer = 0,
+    gridX: number,
+    gridY: number,
+    id: string,
+    damage: boolean = false,
+    timer: number = 0,
+    damageDuration: number = 0,
+    safeDuration: number = 0,
   ) {
-    super(scene, x * CELL_SIZE + CELL_SIZE / 2, y * CELL_SIZE + CELL_SIZE / 2);
-    this.cableId = cableId;
-    this.isActive = active;
+    const posX = gridX * CELL_SIZE + CELL_SIZE / 2;
+    const posY = gridY * CELL_SIZE + CELL_SIZE / 2;
+    super(scene, posX, posY);
+
+    this.cableId = id;
+    this.damage = damage;
     this.timer = timer;
+    this.damageDuration = damageDuration;
+    this.safeDuration = safeDuration;
 
-    // background / base
-    this.core = scene.add.rectangle(
-      0,
-      0,
-      CELL_SIZE * 0.6,
-      CELL_SIZE * 0.6,
-      0x2b3340,
-    );
-    this.core.setStrokeStyle(2, 0x111827);
-    this.add(this.core);
+    this.sprite = scene.add.image(0, 0, damage ? "cable-on" : "cable-off");
+    this.sprite.setScale(SIZE_MULTIPLIER);
+    this.add(this.sprite);
 
-    // glow for active state
-    this.glow = scene.add.rectangle(
-      0,
-      0,
-      CELL_SIZE * 0.7,
-      CELL_SIZE * 0.7,
-      0x00d4ff,
-      0.0,
-    );
-    this.add(this.glow);
-
-    this.setDepth(20);
+    this.setDepth(posY);
     scene.add.existing(this);
 
-    this.applyState(active, timer);
+    this.updateVisual();
   }
 
-  applyState(active: boolean, timer?: number) {
-    this.isActive = active;
-    if (typeof timer === "number") this.timer = timer;
+  applyState(damage: boolean, timer: number, damageDuration?: number, safeDuration?: number) {
+    this.damage = damage;
+    this.timer = timer;
+    if (typeof damageDuration === "number") this.damageDuration = damageDuration;
+    if (typeof safeDuration === "number") this.safeDuration = safeDuration;
+    this.updateVisual();
+  }
 
-    if (this.isActive) {
-      this.core.setFillStyle(0x58c7ff);
-      this.glow.setAlpha(0.75);
-    } else {
-      this.core.setFillStyle(0x2b3340);
-      this.glow.setAlpha(0.0);
+  private updateVisual() {
+    const key = this.damage ? "cable-on" : "cable-off";
+    if (this.sprite.texture.key !== key) {
+      this.sprite.setTexture(key);
     }
+    this.sprite.setTint(this.damage ? 0xff6666 : 0xffffff);
   }
 
   destroy(fromScene?: boolean) {
-    this.core.destroy();
-    this.glow.destroy();
+    this.sprite.destroy();
     super.destroy(fromScene);
   }
 }

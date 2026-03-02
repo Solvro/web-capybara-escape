@@ -11,6 +11,7 @@ import type { Button as ButtonType } from "../../types/button";
 import type { Crate as CrateType } from "../../types/crate";
 import type { Door as DoorType } from "../../types/door";
 import type { Laser as LaserType } from "../../types/laser";
+import type {Cable as CableType} from "../../types/cable";
 import type {
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
@@ -176,20 +177,10 @@ export class Main extends Phaser.Scene {
         for (const laser of message.lasers) {
           this.addLaser(laser);
         }
-
-        // add cables from server mapInfo
-        for (const cable of message.cables ?? []) {
-          if (this.cables.has(cable.cableId)) continue;
-          const c = new Cable(
-            this,
-            cable.x,
-            cable.y,
-            cable.cableId,
-            !!cable.damage,
-            cable.timer,
-          );
-          this.cables.set(cable.cableId, c);
+        for (const cable of message.cables){
+          this.addCable(cable);
         }
+
 
         if (message.vents) {
           for (const vent of message.vents) {
@@ -414,6 +405,22 @@ export class Main extends Phaser.Scene {
     this.add.existing(laser);
     this.lasers.set(laserInfo.laserId, laser);
     laser.launch(false, laserInfo.range);
+  }
+  
+  private addCable(cableInfo: CableType){
+    const cable = new Cable(
+      this,
+      cableInfo.x,
+      cableInfo.y,
+      cableInfo.cableId,
+      cableInfo.damage,
+      cableInfo.timer,
+      cableInfo.damageDuration,
+      cableInfo.safeDuration,
+    );
+    this.add.existing(cable);
+    this.cables.set(cableInfo.cableId, cable);
+
   }
 
   private addButton(buttonInfo: ButtonType) {
