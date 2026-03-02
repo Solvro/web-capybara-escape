@@ -5,6 +5,7 @@ import type { Door } from "../types/door";
 import type { Laser } from "../types/laser";
 import type { Player } from "../types/player";
 import type { Vent } from "../types/vent";
+import type { Cable } from "../types/cable";
 
 export interface MessageMapInfo {
   grid: string[][];
@@ -17,13 +18,7 @@ export interface MessageMapInfo {
   lasers: Laser[];
   vents?: Vent[];
   capybara?: Capybara;
-  cables?: {
-    cableId: string;
-    x: number;
-    y: number;
-    damage?: boolean;
-    timer?: number;
-  }[];
+  cables: Cable[];
 }
 
 export interface MessageCratesUpdate {
