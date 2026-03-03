@@ -117,6 +117,9 @@ export class Main extends Phaser.Scene {
     this.load.image("vent-open", "images/vent/vent-open.png");
     this.load.image("vent-closed", "images/vent/vent-closed.png");
 
+    // cables
+    this.load.image("cable-on", "images/cables/cableWithElectricity.png");
+    this.load.image("cable-off", "images/cables/safecable.png");
     // capybara
     this.load.image("capybara", "images/capybara/back_1.png");
 
