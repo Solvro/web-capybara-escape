@@ -1,10 +1,7 @@
 import * as Phaser from "phaser";
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 
-/**
- * Phaser-side Cable mechanic.
- * Constructor now accepts optional damageDuration and safeDuration to match server schema.
- */
+
 export class Cable extends Phaser.GameObjects.Container {
   public cableId: string;
   public damage: boolean;
@@ -57,7 +54,6 @@ export class Cable extends Phaser.GameObjects.Container {
     if (this.sprite.texture.key !== key) {
       this.sprite.setTexture(key);
     }
-    this.sprite.setTint(this.damage ? 0xff6666 : 0xffffff);
   }
 
   destroy(fromScene?: boolean) {
