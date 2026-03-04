@@ -420,6 +420,7 @@ export class Main extends Phaser.Scene {
       cableInfo.timer,
       cableInfo.damageDuration,
       cableInfo.safeDuration,
+      cableInfo.direction,
     );
     this.add.existing(cable);
     this.cables.set(cableInfo.cableId, cable);
