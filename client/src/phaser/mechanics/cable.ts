@@ -8,6 +8,7 @@ export class Cable extends Phaser.GameObjects.Container {
   public timer: number;
   public damageDuration: number;
   public safeDuration: number;
+  public direction: "up" | "down" | "left" | "right"; 
 
   private sprite: Phaser.GameObjects.Image;
 
@@ -20,6 +21,7 @@ export class Cable extends Phaser.GameObjects.Container {
     timer: number = 0,
     damageDuration: number = 0,
     safeDuration: number = 0,
+    direction: "up" | "down" | "left" | "right" = "up", 
   ) {
     const posX = gridX * CELL_SIZE + CELL_SIZE / 2;
     const posY = gridY * CELL_SIZE + CELL_SIZE / 2;
@@ -30,10 +32,27 @@ export class Cable extends Phaser.GameObjects.Container {
     this.timer = timer;
     this.damageDuration = damageDuration;
     this.safeDuration = safeDuration;
+    this.direction = direction; 
 
     this.sprite = scene.add.image(0, 0, damage ? "cable-on" : "cable-off");
     this.sprite.setScale(SIZE_MULTIPLIER);
     this.add(this.sprite);
+
+    // orient sprite to direction
+    switch (this.direction) {
+      case "up":
+        this.sprite.setAngle(0);
+        break;
+      case "right":
+        this.sprite.setAngle(90);
+        break;
+      case "down":
+        this.sprite.setAngle(180);
+        break;
+      case "left":
+        this.sprite.setAngle(270);
+        break;
+    }
 
     this.setDepth(posY);
     scene.add.existing(this);
