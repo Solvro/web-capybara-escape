@@ -44,6 +44,15 @@
       "y": 3,
       "color": "#33cc33",
       "doorId": "door-green-1"
+    },
+    {
+      "type": "cable",
+      "x": 5,
+      "y": 2,
+      "direction": "left",
+      "damageMs": 3000,
+      "safeMs": 2000,
+      "startDamaging": true
     }
   ],
   "entities": {
