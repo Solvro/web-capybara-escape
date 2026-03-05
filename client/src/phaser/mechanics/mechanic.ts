@@ -34,7 +34,7 @@ export class Mechanic extends Phaser.GameObjects.Container {
       this.gridY * CELL_SIZE + CELL_SIZE / 2,
     );
 
-    this.setDepth(this.y - 0.5);
+    this.setDepth(0.5);
   }
 
   public setFrame(frameKey: number) {
