@@ -4,7 +4,7 @@ import { Position } from "./Position";
 export class Cable extends Schema{
     @type("string") id: string;
     @type(Position) position: Position;
-    
+    @type("string") direction: string; // up, down, left, right
     @type("boolean") damage: boolean = false;
     @type("number") damageDuration: number;
     @type("number") safeDuration: number;
@@ -26,7 +26,7 @@ export class CableState extends Schema{
     private getPositionKey(x: number, y: number): string {
         return `${x}_${y}`;
     }
-    createCable(x: number, y: number, damageMs: number = 3000, safeMs: number = 2000, startDamaging: boolean = true): Cable {
+    createCable(x: number, y: number, direction: string = "up", damageMs: number = 3000, safeMs: number = 2000, startDamaging: boolean = true): Cable {
         const id = this.nextAvailableId++;
         this.usedIds.add(id);
 
@@ -35,7 +35,7 @@ export class CableState extends Schema{
         cable.position = new Position();
         cable.position.x = x;
         cable.position.y = y;
-
+        cable.direction = direction;
         cable.damageDuration = damageMs;
         cable.safeDuration = safeMs;
         cable.damage = startDamaging;

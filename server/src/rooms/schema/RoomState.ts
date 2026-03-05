@@ -92,6 +92,7 @@ export class RoomState extends Schema {
         this.cableState.createCable(
           mechanicData.x,
           mechanicData.y,
+          mechanicData.direction,
           mechanicData.damageMs ?? mechanicData.damage,
           mechanicData.safeMs ?? mechanicData.safeDuration,
           mechanicData.startDamaging ?? mechanicData.startDamage ?? false,
@@ -423,6 +424,7 @@ export class RoomState extends Schema {
           cableId: cable.id,
           x: cable.position.x,
           y: cable.position.y,
+          direction: cable.direction,
           damage: cable.damage,
           damageDuration: cable.damageDuration,
           safeDuration: cable.safeDuration,
@@ -491,11 +493,12 @@ export class RoomState extends Schema {
   spawnCable(
     x: number,
     y: number,
+    direction?: "up" | "down" | "left" | "right",
     damageMs?: number,
     safeMs?: number,
     startDamaging?: boolean,
   ) {
-    this.cableState.createCable(x, y, damageMs, safeMs, startDamaging);
+    this.cableState.createCable(x, y, direction, damageMs, safeMs, startDamaging);
   }
   despawnCable(id: string) {
     this.cableState.removeCable(id);
