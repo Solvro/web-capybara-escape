@@ -45,8 +45,8 @@
     },
     {
       "type": "cable",
-      "x": 6,
-      "y": 5,
+      "x": 2,
+      "y": 7,
       "damageMs": 200,
       "safeMs": 1000,
       "startDamaging": true
