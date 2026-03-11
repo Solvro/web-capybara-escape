@@ -82,10 +82,15 @@ export function CreatorControl({ dims, setDims }: CreatorControlProps) {
         </div>
       </div>
 
-      {/* Reset Button */}
-      <button className="ml-auto rounded-md bg-violet-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-violet-400">
-        Reset
-      </button>
+      {/* Action Buttons */}
+      <div className="ml-auto flex items-center gap-2">
+        <button className="rounded-md bg-violet-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-violet-400">
+          Reset
+        </button>
+        <button className="rounded-md bg-emerald-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-emerald-400">
+          Create
+        </button>
+      </div>
     </div>
   );
 }
