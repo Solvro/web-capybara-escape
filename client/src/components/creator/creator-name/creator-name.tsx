@@ -10,10 +10,8 @@ export function CreatorName({ levelName, setLevelName }: CreatorNameProps) {
   const [tempName, setTempName] = useState(levelName || "");
 
   const handleSave = () => {
-    if (tempName.trim()) {
-      setLevelName(tempName.trim());
-      setIsEditing(false);
-    }
+    setLevelName(tempName.trim());
+    setIsEditing(false);
   };
 
   const handleCancel = () => {
