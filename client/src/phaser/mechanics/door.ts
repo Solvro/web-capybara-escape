@@ -1,38 +1,46 @@
 import { ASSETS } from "../../constants/blocks";
 import { SIZE_MULTIPLIER } from "../../constants/global";
+import type { Door as DoorType } from "../../types/door";
+import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 
-export class Door extends Mechanic {
+export class Door extends Mechanic implements INetworkInterface<DoorType> {
   public readonly doorId: string;
+  public readonly networkId: string | number;
   public readonly color: string;
-  private openFrameKey: number;
-  private closedFrameKey: number;
+  private openFrameKey: number = ASSETS.EMPTY;
+  private closedFrameKey: number = ASSETS.DOOR_CLOSED;
   private open: boolean;
   private baseSprite: Phaser.GameObjects.Sprite;
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    doorId: string,
-    color: string,
-    open = false,
-    openFrameKey = ASSETS.EMPTY,
-    closedFrameKey = ASSETS.DOOR_CLOSED,
-  ) {
-    super(scene, x, y, open ? openFrameKey : closedFrameKey, true, color);
+  constructor(scene: Phaser.Scene, data: DoorType) {
+    super(
+      scene,
+      data.x,
+      data.y,
+      data.open ? ASSETS.EMPTY : ASSETS.DOOR_CLOSED,
+      true,
+      data.color,
+    );
 
     this.baseSprite = this.scene.add
       .sprite(0, 0, "tileset", ASSETS.DOOR_BASE)
       .setScale(SIZE_MULTIPLIER);
 
-    this.doorId = doorId;
-    this.color = color;
-    this.open = open;
-    this.openFrameKey = openFrameKey;
-    this.closedFrameKey = closedFrameKey;
+    this.doorId = data.doorId;
+    this.networkId = data.doorId;
+    this.color = data.color;
+    this.open = data.open;
+    this.openFrameKey = ASSETS.EMPTY;
+    this.closedFrameKey = ASSETS.DOOR_CLOSED;
     this.add(this.baseSprite);
     this.sendToBack(this.baseSprite);
+  }
+
+  public syncState(data: Partial<DoorType>) {
+    if (data.open !== undefined) {
+      this.isOpen = data.open;
+    }
   }
 
   public get id(): string {

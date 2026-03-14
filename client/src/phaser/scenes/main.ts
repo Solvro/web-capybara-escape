@@ -1,17 +1,7 @@
 import type { Room } from "colyseus.js";
 import * as Phaser from "phaser";
 
-import {
-  CELL_SIZE,
-  SIZE_MULTIPLIER,
-  TILE_SIZE,
-  TILE_SIZE_OLD,
-} from "../../constants/global";
-import type { Button as ButtonType } from "../../types/button";
-import type { Cable as CableType } from "../../types/cable";
-import type { Crate as CrateType } from "../../types/crate";
-import type { Door as DoorType } from "../../types/door";
-import type { Laser as LaserType } from "../../types/laser";
+import { CELL_SIZE, TILE_SIZE, TILE_SIZE_OLD } from "../../constants/global";
 import type {
   MessageCablesUpdate,
   MessageCratesUpdate,
@@ -23,11 +13,12 @@ import type {
   MessageOnRemovePlayer,
   MessagePositionUpdate,
 } from "../../types/messages";
+import type { INetworkInterface } from "../../types/network-interface";
 import type { Player as PlayerType } from "../../types/player";
-import type { Wire as WireType } from "../../types/wire";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
+import { createMap } from "../lib/map-creator";
 import {
   PLAYER_TEXTURE_KEYS,
   createPlayerAnimators,
@@ -42,22 +33,6 @@ import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
 import { Wire } from "../mechanics/wire";
 import { SpeechBubble } from "../speech-bubbles/speech-bubble";
-
-// Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)
-const TILE_MAPPING: Record<
-  string,
-  { frame: number; isTall?: boolean; frameSecond?: number }
-> = {
-  w1t: { frame: 0, frameSecond: 10, isTall: true },
-  w1: { frame: 0 },
-  w13: { frame: 9 },
-  w2t: { frame: 2, frameSecond: 4, isTall: true },
-  w2: { frame: 2 },
-  w3t: { frame: 3, frameSecond: 4, isTall: true },
-  w3: { frame: 3 },
-  w21: { frame: 8 },
-  f1: { frame: 6 },
-};
 
 export class Main extends Phaser.Scene {
   private room!: Room;
@@ -88,6 +63,20 @@ export class Main extends Phaser.Scene {
     super({ key: "Main" });
   }
 
+  private spawnEntity<
+    DataType,
+    EntityClass extends Phaser.GameObjects.GameObject &
+      INetworkEntity<DataType>,
+  >(
+    mapCollection: Map<any, EntityClass>,
+    EntityConstructor: new (scene: Phaser.Scene, data: DataType) => EntityClass,
+    data: DataType,
+  ) {
+    const entity = new EntityConstructor(this, data);
+    this.add.existing(entity);
+    mapCollection.set(entity.networkId, entity);
+  }
+
   init() {
     if (!this.registry.has("room")) {
       throw new Error("Room not found in registry");
@@ -100,12 +89,6 @@ export class Main extends Phaser.Scene {
 
     // game objects
     this.load.image("crate", "images/crate.png");
-    this.load.image("button-released", "images/buttons/button-green.png");
-    this.load.image("button-pressed", "images/buttons/button-red.png");
-    this.load.image("door-open", "images/doors/door-green-open.png");
-    this.load.image("door-closed", "images/doors/door-green-closed.png");
-    this.load.image("laser-gun", "images/lasers/laser-gun.png");
-    this.load.image("laser-line", "images/lasers/laser-horizontal-line.png");
     this.load.spritesheet("tileset", "images/capybara-tileset.png", {
       frameWidth: TILE_SIZE,
       frameHeight: TILE_SIZE,
@@ -118,13 +101,6 @@ export class Main extends Phaser.Scene {
       "data/speech-bubble-data.json",
     );
 
-    // vents
-    this.load.image("vent-open", "images/vent/vent-open.png");
-    this.load.image("vent-closed", "images/vent/vent-closed.png");
-
-    // cables
-    //this.load.image("cable-on", "images/cables/cableWithElectricity.png");
-    //this.load.image("cable-off", "images/cables/safecable.png");
     // capybara
     this.load.image("capybara", "images/capybara/back_1.png");
 
@@ -165,43 +141,39 @@ export class Main extends Phaser.Scene {
       const room = this.registry.get("room") as Room;
 
       room.onMessage("mapInfo", (message: MessageMapInfo) => {
-        this.createMap(message.grid, message.width, message.height);
+        createMap(message.grid, message.width, message.height, this);
 
         for (const player of message.players) {
           this.addPlayer(player);
         }
 
         for (const crate of message.crates) {
-          this.addCrate(crate);
+          this.spawnEntity(this.crates, Crate, crate);
         }
 
         for (const button of message.buttons) {
-          this.addButton(button);
+          this.spawnEntity(this.buttons, Button, button);
         }
 
         for (const door of message.doors) {
-          this.addDoor(door);
+          this.spawnEntity(this.doors, Door, door);
         }
 
         for (const laser of message.lasers) {
-          this.addLaser(laser);
+          this.spawnEntity(this.lasers, Laser, laser);
         }
         for (const cable of message.cables) {
-          this.addCable(cable);
+          this.spawnEntity(this.cables, Cable, cable);
         }
         for (const wire of message.wires) {
-          this.addWire(wire);
+          this.spawnEntity(this.wires, Wire, wire);
         }
 
-        if (message.vents) {
-          for (const vent of message.vents) {
-            this.addVent(vent);
-          }
+        for (const vent of message.vents) {
+          this.spawnEntity(this.vents, Vent, vent);
         }
 
-        if (message.capybara) {
-          this.addCapybara(message.capybara);
-        }
+        this.addCapybara(message.capybara);
       });
 
       room.onMessage("onAddPlayer", (message: MessageOnAddPlayer) => {
@@ -232,10 +204,7 @@ export class Main extends Phaser.Scene {
 
       room.onMessage("cratesUpdate", (message: MessageCratesUpdate) => {
         for (const crateUpdate of message.crates) {
-          const crate = this.crates.get(crateUpdate.crateId);
-          if (crate !== undefined) {
-            crate.move(crateUpdate.direction);
-          }
+          this.crates.get(crateUpdate.crateId)?.syncState(crateUpdate);
         }
       });
 
@@ -261,14 +230,8 @@ export class Main extends Phaser.Scene {
           for (const element of message.doorsAndButtons) {
             const door = this.doors.get(element.doorId);
             const button = this.buttons.get(element.buttonId);
-
-            if (door !== undefined) {
-              door.isOpen = element.open;
-            }
-
-            if (button !== undefined) {
-              button.isPressed = element.open;
-            }
+            door?.syncState({ open: element.open });
+            button?.syncState({ pressed: element.open });
           }
         },
       );
@@ -282,7 +245,7 @@ export class Main extends Phaser.Scene {
       room.onMessage(
         "capybaraUpdate",
         (message: { x: number; y: number; state: string }) => {
-          if (this.capybara) {
+          if (this.capybara !== null) {
             this.capybara.setPosition(
               message.x * CELL_SIZE + CELL_SIZE / 2,
               message.y * CELL_SIZE + CELL_SIZE / 2,
@@ -307,7 +270,12 @@ export class Main extends Phaser.Scene {
       });
 
       room.onMessage("cablesUpdate", (cables: MessageCablesUpdate) => {
-        this.handleCablesUpdate(cables);
+        for (const cableUpdate of cables.cables) {
+          const cable = this.cables.get(cableUpdate.cableId);
+          if (cable !== undefined) {
+            cable.syncState(cableUpdate);
+          }
+        }
       });
 
       this.room.send("getMapInfo");
@@ -374,143 +342,13 @@ export class Main extends Phaser.Scene {
     this.add.existing(player);
   }
 
-  private addCrate(crateInfo: CrateType) {
-    const crate = new Crate(this, crateInfo.x, crateInfo.y, crateInfo.crateId);
-    this.add.existing(crate);
-    this.crates.set(crateInfo.crateId, crate);
-  }
-
-  private addLaser(laserInfo: LaserType) {
-    const laser = new Laser(
-      this,
-      laserInfo.x,
-      laserInfo.y,
-      laserInfo.laserId,
-      laserInfo.direction,
-      laserInfo.range,
-      laserInfo.color,
-    );
-    // console.log("Adding laser:", laserInfo);
-    this.add.existing(laser);
-    this.lasers.set(laserInfo.laserId, laser);
-    laser.launch(laserInfo.active ?? false, laserInfo.range);
-  }
-
-  private addCable(cableInfo: CableType) {
-    // console.log("addCable called", cableInfo);
-    const cable = new Cable(
-      this,
-      cableInfo.x,
-      cableInfo.y,
-      cableInfo.cableId,
-      cableInfo.damage,
-      cableInfo.timer,
-      cableInfo.damageDuration,
-      cableInfo.safeDuration,
-      cableInfo.direction,
-    );
-    this.add.existing(cable);
-    //console.log("added cable object", cable, "frame:", cable.frame?.name);
-    this.cables.set(cableInfo.cableId, cable);
-  }
-  private addWire(wireInfo: WireType) {
-    const wire = new Wire(
-      this,
-      wireInfo.x,
-      wireInfo.y,
-      wireInfo.wireId,
-      wireInfo.direction ?? "up",
-    );
-    this.add.existing(wire);
-    this.wires.set(wireInfo.wireId, wire);
-  }
-
-  private addButton(buttonInfo: ButtonType) {
-    const button = new Button(
-      this,
-      buttonInfo.x,
-      buttonInfo.y,
-      buttonInfo.buttonId,
-      buttonInfo.color,
-      buttonInfo.pressed,
-    );
-    this.add.existing(button);
-    this.buttons.set(buttonInfo.buttonId, button);
-  }
-
-  private addDoor(doorInfo: DoorType) {
-    const door = new Door(
-      this,
-      doorInfo.x,
-      doorInfo.y,
-      doorInfo.doorId,
-      doorInfo.color,
-      doorInfo.open,
-    );
-    this.add.existing(door);
-    this.doors.set(doorInfo.doorId, door);
-  }
-
-  private addVent(ventInfo: {
-    id: number;
-    x: number;
-    y: number;
-    open: boolean;
-  }) {
-    const vent = new Vent(
-      this,
-      ventInfo.x,
-      ventInfo.y,
-      ventInfo.id,
-      ventInfo.open,
-    );
-    this.add.existing(vent);
-    this.vents.set(ventInfo.id, vent);
-  }
-
   private addCapybara(capybaraInfo: { x: number; y: number }) {
-    if (this.capybara) {
+    if (this.capybara !== null) {
       this.capybara.destroy();
     }
 
     this.capybara = new Capybara(this, capybaraInfo.x, capybaraInfo.y);
     this.add.existing(this.capybara);
-  }
-
-  createMap(grid: string[][], width: number, height: number) {
-    // console.log(grid);
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const tileType = grid[y][x];
-        const posX = x * CELL_SIZE + CELL_SIZE / 2;
-        const posY = y * CELL_SIZE + CELL_SIZE / 2;
-
-        const config = TILE_MAPPING[tileType];
-
-        // if floor detected, add floor tile
-        if (tileType === "f1") {
-          this.add
-            .image(posX, posY, "tileset", config.frame)
-            .setDepth(0)
-            .setScale(SIZE_MULTIPLIER);
-        }
-
-        // if wall detected, add wall tile (and second 0.5 tile if tall)
-        if (tileType.startsWith("w")) {
-          this.add
-            .image(posX, posY, "tileset", config.frame)
-            .setDepth(posY)
-            .setScale(SIZE_MULTIPLIER);
-
-          if (config.isTall ?? false) {
-            this.add
-              .image(posX, posY - CELL_SIZE, "tileset", config.frameSecond)
-              .setScale(SIZE_MULTIPLIER)
-              .setDepth(posY);
-          }
-        }
-      }
-    }
   }
 
   handleInput(time: number) {
@@ -544,25 +382,13 @@ export class Main extends Phaser.Scene {
       this.buttons,
     ];
 
-    mapsToDestroy.forEach((map) => {
-      map.forEach((obj: any) => {
-        if (obj && typeof obj.destroy === "function") {
-          obj.destroy();
-        }
-      });
-      map.clear();
-    });
+    for (const object of mapsToDestroy) {
+      for (const entity of object.values()) {
+        entity.destroy();
+      }
+      object.clear();
+    }
 
     this.children.removeAll();
-  }
-
-  private handleCablesUpdate(cables: MessageCablesUpdate) {
-    for (const t of cables.cables) {
-      const id = t.cableId;
-      const cable = this.cables.get(id);
-      if (cable !== undefined) {
-        cable.applyState(t.damage, cable.timer);
-      }
-    }
   }
 }

@@ -1,39 +1,32 @@
 import { ASSETS } from "../../constants/blocks";
 import { SIZE_MULTIPLIER } from "../../constants/global";
+import type { Button as ButtonType } from "../../types/button";
+import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 
-export class Button extends Mechanic {
+export class Button extends Mechanic implements INetworkInterface<ButtonType> {
   public readonly buttonId: string;
+  public readonly networkId: string | number;
   public readonly color: string;
   private pressed: boolean;
-  private pressedFrameKey: number;
-  private releasedFrameKey: number;
+  private pressedFrameKey: number = ASSETS.BUTTON_PRESSED;
+  private releasedFrameKey: number = ASSETS.BUTTON_RELEASED;
   private baseSprite: Phaser.GameObjects.Sprite;
   private borderSprite: Phaser.GameObjects.Sprite;
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    buttonId: string,
-    color: string,
-    pressed = false,
-    pressedFrameKey = ASSETS.BUTTON_PRESSED,
-    releasedFrameKey = ASSETS.BUTTON_RELEASED,
-  ) {
+  constructor(scene: Phaser.Scene, data: ButtonType) {
     super(
       scene,
-      x,
-      y,
-      pressed ? pressedFrameKey : releasedFrameKey,
+      data.x,
+      data.y,
+      data.pressed ? ASSETS.BUTTON_PRESSED : ASSETS.BUTTON_RELEASED,
       true,
-      color,
+      data.color,
     );
-    this.buttonId = buttonId;
-    this.color = color;
-    this.pressed = pressed;
-    this.pressedFrameKey = pressedFrameKey;
-    this.releasedFrameKey = releasedFrameKey;
+    this.buttonId = data.buttonId;
+    this.networkId = data.buttonId;
+    this.color = data.color;
+    this.pressed = data.pressed;
 
     this.baseSprite = this.scene.add
       .sprite(0, 0, "tileset", ASSETS.BUTTON_BASE)
@@ -43,13 +36,19 @@ export class Button extends Mechanic {
       .setScale(SIZE_MULTIPLIER);
 
     this.borderSprite.setTint(
-      Phaser.Display.Color.HexStringToColor(color).color,
+      Phaser.Display.Color.HexStringToColor(data.color).color,
     );
     this.borderSprite.setVisible(this.pressed);
 
     this.add(this.baseSprite);
     this.add(this.borderSprite);
     this.sendToBack(this.baseSprite);
+  }
+
+  public syncState(data: Partial<ButtonType>): void {
+    if (data.pressed !== undefined) {
+      this.isPressed = data.pressed;
+    }
   }
 
   public get id(): string {

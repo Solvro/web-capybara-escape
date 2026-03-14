@@ -17,10 +17,10 @@ export interface MessageMapInfo {
   doors: Door[];
   buttons: Button[];
   lasers: Laser[];
-  vents?: Vent[];
-  capybara?: Capybara;
   cables: Cable[];
   wires: Wire[];
+  vents: Vent[];
+  capybara: Capybara;
 }
 
 export interface MessageCratesUpdate {

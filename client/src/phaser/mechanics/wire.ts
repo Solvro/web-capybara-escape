@@ -1,9 +1,12 @@
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE } from "../../constants/global";
+import type { INetworkInterface } from "../../types/network-interface";
+import type { Wire as WireType } from "../../types/wire";
 import { Mechanic } from "./mechanic";
 
-export class Wire extends Mechanic {
+export class Wire extends Mechanic implements INetworkInterface<WireType> {
   public wireId: string;
+  public networkId: string;
   private direction:
     | "up"
     | "down"
@@ -15,22 +18,8 @@ export class Wire extends Mechanic {
     | "up-left"
     | "socket";
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    wireId: string,
-    direction:
-      | "up"
-      | "down"
-      | "left"
-      | "right"
-      | "down-right"
-      | "down-left"
-      | "up-right"
-      | "up-left"
-      | "socket",
-  ) {
+  constructor(scene: Phaser.Scene, data: WireType) {
+    const { x, y, wireId, direction } = data;
     const posY = y * CELL_SIZE + CELL_SIZE / 2;
     let FRAME = ASSETS.WIRE;
     if (direction.includes("-")) {
@@ -40,6 +29,7 @@ export class Wire extends Mechanic {
       FRAME = ASSETS.SOCKET;
     }
     super(scene, x, y, FRAME);
+    this.networkId = data.wireId;
     this.wireId = wireId;
     this.direction = direction;
 
@@ -84,6 +74,10 @@ export class Wire extends Mechanic {
     }
 
     this.setDepth(posY);
+  }
+
+  public syncState(_: WireType) {
+    // Wire state is static, so no need to implement this method
   }
 
   public get id(): string {
