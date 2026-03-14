@@ -13,3 +13,19 @@ export const ASSETS = {
   LASER_LINE: 11,
   CABLE: 25,
 };
+
+// Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)
+export const TILE_MAPPING: Record<
+  string,
+  { frame: number; isTall?: boolean; frameSecond?: number }
+> = {
+  w1t: { frame: 0, frameSecond: 10, isTall: true },
+  w1: { frame: 0 },
+  w13: { frame: 9 },
+  w2t: { frame: 2, frameSecond: 4, isTall: true },
+  w2: { frame: 2 },
+  w3t: { frame: 3, frameSecond: 4, isTall: true },
+  w3: { frame: 3 },
+  w21: { frame: 8 },
+  f1: { frame: 6 },
+};

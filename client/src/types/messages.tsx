@@ -15,9 +15,9 @@ export interface MessageMapInfo {
   doors: Door[];
   buttons: Button[];
   lasers: Laser[];
-  vents?: Vent[];
-  capybara?: Capybara;
-  cables?: {
+  vents: Vent[];
+  capybara: Capybara;
+  cables: {
     cableId: string;
     x: number;
     y: number;

@@ -1,29 +1,37 @@
 import { ASSETS } from "../../constants/blocks";
+import type { Door as DoorType } from "../../types/door";
+import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 
-export class Door extends Mechanic {
+export class Door extends Mechanic implements INetworkInterface<DoorType> {
   public readonly doorId: string;
+  public readonly networkId: string | number;
   public readonly color: string;
-  private openFrameKey: number;
-  private closedFrameKey: number;
+  private openFrameKey: number = ASSETS.DOOR_OPEN;
+  private closedFrameKey: number = ASSETS.DOOR_CLOSED;
   private open: boolean;
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    doorId: string,
-    color: string,
-    open = false,
-    openFrameKey = ASSETS.DOOR_OPEN,
-    closedFrameKey = ASSETS.DOOR_CLOSED,
-  ) {
-    super(scene, x, y, open ? openFrameKey : closedFrameKey, true, color);
-    this.doorId = doorId;
-    this.color = color;
-    this.open = open;
-    this.openFrameKey = openFrameKey;
-    this.closedFrameKey = closedFrameKey;
+  constructor(scene: Phaser.Scene, data: DoorType) {
+    super(
+      scene,
+      data.x,
+      data.y,
+      data.open ? ASSETS.DOOR_OPEN : ASSETS.DOOR_CLOSED,
+      true,
+      data.color,
+    );
+    this.doorId = data.doorId;
+    this.networkId = data.doorId;
+    this.color = data.color;
+    this.open = data.open;
+    this.openFrameKey = ASSETS.DOOR_OPEN;
+    this.closedFrameKey = ASSETS.DOOR_CLOSED;
+  }
+
+  public syncState(data: Partial<DoorType>) {
+    if (data.open !== undefined) {
+      this.isOpen = data.open;
+    }
   }
 
   public get id(): string {

@@ -87,13 +87,14 @@ export class Entity extends Phaser.GameObjects.Container {
       y: targetY,
       duration: 200,
       ease,
+      onUpdate: () => {
+        this.setDepth(this.y);
+      },
       onComplete: () => {
         this.setPosition(targetX, targetY);
         this.stopAnim(walkAnimName, `idle-${direction}`);
       },
     });
-
-    this.setDepth(targetY);
   }
 
   destroy(): void {
