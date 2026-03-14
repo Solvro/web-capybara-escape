@@ -1,5 +1,6 @@
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
+import type { Laser as LaserType } from "../../types/laser";
 import { Mechanic } from "./mechanic";
 
 const GHOST_IDLE_FRAMES: Record<"left" | "right" | "up" | "down", number> = {
@@ -32,44 +33,35 @@ export class Laser extends Mechanic {
   private baseSprite: Phaser.GameObjects.Sprite;
   private beamSprites: Phaser.GameObjects.Sprite[] = [];
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    laserId: string,
-    direction: "left" | "right" | "up" | "down",
-    range: number,
-    color: string,
-    launched = false,
-  ) {
+  constructor(scene: Phaser.Scene, data: LaserType) {
     super(
       scene,
-      x,
-      y,
-      launched ? GHOST_COLOR_FRAMES[direction] : ASSETS.EMPTY,
+      data.x,
+      data.y,
+      data.active ? GHOST_COLOR_FRAMES[data.direction] : ASSETS.EMPTY,
       true,
-      color,
+      data.color,
     );
     this.baseSprite = this.scene.add
       .sprite(
         0,
         0,
         "tileset",
-        launched
-          ? GHOST_ACTIVE_FRAMES[direction]
-          : GHOST_IDLE_FRAMES[direction],
+        data.active
+          ? GHOST_ACTIVE_FRAMES[data.direction]
+          : GHOST_IDLE_FRAMES[data.direction],
       )
       .setScale(SIZE_MULTIPLIER);
     this.add(this.baseSprite);
-    if (direction === "left") {
+    if (data.direction === "left") {
       this.sprite.setAngle(180);
       this.baseSprite.setAngle(180);
     }
-    this.laserId = laserId;
-    this.color = color;
-    this.launched = launched;
-    this.direction = direction;
-    this.range = range;
+    this.laserId = data.laserId;
+    this.color = data.color;
+    this.launched = data.active;
+    this.direction = data.direction;
+    this.range = data.range;
     this.sendToBack(this.baseSprite);
   }
 

@@ -2,9 +2,12 @@ import type * as Phaser from "phaser";
 
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE } from "../../constants/global";
+import type { Cable as CableType } from "../../types/cable";
+import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 
-export class Cable extends Mechanic {
+export class Cable extends Mechanic implements INetworkInterface<CableType> {
+  public networkId: string;
   public cableId: string;
   public damage: boolean;
   public timer: number;
@@ -12,32 +15,23 @@ export class Cable extends Mechanic {
   public safeDuration: number;
   public direction: "up" | "down" | "left" | "right";
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    id: string,
-    damaged: boolean,
-    timer: number,
-    damageDuration: number,
-    safeDuration: number,
-    direction: "up" | "down" | "left" | "right",
-  ) {
-    const posY = y * CELL_SIZE + CELL_SIZE / 2;
+  constructor(scene: Phaser.Scene, data: CableType) {
+    const posY = data.y * CELL_SIZE + CELL_SIZE / 2;
 
     super(
       scene,
-      x,
-      y,
-      damaged ? ASSETS.CABLE_END_ACTIVE : ASSETS.CABLE_END_INACTIVE,
+      data.x,
+      data.y,
+      data.damage ? ASSETS.CABLE_END_ACTIVE : ASSETS.CABLE_END_INACTIVE,
     );
 
-    this.cableId = id;
-    this.damage = damaged;
-    this.timer = timer;
-    this.damageDuration = damageDuration;
-    this.safeDuration = safeDuration;
-    this.direction = direction;
+    this.networkId = data.cableId;
+    this.cableId = data.cableId;
+    this.damage = data.damage;
+    this.timer = data.timer;
+    this.damageDuration = data.damageDuration;
+    this.safeDuration = data.safeDuration;
+    this.direction = data.direction;
 
     switch (this.direction) {
       case "up": {
@@ -62,6 +56,12 @@ export class Cable extends Mechanic {
 
     this.updateVisual();
   }
+
+  syncState = (data: CableType) => {
+    this.damage = data.damage;
+    this.timer = data.timer;
+    this.updateVisual();
+  };
 
   applyState(damage: boolean) {
     this.damage = damage;
