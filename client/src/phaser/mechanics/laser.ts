@@ -1,6 +1,7 @@
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 import type { Laser as LaserType } from "../../types/laser";
+import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 
 const GHOST_IDLE_FRAMES: Record<"left" | "right" | "up" | "down", number> = {
@@ -24,8 +25,9 @@ const GHOST_COLOR_FRAMES: Record<"left" | "right" | "up" | "down", number> = {
   left: ASSETS.GHOST_COLOR_RIGHT,
 };
 
-export class Laser extends Mechanic {
+export class Laser extends Mechanic implements INetworkInterface<LaserType> {
   public readonly laserId: string;
+  public readonly networkId: string | number;
   public readonly color: string;
   private launched: boolean;
   private direction: "left" | "right" | "up" | "down";
@@ -57,12 +59,18 @@ export class Laser extends Mechanic {
       this.sprite.setAngle(180);
       this.baseSprite.setAngle(180);
     }
+    this.networkId = data.laserId;
     this.laserId = data.laserId;
     this.color = data.color;
     this.launched = data.active;
     this.direction = data.direction;
     this.range = data.range;
     this.sendToBack(this.baseSprite);
+  }
+
+  public syncState(data: LaserType) {
+    this.isLaunched = data.active;
+    this.range = data.range;
   }
 
   public get id(): string {
