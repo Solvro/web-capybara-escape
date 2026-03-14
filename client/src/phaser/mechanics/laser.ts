@@ -1,40 +1,33 @@
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE } from "../../constants/global";
+import type { Laser as LaserType } from "../../types/laser";
+import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 
-export class Laser extends Mechanic {
+export class Laser extends Mechanic implements INetworkInterface<LaserType> {
   public readonly laserId: string;
+  public readonly networkId: string | number;
   public readonly color: string;
   private launched: boolean;
-  private launchedFrameKey: number;
-  private disactivatedFrameKey: number;
-  private laserLineFrameKey: number;
+  private launchedFrameKey: number = ASSETS.LASER_GUN_FIRED;
+  private disactivatedFrameKey: number = ASSETS.LASER_GUN;
+  private laserLineFrameKey: number = ASSETS.LASER_LINE;
   private direction: "left" | "right" | "up" | "down";
   private range: number;
   private laserLine: Phaser.GameObjects.Sprite[] = [];
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    laserId: string,
-    direction: "left" | "right" | "up" | "down",
-    range: number,
-    color: string,
-    launched = false,
-    launchedFrameKey = ASSETS.LASER_GUN_FIRED,
-    disactivatedFrameKey = ASSETS.LASER_GUN,
-    laserLineFrameKey = ASSETS.LASER_LINE,
-  ) {
-    super(scene, x, y, launched ? launchedFrameKey : disactivatedFrameKey);
-    this.laserId = laserId;
-    this.color = color;
-    this.launched = launched;
-    this.launchedFrameKey = launchedFrameKey;
-    this.disactivatedFrameKey = disactivatedFrameKey;
-    this.laserLineFrameKey = laserLineFrameKey;
-    this.direction = direction;
-    this.range = range;
+  constructor(scene: Phaser.Scene, data: LaserType) {
+    super(scene, data.x, data.y, ASSETS.LASER_GUN);
+    this.laserId = data.laserId;
+    this.color = data.color;
+    this.launched = false;
+    this.direction = data.direction;
+    this.range = data.range;
+    this.networkId = data.laserId;
+  }
+
+  public syncState(data: Partial<LaserType>): void {
+    //
   }
 
   public get id(): string {
