@@ -11,6 +11,7 @@ import type { Button as ButtonType } from "../../types/button";
 import type { Crate as CrateType } from "../../types/crate";
 import type { Door as DoorType } from "../../types/door";
 import type { Laser as LaserType } from "../../types/laser";
+import type {Wire as WireType} from "../../types/wire";
 import type {Cable as CableType} from "../../types/cable";
 import type {
   MessageCratesUpdate,
@@ -35,6 +36,7 @@ import {
 import type { SpriteAnimator } from "../lib/sprite-animator";
 import { Button } from "../mechanics/button";
 import { Cable } from "../mechanics/cable";
+import { Wire } from "../mechanics/wire";
 import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
@@ -65,6 +67,7 @@ export class Main extends Phaser.Scene {
   private doors = new Map<string, Door>();
   private lasers = new Map<string, Laser>();
   private cables = new Map<string, Cable>();
+  private wires = new Map<string, Wire>();
   private vents = new Map<number, Vent>();
   private speechBubbles = new Map<string, SpeechBubble>();
   private bubbleTimer!: Phaser.Time.TimerEvent;
@@ -182,6 +185,9 @@ export class Main extends Phaser.Scene {
         }
         for (const cable of message.cables){
           this.addCable(cable);
+        }
+        for (const wire of message.wires){
+          this.addWire(wire);
         }
 
 
@@ -426,6 +432,17 @@ export class Main extends Phaser.Scene {
     this.add.existing(cable);
     console.log("added cable object", cable, "frame:", cable.frame?.name);
     this.cables.set(cableInfo.cableId, cable);
+  }
+  private addWire(wireInfo: WireType){
+    const wire = new Wire(
+      this,
+      wireInfo.x,
+      wireInfo.y,
+      wireInfo.wireId,
+      wireInfo.direction ?? "up",
+    );
+    this.add.existing(wire);
+    this.wires.set(wireInfo.wireId, wire);
   }
 
   private addButton(buttonInfo: ButtonType) {

@@ -6,8 +6,10 @@ import { ButtonState } from "./ButtonState.js";
 import { DoorState } from "./DoorState.js";
 import { LaserState } from "./LaserState.js";
 import { CableState } from "./CableState.js";
+import { WireState } from "./WireState.js";
 import { VentState } from "./VentState.js";
 import { Capybara } from "./Capybara.js";
+
 
 export class RoomState extends Schema {
   @type(["string"]) grid = new ArraySchema<string>();
@@ -22,6 +24,7 @@ export class RoomState extends Schema {
   @type(ButtonState) buttonState: ButtonState = new ButtonState();
   @type(LaserState) laserState: LaserState = new LaserState();
   @type(CableState) cableState: CableState = new CableState();
+  @type(WireState) wireState: WireState = new WireState();
   @type(VentState) ventState: VentState = new VentState();
   @type(Capybara) capybara: Capybara;
 
@@ -98,6 +101,14 @@ export class RoomState extends Schema {
           mechanicData.damageMs ?? mechanicData.damage,
           mechanicData.safeMs ?? mechanicData.safeDuration,
           mechanicData.startDamaging ?? mechanicData.startDamage ?? false,
+        );
+      }
+        else if (mechanicType === "wire"){
+        this.wireState.createWire(
+          mechanicData.id,
+          mechanicData.x,
+          mechanicData.y,
+          mechanicData.direction,
         );
       }
     }
@@ -278,6 +289,7 @@ export class RoomState extends Schema {
     this.buttonState.onRoomDispose();
     this.laserState.onRoomDispose();
     this.cableState.onRoomDispose();
+    this.wireState.onRoomDispose();
   }
 
   movePlayer(sessionId: string, deltaX: number, deltaY: number): boolean {
@@ -431,6 +443,14 @@ export class RoomState extends Schema {
           damageDuration: cable.damageDuration,
           safeDuration: cable.safeDuration,
           timer: cable.timer,
+        };
+      }),
+      wires: Array.from(this.wireState.wires.values()).map((wire) =>{
+        return {
+          wireId: wire.id,
+          x: wire.position.x,
+          y: wire.position.y,
+          direction: wire.direction,
         };
       }),
       doors: Array.from(this.doorState.doors.values()).map((door) => ({

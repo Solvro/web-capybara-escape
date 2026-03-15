@@ -1,6 +1,6 @@
 import {type, Schema, MapSchema} from "@colyseus/schema";
 import { Position } from "./Position";
-import { Cable } from "./CableState";
+
 
 export class Wire extends Schema{
     @type("string") id: string;
@@ -19,25 +19,31 @@ export class WireState extends Schema{
     private getPositionKey(x: number, y:number): string {
         return `${x}_${y}`;
     }
-    createWire(x: number, y: number, direction: string = "up") : Wire{
-        
-        const id = this.nextAvailableId++;
-        this.usedIds.add(id);
+    // accept optional `id` (string) from map JSON; if omitted, generate numeric id
+    createWire(id: string | undefined, x: number, y: number, direction: string = "up") : Wire{
+        let assignedId: string;
+        if (typeof id === "string" && id.length > 0) {
+            assignedId = id;
+        } else {
+            const numId = this.nextAvailableId++;
+            this.usedIds.add(numId);
+            assignedId = numId.toString();
+        }
 
         const wire = new Wire();
-        wire.id = id.toString();
-        wire.position = new Position();
-        wire.position.x = x;
-        wire.position.y = y;
-        wire.direction = direction;
-
-        this.wires.set(wire.id, wire);
-
-        const key = this.getPositionKey(x,y);
-        this.positionToWireId.set(key, wire.id);
-        
-        return wire;
-    }
+        wire.id = assignedId;
+         wire.position = new Position();
+         wire.position.x = x;
+         wire.position.y = y;
+         wire.direction = direction;
+ 
+         this.wires.set(wire.id, wire);
+ 
+         const key = this.getPositionKey(x,y);
+         this.positionToWireId.set(key, wire.id);
+         
+         return wire;
+     }
     removeWire(id: string){
         const wire = this.wires.get(id);
         if (!wire) return;
