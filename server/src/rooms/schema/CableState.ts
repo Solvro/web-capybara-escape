@@ -26,12 +26,19 @@ export class CableState extends Schema{
     private getPositionKey(x: number, y: number): string {
         return `${x}_${y}`;
     }
-    createCable(x: number, y: number, direction: string = "up", damageMs: number = 3000, safeMs: number = 2000, startDamaging: boolean = true): Cable {
-        const id = this.nextAvailableId++;
-        this.usedIds.add(id);
-
+    // now accepts optional `id` (string). If omitted, generate numeric id as before.
+    createCable(id: string | undefined, x: number, y: number, direction: string = "up", damageMs: number = 3000, safeMs: number = 2000, startDamaging: boolean = true): Cable {
+        let assignedId: string;
+        if (typeof id === "string" && id.length > 0) {
+            assignedId = id;
+        } else {
+            const numId = this.nextAvailableId++;
+            this.usedIds.add(numId);
+            assignedId = numId.toString();
+        }
+        
         const cable = new Cable();
-        cable.id = id.toString();
+        cable.id = assignedId;
         cable.position = new Position();
         cable.position.x = x;
         cable.position.y = y;
