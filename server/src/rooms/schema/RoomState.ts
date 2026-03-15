@@ -89,7 +89,9 @@ export class RoomState extends Schema {
           mechanicData.inactiveDuration ?? 1000,
         );
       } else if (mechanicType === "cable") {
+        // pass mechanic id so cable uses same id defined in room JSON 
         this.cableState.createCable(
+          mechanicData.id,
           mechanicData.x,
           mechanicData.y,
           mechanicData.direction,
@@ -489,20 +491,7 @@ export class RoomState extends Schema {
     this.crateState.removeCrate(id);
   }
 
-  // proxy so callers can pass cable timing / initial state
-  spawnCable(
-    x: number,
-    y: number,
-    direction?: "up" | "down" | "left" | "right",
-    damageMs?: number,
-    safeMs?: number,
-    startDamaging?: boolean,
-  ) {
-    this.cableState.createCable(x, y, direction, damageMs, safeMs, startDamaging);
-  }
-  despawnCable(id: string) {
-    this.cableState.removeCable(id);
-  }
+  
 
   // expose toggles/moves for broadcasting
   getAndClearToggledCables() {
