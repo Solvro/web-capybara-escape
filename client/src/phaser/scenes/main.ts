@@ -118,8 +118,8 @@ export class Main extends Phaser.Scene {
     this.load.image("vent-closed", "images/vent/vent-closed.png");
 
     // cables
-    this.load.image("cable-on", "images/cables/cableWithElectricity.png");
-    this.load.image("cable-off", "images/cables/safecable.png");
+    //this.load.image("cable-on", "images/cables/cableWithElectricity.png");
+    //this.load.image("cable-off", "images/cables/safecable.png");
     // capybara
     this.load.image("capybara", "images/capybara/back_1.png");
 
@@ -411,6 +411,7 @@ export class Main extends Phaser.Scene {
   }
   
   private addCable(cableInfo: CableType){
+    console.log("addCable called", cableInfo);
     const cable = new Cable(
       this,
       cableInfo.x,
@@ -423,8 +424,8 @@ export class Main extends Phaser.Scene {
       cableInfo.direction,
     );
     this.add.existing(cable);
+    console.log("added cable object", cable, "frame:", cable.frame?.name);
     this.cables.set(cableInfo.cableId, cable);
-
   }
 
   private addButton(buttonInfo: ButtonType) {

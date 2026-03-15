@@ -1,61 +1,61 @@
 import * as Phaser from "phaser";
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
+import { Mechanic } from "./mechanic";
 
+const CABLE_FRAME_ON = 25; 
+const CABLE_FRAME_OFF = 24; 
 
-export class Cable extends Phaser.GameObjects.Container {
+export class Cable extends Mechanic {
   public cableId: string;
   public damage: boolean;
   public timer: number;
   public damageDuration: number;
   public safeDuration: number;
-  public direction: "up" | "down" | "left" | "right"; 
-
-  private sprite: Phaser.GameObjects.Image;
+  public direction: "up" | "down" | "left" | "right";
 
   constructor(
     scene: Phaser.Scene,
-    gridX: number,
-    gridY: number,
-    id: string,
-    damage: boolean = false,
-    timer: number = 0,
-    damageDuration: number = 0,
-    safeDuration: number = 0,
-    direction: "up" | "down" | "left" | "right" = "up", 
+    x: number,
+    y: number,
+    id: number,
+    damaged: boolean,
+    timer: number,
+    damageDuration: number,
+    safeDuration: number,
+    direction: string,
   ) {
-    const posX = gridX * CELL_SIZE + CELL_SIZE / 2;
-    const posY = gridY * CELL_SIZE + CELL_SIZE / 2;
-    super(scene, posX, posY);
+    const posX = x * CELL_SIZE + CELL_SIZE / 2;
+    const posY = y * CELL_SIZE + CELL_SIZE / 2;
 
-    this.cableId = id;
-    this.damage = damage;
+
+    super(scene, x, y, damaged ? CABLE_FRAME_ON : CABLE_FRAME_OFF);
+
+    this.cableId = id.toString();
+    this.damage = damaged;
     this.timer = timer;
     this.damageDuration = damageDuration;
     this.safeDuration = safeDuration;
-    this.direction = direction; 
+    this.direction = direction as any;
 
-    this.sprite = scene.add.image(0, 0, damage ? "cable-on" : "cable-off");
-    this.sprite.setScale(SIZE_MULTIPLIER);
-    this.add(this.sprite);
 
-    // orient sprite to direction
+
     switch (this.direction) {
       case "up":
-        this.sprite.setAngle(0);
+        this.setAngle(0);
         break;
       case "right":
-        this.sprite.setAngle(90);
+        this.setAngle(90);
         break;
       case "down":
-        this.sprite.setAngle(180);
+        this.setAngle(180);
         break;
       case "left":
-        this.sprite.setAngle(270);
+        this.setAngle(270);
         break;
     }
 
     this.setDepth(posY);
-    scene.add.existing(this);
+
 
     this.updateVisual();
   }
@@ -69,14 +69,13 @@ export class Cable extends Phaser.GameObjects.Container {
   }
 
   private updateVisual() {
-    const key = this.damage ? "cable-on" : "cable-off";
-    if (this.sprite.texture.key !== key) {
-      this.sprite.setTexture(key);
+    const frame = this.damage ? CABLE_FRAME_ON : CABLE_FRAME_OFF;
+    if ((this as any).setFrame) {
+      this.setFrame(frame);
     }
   }
 
   destroy(fromScene?: boolean) {
-    this.sprite.destroy();
     super.destroy(fromScene);
   }
 }
