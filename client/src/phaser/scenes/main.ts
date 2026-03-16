@@ -27,6 +27,7 @@ import type { Player as PlayerType } from "../../types/player";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
+import { Display } from "../lib/display";
 import {
   PLAYER_TEXTURE_KEYS,
   createPlayerAnimators,
@@ -60,6 +61,7 @@ const TILE_MAPPING: Record<
 
 export class Main extends Phaser.Scene {
   private room!: Room;
+  displayHandler!: Display;
   private capybara: Capybara | null = null;
   private players = new Map<string, Player>();
   private crates = new Map<number, Crate>();
@@ -91,6 +93,7 @@ export class Main extends Phaser.Scene {
       throw new Error("Room not found in registry");
     }
     this.room = this.registry.get("room") as Room;
+    this.displayHandler = new Display(this);
   }
 
   preload() {
@@ -162,7 +165,11 @@ export class Main extends Phaser.Scene {
       const room = this.registry.get("room") as Room;
 
       room.onMessage("mapInfo", (message: MessageMapInfo) => {
-        this.createMap(message.grid, message.width, message.height);
+        this.displayHandler.createMap(
+          message.grid,
+          message.width,
+          message.height,
+        );
 
         for (const player of message.players) {
           this.addPlayer(player);
@@ -346,10 +353,9 @@ export class Main extends Phaser.Scene {
       this.speechBubbles.delete(sessionId);
       this.bubbleTimer.remove();
     }
-    this.speechBubbles.set(
-      sessionId,
-      new SpeechBubble(this, target, text, sessionId),
-    );
+    const bubble = new SpeechBubble(this, target, text, sessionId);
+    this.speechBubbles.set(sessionId, bubble);
+    this.displayHandler.add("effects", bubble, true);
 
     this.bubbleTimer = this.time.delayedCall(
       text.split(" ").length * 600 + 2000,
@@ -391,12 +397,12 @@ export class Main extends Phaser.Scene {
       animator,
     );
     this.players.set(playerSpawnInfo.sessionId, player);
-    this.add.existing(player);
+    this.displayHandler.add("entities", player);
   }
 
   private addCrate(crateInfo: CrateType) {
     const crate = new Crate(this, crateInfo.x, crateInfo.y, crateInfo.crateId);
-    this.add.existing(crate);
+    this.displayHandler.add("entities", crate);
     this.crates.set(crateInfo.crateId, crate);
   }
 
@@ -411,7 +417,7 @@ export class Main extends Phaser.Scene {
       laserInfo.color,
     );
     // console.log("Adding laser:", laserInfo);
-    this.add.existing(laser);
+    this.displayHandler.add("floor decoys", laser);
     this.lasers.set(laserInfo.laserId, laser);
     laser.launch(false, laserInfo.range);
   }
@@ -454,7 +460,7 @@ export class Main extends Phaser.Scene {
       buttonInfo.color,
       buttonInfo.pressed,
     );
-    this.add.existing(button);
+    this.displayHandler.add("floor decoys", button);
     this.buttons.set(buttonInfo.buttonId, button);
   }
 
@@ -467,7 +473,7 @@ export class Main extends Phaser.Scene {
       doorInfo.color,
       doorInfo.open,
     );
-    this.add.existing(door);
+    this.displayHandler.add("wall decoys", door);
     this.doors.set(doorInfo.doorId, door);
   }
 
@@ -484,7 +490,7 @@ export class Main extends Phaser.Scene {
       ventInfo.id,
       ventInfo.open,
     );
-    this.add.existing(vent);
+    this.displayHandler.add("floor decoys", vent);
     this.vents.set(ventInfo.id, vent);
   }
 
@@ -494,43 +500,7 @@ export class Main extends Phaser.Scene {
     }
 
     this.capybara = new Capybara(this, capybaraInfo.x, capybaraInfo.y);
-    this.add.existing(this.capybara);
-  }
-
-  createMap(grid: string[][], width: number, height: number) {
-    // console.log(grid);
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const tileType = grid[y][x];
-        const posX = x * CELL_SIZE + CELL_SIZE / 2;
-        const posY = y * CELL_SIZE + CELL_SIZE / 2;
-
-        const config = TILE_MAPPING[tileType];
-
-        // if floor detected, add floor tile
-        if (tileType === "f1") {
-          this.add
-            .image(posX, posY, "tileset", config.frame)
-            .setDepth(0)
-            .setScale(SIZE_MULTIPLIER);
-        }
-
-        // if wall detected, add wall tile (and second 0.5 tile if tall)
-        if (tileType.startsWith("w")) {
-          this.add
-            .image(posX, posY, "tileset", config.frame)
-            .setDepth(posY)
-            .setScale(SIZE_MULTIPLIER);
-
-          if (config.isTall ?? false) {
-            this.add
-              .image(posX, posY - CELL_SIZE, "tileset", config.frameSecond)
-              .setScale(SIZE_MULTIPLIER)
-              .setDepth(posY);
-          }
-        }
-      }
-    }
+    this.displayHandler.add("entities", this.capybara);
   }
 
   handleInput(time: number) {
