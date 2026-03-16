@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/filename-case */
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
+import { Creator } from "./pages/creator";
 import { Game } from "./pages/game";
 import { Intro } from "./pages/intro";
 import { Playground } from "./pages/playground";
@@ -12,6 +13,7 @@ export function App() {
         <Routes>
           <Route path="/" element={<Intro />} />
           <Route path="/game" element={<Game />} />
+          <Route path="/creator" element={<Creator />} />
           <Route path="/playground" element={<Playground />} />
         </Routes>
       </Router>
