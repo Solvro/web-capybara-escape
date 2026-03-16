@@ -47,12 +47,24 @@
     },
     {
       "type": "cable",
-      "x": 5,
-      "y": 2,
-      "direction": "left",
+      "x": 6,
+      "y": 3,
+      "direction": "up",
       "damageMs": 3000,
       "safeMs": 2000,
       "startDamaging": true
+    },
+    {
+      "type": "wire",
+      "x": 6,
+      "y": 4,
+      "direction": "up"
+    },
+    {
+      "type": "wire",
+      "x": 7,
+      "y": 4,
+      "direction": "left"
     }
   ],
   "entities": {

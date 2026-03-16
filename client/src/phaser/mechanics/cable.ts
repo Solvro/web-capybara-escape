@@ -1,9 +1,10 @@
 import * as Phaser from "phaser";
+
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 import { Mechanic } from "./mechanic";
 
-const CABLE_FRAME_ON = 25; 
-const CABLE_FRAME_OFF = 24; 
+const CABLE_FRAME_ON = 25;
+const CABLE_FRAME_OFF = 24;
 
 export class Cable extends Mechanic {
   public cableId: string;
@@ -27,7 +28,6 @@ export class Cable extends Mechanic {
     const posX = x * CELL_SIZE + CELL_SIZE / 2;
     const posY = y * CELL_SIZE + CELL_SIZE / 2;
 
-
     super(scene, x, y, damaged ? CABLE_FRAME_ON : CABLE_FRAME_OFF);
 
     this.cableId = id.toString();
@@ -37,33 +37,36 @@ export class Cable extends Mechanic {
     this.safeDuration = safeDuration;
     this.direction = direction as any;
 
-
-
     switch (this.direction) {
       case "up":
-        this.setAngle(0);
+        this.setAngle(270);
         break;
       case "right":
-        this.setAngle(90);
+        this.setAngle(0);
         break;
       case "down":
-        this.setAngle(180);
+        this.setAngle(90);
         break;
       case "left":
-        this.setAngle(270);
+        this.setAngle(180);
         break;
     }
 
     this.setDepth(posY);
 
-
     this.updateVisual();
   }
 
-  applyState(damage: boolean, timer: number, damageDuration?: number, safeDuration?: number) {
+  applyState(
+    damage: boolean,
+    timer: number,
+    damageDuration?: number,
+    safeDuration?: number,
+  ) {
     this.damage = damage;
     this.timer = timer;
-    if (typeof damageDuration === "number") this.damageDuration = damageDuration;
+    if (typeof damageDuration === "number")
+      this.damageDuration = damageDuration;
     if (typeof safeDuration === "number") this.safeDuration = safeDuration;
     this.updateVisual();
   }
