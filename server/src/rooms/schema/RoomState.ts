@@ -32,6 +32,8 @@ export class RoomState extends Schema {
 
   loadRoomFromJson(jsonData: any) {
     try {
+      this.clearState();
+      
       this.width = jsonData.width;
       this.height = jsonData.height;
 
@@ -576,4 +578,19 @@ export class RoomState extends Schema {
     }
     return doorsAndButtonsToUpdate;
   }
+  clearState() {
+    this.crateState.crates.clear();
+    this.doorState.doors.clear();
+    this.buttonState.buttons.clear();
+    this.laserState.lasers.clear();
+    this.cableState.cables.clear();
+    this.wireState.wires.clear();
+    this.ventState.vents.clear();
+    
+    this.grid.clear();
+    this.startingPositions.clear();
+    this.capybaraPath = [];
+    this.capybara = undefined;
+    
+}
 }

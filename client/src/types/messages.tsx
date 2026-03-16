@@ -60,3 +60,8 @@ export interface MessageGenerateLines {
   sessionId: string;
   text: string;
 }
+
+export interface MessageRoomReset {
+  message: string;      
+  timestamp: number;    
+}

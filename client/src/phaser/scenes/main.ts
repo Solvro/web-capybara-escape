@@ -79,6 +79,7 @@ export class Main extends Phaser.Scene {
     D: Phaser.Input.Keyboard.Key;
   };
   private speakInput!: Phaser.Input.Keyboard.Key;
+  private resetInput!: Phaser.Input.Keyboard.Key;
   private playerMoveDebounce = 0;
   private playerAnimators!: SpriteAnimator[];
 
@@ -155,6 +156,7 @@ export class Main extends Phaser.Scene {
         D: Phaser.Input.Keyboard.Key;
       };
       this.speakInput = this.input.keyboard.addKey("L");
+      this.resetInput = this.input.keyboard.addKey("R");
     }
 
     // Colyseus message handlers
@@ -296,6 +298,15 @@ export class Main extends Phaser.Scene {
         }
       });
 
+      room.onMessage("roomReset", () => {
+        console.log(`Resetting scene graphics...`);
+
+    
+        this.resetGraphics();
+    
+        this.room.send("getMapInfo");
+});
+
       this.room.send("getMapInfo");
     } catch (error) {
       console.error("Error setting up Colyseus message handlers:", error);
@@ -320,7 +331,7 @@ export class Main extends Phaser.Scene {
           room.offMessage("mapInfo", onMapInfo);
           room.offMessage("cablesUpdate", onCables);
           room.offMessage("playerDamaged", onPlayerDamaged);
-        } catch (e) {}
+        } catch {}
       });
     }
 
@@ -328,11 +339,11 @@ export class Main extends Phaser.Scene {
     this.events.on("cables:update", (list: any[]) => {
       for (const t of list) {
         const id = t.cableId ?? t.id;
-        if (!id) continue;
+        if (!id) {continue;}
         const cable = this.cables.get(id);
         if (cable) {
           cable.applyState(
-            !!t.damage,
+            Boolean(t.damage),
             typeof t.timer === "number" ? t.timer : cable.timer,
           );
         }
@@ -363,9 +374,13 @@ export class Main extends Phaser.Scene {
   }
 
   update(time: number) {
+    if (Phaser.Input.Keyboard.JustDown(this.resetInput)) {
+    this.room.send("reset");
+  }
     if (Phaser.Input.Keyboard.JustDown(this.speakInput)) {
       this.room.send("generateLine");
     }
+    
     if (time - this.playerMoveDebounce < 250) {
       return;
     }
@@ -551,4 +566,29 @@ export class Main extends Phaser.Scene {
       this.playerMoveDebounce = time;
     }
   }
+
+private resetGraphics() {
+  console.log("Resetting scene graphics...");
+
+  const mapsToDestroy = [
+    this.cables, 
+    this.players, 
+    this.speechBubbles, 
+    this.crates, 
+    this.doors, 
+    this.buttons
+  ];
+
+  mapsToDestroy.forEach(map => {
+    map.forEach((obj: any) => {
+      if (obj && typeof obj.destroy === "function") {
+        obj.destroy();
+      }
+    });
+    map.clear();
+  });
+
+  this.children.removeAll();
+}
+
 }

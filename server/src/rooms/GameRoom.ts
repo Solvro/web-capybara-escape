@@ -89,6 +89,26 @@ export class GameRoom extends Room<RoomState> {
         text: SpeechBubble.getInstance().pickRandomLine("neutral"),
       });
     });
+
+    this.onMessage("reset", (client) => {
+      console.log(`[RESET] Room reset requested by ${client.sessionId}`);
+
+      this.state.loadRoomFromJson(room);
+
+      this.clients.forEach((c) => {
+        const player = this.state.playerState.players.get(c.sessionId);
+        if (player) {
+            const startPos = this.state.startingPositions[player.index % this.state.startingPositions.length];
+            player.position.x = startPos.x;
+            player.position.y = startPos.y;
+        }
+    });
+
+      this.broadcast("roomReset", {
+        message: "Level has been reset",
+        mapInfo: this.state.getMapInfo()
+      });
+    });
   }
 
   onJoin(client: Client, options: any) {
