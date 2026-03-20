@@ -1,7 +1,7 @@
 import { Room, Client } from "@colyseus/core";
 import { getMoveVectorFromDirection } from "../shared/utils/vectorUtils";
 import { RoomState } from "./schema/RoomState";
-import room from "./json/examples/room1.json";
+import room from "./json/examples/room2.json";
 import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
 // import room from "./json/examples/room2.json";
 // import room from "./json/examples/room3.json";

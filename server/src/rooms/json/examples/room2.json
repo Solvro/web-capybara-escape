@@ -3,108 +3,69 @@
   "width": 10,
   "height": 8,
   "layout": [
-    ["", "", "", "", "", "", "", "", "", ""],
-    ["w1t", "w1t", "w2t", "w2t", "w1t", "w1t", "", "", "", ""],
-    ["w1t", "f1", "w2t", "w2t", "w2t", "w2t", "w2t", "w2t", "w1t", "w1t"],
-    ["f1", "f1", "w1t", "f1", "w1t", "w1t", "f1", "w1t", "f1", "w1t"],
-    ["w1t", "f1", "w1t", "f1", "w2t", "w1t", "f1", "f1", "f1", "f1"],
-    ["f1", "f1", "f1", "f1", "w2t", "w1t", "f1", "w2t", "w1t", "w1t"],
-    ["w1t", "w1t", "w1t", "f1", "w2t", "", "", "", "", ""],
-    ["f1", "f1", "f1", "f1", "f1", "", "", "", "", ""]
+    ["f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1"],
+    ["f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1", "f1"]
   ],
   "mechanics": [
     {
-      "type": "door",
-      "x": 1,
-      "y": 4,
-      "id": "door-red-1",
-      "color": "#FF3B30",
-      "active": false
+      "type": "laser",
+      "id": "laser-down",
+      "color": "#007AFF",
+      "x": 5,
+      "y": 0,
+      "direction": "down",
+      "range": 7,
+      "inactiveDuration": 1200,
+      "activeDuration": 800
     },
     {
       "type": "laser",
-      "id": "laser-1",
-      "color": "#007AFF",
-      "x": 3,
+      "id": "laser-up",
+      "color": "#34C759",
+      "x": 1,
       "y": 7,
       "direction": "up",
-      "range": 8,
-      "inactiveDuration": 200,
-      "activeDuration": 400
+      "range": 7,
+      "inactiveDuration": 800,
+      "activeDuration": 1200
     },
     {
       "type": "laser",
-      "id": "laser-2",
+      "id": "laser-left",
       "color": "#FF00FF",
-      "x": 6,
+      "x": 9,
       "y": 4,
-      "direction": "right",
-      "range": 6,
-      "inactiveDuration": 200,
+      "direction": "left",
+      "range": 9,
+      "inactiveDuration": 600,
       "activeDuration": 1000
     },
     {
-      "type": "cable",
-      "x": 2,
-      "y": 7,
-      "damageMs": 200,
-      "safeMs": 1000,
-      "startDamaging": true
-    },
-    {
-      "type": "door",
-      "x": 3,
-      "y": 6,
-      "id": "door-green-1",
-      "color": "#33cc33",
-      "active": false
-    },
-    {
-      "type": "button",
-      "id": "button-red-1",
-      "x": 8,
-      "y": 3,
-      "color": "#FF3B30",
-      "doorId": "door-red-1"
-    },
-    {
-      "type": "button",
-      "id": "button-green-1",
-      "x": 3,
-      "y": 3,
-      "color": "#33cc33",
-      "doorId": "door-green-1"
-    },
-    {
-      "type": "spikes",
-      "x": 5,
-      "y": 3,
-      "damage": 1,
-      "cooldownMs": 600
+      "type": "laser",
+      "id": "laser-right",
+      "color": "#FF9500",
+      "x": 0,
+      "y": 1,
+      "direction": "right",
+      "range": 9,
+      "inactiveDuration": 1000,
+      "activeDuration": 600
     }
   ],
   "entities": {
     "players": [
-      { "x": 1, "y": 2 },
-      { "x": 6, "y": 4 }
+      { "x": 4, "y": 4 },
+      { "x": 5, "y": 4 }
     ],
     "enemies": [],
-    "capybara": { "x": 0, "y": 5 },
-    "crates": [
-      { "x": 7, "y": 4 },
-      { "x": 3, "y": 4 }
-    ],
-    "vents": [
-      {
-        "x": 1,
-        "y": 3,
-        "open": false
-      },
-      {
-        "x": 0,
-        "y": 7,
-        "open": true
-      }
-    ]
+    "capybara": { "x": 0, "y": 0 },
+    "crates": [],
+    "vents": []
   }
 }

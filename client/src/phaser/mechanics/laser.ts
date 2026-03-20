@@ -1,5 +1,5 @@
 import { ASSETS } from "../../constants/blocks";
-import { CELL_SIZE } from "../../constants/global";
+import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 import { Mechanic } from "./mechanic";
 
 export class Laser extends Mechanic {
@@ -26,7 +26,14 @@ export class Laser extends Mechanic {
     disactivatedFrameKey = ASSETS.LASER_GUN,
     laserLineFrameKey = ASSETS.LASER_LINE,
   ) {
-    super(scene, x, y, launched ? launchedFrameKey : disactivatedFrameKey);
+    super(
+      scene,
+      x,
+      y,
+      launched ? launchedFrameKey : disactivatedFrameKey,
+      true,
+      color,
+    );
     this.laserId = laserId;
     this.color = color;
     this.launched = launched;
@@ -35,6 +42,12 @@ export class Laser extends Mechanic {
     this.laserLineFrameKey = laserLineFrameKey;
     this.direction = direction;
     this.range = range;
+
+    this.updateCannonRotation();
+
+    if (this.launched) {
+      this.launchLaser();
+    }
   }
 
   public get id(): string {
@@ -52,11 +65,36 @@ export class Laser extends Mechanic {
       : this.disactivatedFrameKey;
     this.setFrame(frameKey);
 
+    this.updateCannonRotation();
+
     if (this.launched) {
       this.launchLaser();
     } else {
       this.disactivateLaser();
     }
+  }
+
+  private updateCannonRotation() {
+    let angle = 0;
+    switch (this.direction) {
+      case "up": {
+        angle = 0;
+        break;
+      }
+      case "right": {
+        angle = 90;
+        break;
+      }
+      case "down": {
+        angle = 180;
+        break;
+      }
+      case "left": {
+        angle = -90;
+        break;
+      }
+    }
+    this.sprite.setAngle(angle);
   }
 
   public launch(isLaunched: boolean, range: number) {
@@ -67,29 +105,45 @@ export class Laser extends Mechanic {
   private launchLaser() {
     this.disactivateLaser();
 
-    for (let index = 1; index <= this.range; index++) {
-      let offsetX = 0;
-      let offsetY = 0;
+    const colorInt = Phaser.Display.Color.HexStringToColor(this.color).color;
+
+    // Horizontal beam needs 90° rotation since the line tile is vertical by default
+    const isHorizontal =
+      this.direction === "left" || this.direction === "right";
+    const beamAngle = isHorizontal ? 90 : 0;
+
+    for (let i = 1; i <= this.range; i++) {
+      let x = 0;
+      let y = 0;
       switch (this.direction) {
-        case "left":
-          offsetX = -index * CELL_SIZE;
+        case "right": {
+          x = i * CELL_SIZE;
           break;
-        case "right":
-          offsetX = index * CELL_SIZE;
+        }
+        case "left": {
+          x = -i * CELL_SIZE;
           break;
-        case "up":
-          offsetY = -index * CELL_SIZE;
+        }
+        case "up": {
+          y = -i * CELL_SIZE;
           break;
-        case "down":
-          offsetY = index * CELL_SIZE;
+        }
+        case "down": {
+          y = i * CELL_SIZE;
           break;
+        }
       }
+
       const segment = this.scene.add.sprite(
-        offsetX,
-        offsetY,
+        x,
+        y,
         "tileset",
         this.laserLineFrameKey,
       );
+      segment.setScale(SIZE_MULTIPLIER);
+      segment.setAngle(beamAngle);
+      segment.setTint(colorInt);
+
       this.laserLine.push(segment);
       this.add(segment);
     }

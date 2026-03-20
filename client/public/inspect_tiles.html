@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Tileset Inspector</title>
+    <style>
+      body {
+        background: #333;
+        padding: 20px;
+        font-family: monospace;
+      }
+      canvas {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .tile {
+        position: relative;
+        cursor: pointer;
+      }
+      .tile span {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 10px;
+        padding: 1px 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2 style="color: white">
+      Capybara Tileset - Each tile @ 5x (tile 24×24 → 120×120)
+    </h2>
+    <div class="grid" id="grid"></div>
+    <script>
+      const img = new Image();
+      img.onload = () => {
+        const COLS = 6,
+          ROWS = 6,
+          TILE = 24,
+          SCALE = 5;
+        const grid = document.getElementById("grid");
+        for (let row = 0; row < ROWS; row++) {
+          for (let col = 0; col < COLS; col++) {
+            const id = row * COLS + col;
+            const wrapper = document.createElement("div");
+            wrapper.className = "tile";
+            const c = document.createElement("canvas");
+            c.width = TILE * SCALE;
+            c.height = TILE * SCALE;
+            const ctx = c.getContext("2d");
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(
+              img,
+              col * TILE,
+              row * TILE,
+              TILE,
+              TILE,
+              0,
+              0,
+              TILE * SCALE,
+              TILE * SCALE,
+            );
+            const label = document.createElement("span");
+            label.textContent = id;
+            wrapper.appendChild(c);
+            wrapper.appendChild(label);
+            grid.appendChild(wrapper);
+          }
+        }
+      };
+      img.src = "/images/capybara-tileset.png";
+    </script>
+  </body>
+</html>

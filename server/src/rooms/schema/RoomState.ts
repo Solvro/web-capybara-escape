@@ -1,15 +1,13 @@
 import { type, Schema, ArraySchema } from "@colyseus/schema";
-import { Position } from "./Position.js";
-import { PlayerState } from "./PlayerState.js";
-import { CrateState } from "./CrateState.js";
-import { ButtonState } from "./ButtonState.js";
-import { DoorState } from "./DoorState.js";
-import { LaserState } from "./LaserState.js";
-import { CableState } from "./CableState.js";
-import { WireState } from "./WireState.js";
-import { VentState } from "./VentState.js";
-import { Capybara } from "./Capybara.js";
-
+import { Position } from "./Position";
+import { PlayerState } from "./PlayerState";
+import { CrateState } from "./CrateState";
+import { ButtonState } from "./ButtonState";
+import { DoorState } from "./DoorState";
+import { LaserState } from "./LaserState";
+import { CableState } from "./CableState";
+import { VentState } from "./VentState";
+import { Capybara } from "./Capybara";
 
 export class RoomState extends Schema {
   @type(["string"]) grid = new ArraySchema<string>();
@@ -24,7 +22,6 @@ export class RoomState extends Schema {
   @type(ButtonState) buttonState: ButtonState = new ButtonState();
   @type(LaserState) laserState: LaserState = new LaserState();
   @type(CableState) cableState: CableState = new CableState();
-  @type(WireState) wireState: WireState = new WireState();
   @type(VentState) ventState: VentState = new VentState();
   @type(Capybara) capybara: Capybara;
 
@@ -92,23 +89,12 @@ export class RoomState extends Schema {
           mechanicData.inactiveDuration ?? 1000,
         );
       } else if (mechanicType === "cable") {
-        // pass mechanic id so cable uses same id defined in room JSON 
         this.cableState.createCable(
-          mechanicData.id,
           mechanicData.x,
           mechanicData.y,
-          mechanicData.direction,
           mechanicData.damageMs ?? mechanicData.damage,
           mechanicData.safeMs ?? mechanicData.safeDuration,
           mechanicData.startDamaging ?? mechanicData.startDamage ?? false,
-        );
-      }
-        else if (mechanicType === "wire"){
-        this.wireState.createWire(
-          mechanicData.id,
-          mechanicData.x,
-          mechanicData.y,
-          mechanicData.direction,
         );
       }
     }
@@ -289,7 +275,6 @@ export class RoomState extends Schema {
     this.buttonState.onRoomDispose();
     this.laserState.onRoomDispose();
     this.cableState.onRoomDispose();
-    this.wireState.onRoomDispose();
   }
 
   movePlayer(sessionId: string, deltaX: number, deltaY: number): boolean {
@@ -376,14 +361,12 @@ export class RoomState extends Schema {
         currentY < 0 ||
         currentY >= this.height
       ) {
-        range = i;
         break;
       }
 
       // Stop if hit a wall
       const cell = this.getCellValue(currentX, currentY);
       if (cell === undefined || cell.startsWith("w")) {
-        range = i;
         break;
       }
 
@@ -397,6 +380,8 @@ export class RoomState extends Schema {
         });
         this.crateState.removeCrate(crate.id);
       }
+
+      range++;
 
       currentX += dx;
       currentY += dy;
@@ -438,19 +423,10 @@ export class RoomState extends Schema {
           cableId: cable.id,
           x: cable.position.x,
           y: cable.position.y,
-          direction: cable.direction,
           damage: cable.damage,
           damageDuration: cable.damageDuration,
           safeDuration: cable.safeDuration,
           timer: cable.timer,
-        };
-      }),
-      wires: Array.from(this.wireState.wires.values()).map((wire) =>{
-        return {
-          wireId: wire.id,
-          x: wire.position.x,
-          y: wire.position.y,
-          direction: wire.direction,
         };
       }),
       doors: Array.from(this.doorState.doors.values()).map((door) => ({
@@ -511,7 +487,19 @@ export class RoomState extends Schema {
     this.crateState.removeCrate(id);
   }
 
-  
+  // proxy so callers can pass cable timing / initial state
+  spawnCable(
+    x: number,
+    y: number,
+    damageMs?: number,
+    safeMs?: number,
+    startDamaging?: boolean,
+  ) {
+    this.cableState.createCable(x, y, damageMs, safeMs, startDamaging);
+  }
+  despawnCable(id: string) {
+    this.cableState.removeCable(id);
+  }
 
   // expose toggles/moves for broadcasting
   getAndClearToggledCables() {

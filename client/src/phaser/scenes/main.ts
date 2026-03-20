@@ -11,8 +11,6 @@ import type { Button as ButtonType } from "../../types/button";
 import type { Crate as CrateType } from "../../types/crate";
 import type { Door as DoorType } from "../../types/door";
 import type { Laser as LaserType } from "../../types/laser";
-import type {Wire as WireType} from "../../types/wire";
-import type {Cable as CableType} from "../../types/cable";
 import type {
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
@@ -36,7 +34,6 @@ import {
 import type { SpriteAnimator } from "../lib/sprite-animator";
 import { Button } from "../mechanics/button";
 import { Cable } from "../mechanics/cable";
-import { Wire } from "../mechanics/wire";
 import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
@@ -67,7 +64,6 @@ export class Main extends Phaser.Scene {
   private doors = new Map<string, Door>();
   private lasers = new Map<string, Laser>();
   private cables = new Map<string, Cable>();
-  private wires = new Map<string, Wire>();
   private vents = new Map<number, Vent>();
   private speechBubbles = new Map<string, SpeechBubble>();
   private bubbleTimer!: Phaser.Time.TimerEvent;
@@ -120,9 +116,6 @@ export class Main extends Phaser.Scene {
     this.load.image("vent-open", "images/vent/vent-open.png");
     this.load.image("vent-closed", "images/vent/vent-closed.png");
 
-    // cables
-    //this.load.image("cable-on", "images/cables/cableWithElectricity.png");
-    //this.load.image("cable-off", "images/cables/safecable.png");
     // capybara
     this.load.image("capybara", "images/capybara/back_1.png");
 
@@ -183,13 +176,20 @@ export class Main extends Phaser.Scene {
         for (const laser of message.lasers) {
           this.addLaser(laser);
         }
-        for (const cable of message.cables){
-          this.addCable(cable);
-        }
-        for (const wire of message.wires){
-          this.addWire(wire);
-        }
 
+        // add cables from server mapInfo
+        for (const cable of message.cables ?? []) {
+          if (this.cables.has(cable.cableId)) continue;
+          const c = new Cable(
+            this,
+            cable.x,
+            cable.y,
+            cable.cableId,
+            !!cable.damage,
+            cable.timer,
+          );
+          this.cables.set(cable.cableId, c);
+        }
 
         if (message.vents) {
           for (const vent of message.vents) {
@@ -414,35 +414,6 @@ export class Main extends Phaser.Scene {
     this.add.existing(laser);
     this.lasers.set(laserInfo.laserId, laser);
     laser.launch(false, laserInfo.range);
-  }
-  
-  private addCable(cableInfo: CableType){
-    console.log("addCable called", cableInfo);
-    const cable = new Cable(
-      this,
-      cableInfo.x,
-      cableInfo.y,
-      cableInfo.cableId,
-      cableInfo.damage,
-      cableInfo.timer,
-      cableInfo.damageDuration,
-      cableInfo.safeDuration,
-      cableInfo.direction,
-    );
-    this.add.existing(cable);
-    console.log("added cable object", cable, "frame:", cable.frame?.name);
-    this.cables.set(cableInfo.cableId, cable);
-  }
-  private addWire(wireInfo: WireType){
-    const wire = new Wire(
-      this,
-      wireInfo.x,
-      wireInfo.y,
-      wireInfo.wireId,
-      wireInfo.direction ?? "up",
-    );
-    this.add.existing(wire);
-    this.wires.set(wireInfo.wireId, wire);
   }
 
   private addButton(buttonInfo: ButtonType) {

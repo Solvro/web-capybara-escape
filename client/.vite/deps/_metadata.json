@@ -1,0 +1,61 @@
+{
+  "hash": "906d5f66",
+  "configHash": "03e80464",
+  "lockfileHash": "16a41178",
+  "browserHash": "ff55a556",
+  "optimized": {
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "df6dab71",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "6312c552",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "4cc5f58a",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "c54f41c6",
+      "needsInterop": false
+    },
+    "colyseus.js": {
+      "src": "../../node_modules/colyseus.js/build/cjs/index.js",
+      "file": "colyseus__js.js",
+      "fileHash": "76ee25b1",
+      "needsInterop": true
+    },
+    "@headlessui/react": {
+      "src": "../../node_modules/@headlessui/react/dist/headlessui.esm.js",
+      "file": "@headlessui_react.js",
+      "fileHash": "0208de10",
+      "needsInterop": false
+    },
+    "phaser": {
+      "src": "../../node_modules/phaser/dist/phaser.js",
+      "file": "phaser.js",
+      "fileHash": "6250272a",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-AZZLBHVG": {
+      "file": "chunk-AZZLBHVG.js"
+    },
+    "chunk-LTZIYYLR": {
+      "file": "chunk-LTZIYYLR.js"
+    },
+    "chunk-V4OQ3NZ2": {
+      "file": "chunk-V4OQ3NZ2.js"
+    }
+  }
+}
