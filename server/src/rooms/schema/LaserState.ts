@@ -10,11 +10,23 @@ export class Laser extends Schema {
   @type("string") color: string = "#FF0000";
   @type("number") activeDuration: number = 1000;
   @type("number") inactiveDuration: number = 1000;
+  @type("number") delay: number = 0;
 
   private timeSinceStateChange: number = 0;
+  private isWaitingDelay: boolean = true;
 
   update(deltaTime: number) {
     this.timeSinceStateChange += deltaTime;
+
+    // Like in the test room, wait for the initial delay before starting the cycle
+    if (this.isWaitingDelay) {
+      if (this.timeSinceStateChange >= this.delay) {
+        this.isWaitingDelay = false;
+        this.active = true;
+        this.timeSinceStateChange = 0;
+      }
+      return;
+    }
 
     const duration = this.active ? this.activeDuration : this.inactiveDuration;
 
@@ -38,6 +50,7 @@ export class LaserState extends Schema {
     range: number = 10,
     activeDuration: number = 1000,
     inactiveDuration: number = 1000,
+    delay: number = 0,
   ): Laser {
     const laser = new Laser();
     laser.id = id;
@@ -49,6 +62,7 @@ export class LaserState extends Schema {
     laser.active = false;
     laser.activeDuration = activeDuration;
     laser.inactiveDuration = inactiveDuration;
+    laser.delay = delay;
     this.lasers.set(id, laser);
     this.positionMap.set(`${x}_${y}`, id);
     return laser;

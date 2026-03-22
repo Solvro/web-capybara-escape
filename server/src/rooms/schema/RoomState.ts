@@ -90,6 +90,7 @@ export class RoomState extends Schema {
           mechanicData.range ?? 10,
           mechanicData.activeDuration ?? 1000,
           mechanicData.inactiveDuration ?? 1000,
+          mechanicData.delay ?? 0,
         );
       } else if (mechanicType === "cable") {
         // pass mechanic id so cable uses same id defined in room JSON 

@@ -65,6 +65,32 @@
       "x": 7,
       "y": 4,
       "direction": "left"
+    },
+    {
+      "type": "laser",
+      "x": 1,
+      "y": 2,
+      "id": "laser-v",
+      "direction": "down",
+      "range": 5,
+      "color": "#aa44ff",
+      "active": false,
+      "activeDuration": 2000,
+      "inactiveDuration": 2000,
+      "delay": 0
+    },
+    {
+      "type": "laser",
+      "x": 0,
+      "y": 5,
+      "id": "laser-h",
+      "direction": "right",
+      "range": 4,
+      "color": "#ffaa00",
+      "active": false,
+      "activeDuration": 2000,
+      "inactiveDuration": 2000,
+      "delay": 2000
     }
   ],
   "entities": {

@@ -8,8 +8,19 @@ export const ASSETS = {
   DOOR_CLOSED: 22,
   VENT_OPEN: 18,
   VENT_CLOSED: 12,
+  // Legacy laser constants (kept for backward compatibility)
   LASER_GUN: 5,
   LASER_GUN_FIRED: 23,
   LASER_LINE: 11,
+  // Directional laser cannon frames
+  LASER_GUN_UP: 17,
+  LASER_GUN_DOWN: 23,
+  LASER_GUN_RIGHT: 30,
+  LASER_GUN_LEFT: 35,
+  // Laser beam frames
+  LASER_BEAM_HORIZONTAL: 31,
+  LASER_BEAM_HORIZONTAL_TIP: 32,
+  LASER_BEAM_VERTICAL: 11,
+  LASER_BEAM_VERTICAL_TIP: 17,
   CABLE: 25,
 };
