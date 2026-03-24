@@ -1,4 +1,5 @@
 export const ASSETS = {
+  EMPTY: 7,
   BUTTON_PRESSED: 13,
   BUTTON_RELEASED: 14,
   BUTTON_BASE: 15,
@@ -8,19 +9,21 @@ export const ASSETS = {
   DOOR_CLOSED: 22,
   VENT_OPEN: 18,
   VENT_CLOSED: 12,
-  // Legacy laser constants (kept for backward compatibility)
-  LASER_GUN: 5,
-  LASER_GUN_FIRED: 23,
-  LASER_LINE: 11,
-  // Directional laser cannon frames
-  LASER_GUN_UP: 17,
-  LASER_GUN_DOWN: 23,
-  LASER_GUN_RIGHT: 30,
-  LASER_GUN_LEFT: 35,
-  // Laser beam frames
   LASER_BEAM_HORIZONTAL: 31,
-  LASER_BEAM_HORIZONTAL_TIP: 32,
   LASER_BEAM_VERTICAL: 11,
+  LASER_BEAM_HORIZONTAL_TIP: 32,
   LASER_BEAM_VERTICAL_TIP: 17,
+  // Ghost
+  GHOST_ACTIVE_DOWN: 5,
+  GHOST_ACTIVE_UP: 23,
+  GHOST_ACTIVE_RIGHT: 30,
+  // Ghost Color Layer
+  GHOST_COLOR_RIGHT: 40,
+  GHOST_COLOR_DOWN: 41,
+  GHOST_COLOR_UP: 42,
+  // Ghost Idle
+  GHOST_IDLE_RIGHT: 38,
+  GHOST_IDLE_DOWN: 38,
+  GHOST_IDLE_UP: 39,
   CABLE: 25,
 };
