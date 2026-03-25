@@ -1,10 +1,8 @@
 import * as Phaser from "phaser";
 
-import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
+import { ASSETS } from "../../constants/blocks";
+import { CELL_SIZE } from "../../constants/global";
 import { Mechanic } from "./mechanic";
-
-const CABLE_FRAME_ON = 25;
-const CABLE_FRAME_OFF = 24;
 
 export class Cable extends Mechanic {
   public cableId: string;
@@ -23,19 +21,23 @@ export class Cable extends Mechanic {
     timer: number,
     damageDuration: number,
     safeDuration: number,
-    direction: string,
+    direction: "up" | "down" | "left" | "right",
   ) {
-    const posX = x * CELL_SIZE + CELL_SIZE / 2;
     const posY = y * CELL_SIZE + CELL_SIZE / 2;
 
-    super(scene, x, y, damaged ? CABLE_FRAME_ON : CABLE_FRAME_OFF);
+    super(
+      scene,
+      x,
+      y,
+      damaged ? ASSETS.CABLE_END_ACTIVE : ASSETS.CABLE_END_INACTIVE,
+    );
 
     this.cableId = id;
     this.damage = damaged;
     this.timer = timer;
     this.damageDuration = damageDuration;
     this.safeDuration = safeDuration;
-    this.direction = direction as any;
+    this.direction = direction;
 
     switch (this.direction) {
       case "up":
@@ -72,7 +74,9 @@ export class Cable extends Mechanic {
   }
 
   private updateVisual() {
-    const frame = this.damage ? CABLE_FRAME_ON : CABLE_FRAME_OFF;
+    const frame = this.damage
+      ? ASSETS.CABLE_END_ACTIVE
+      : ASSETS.CABLE_END_INACTIVE;
     if ((this as any).setFrame) {
       this.setFrame(frame);
     }
