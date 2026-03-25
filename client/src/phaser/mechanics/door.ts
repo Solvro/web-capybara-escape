@@ -1,4 +1,5 @@
 import { ASSETS } from "../../constants/blocks";
+import { SIZE_MULTIPLIER } from "../../constants/global";
 import { Mechanic } from "./mechanic";
 
 export class Door extends Mechanic {
@@ -7,6 +8,7 @@ export class Door extends Mechanic {
   private openFrameKey: number;
   private closedFrameKey: number;
   private open: boolean;
+  private baseSprite: Phaser.GameObjects.Sprite;
 
   constructor(
     scene: Phaser.Scene,
@@ -15,15 +17,22 @@ export class Door extends Mechanic {
     doorId: string,
     color: string,
     open = false,
-    openFrameKey = ASSETS.DOOR_OPEN,
+    openFrameKey = ASSETS.EMPTY,
     closedFrameKey = ASSETS.DOOR_CLOSED,
   ) {
     super(scene, x, y, open ? openFrameKey : closedFrameKey, true, color);
+
+    this.baseSprite = this.scene.add
+      .sprite(0, 0, "tileset", ASSETS.DOOR_BASE)
+      .setScale(SIZE_MULTIPLIER);
+
     this.doorId = doorId;
     this.color = color;
     this.open = open;
     this.openFrameKey = openFrameKey;
     this.closedFrameKey = closedFrameKey;
+    this.add(this.baseSprite);
+    this.sendToBack(this.baseSprite);
   }
 
   public get id(): string {
