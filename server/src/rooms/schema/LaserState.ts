@@ -4,13 +4,14 @@ import { Position } from "./Position";
 export class Laser extends Schema {
   @type("string") id: string;
   @type(Position) position: Position = new Position();
-  @type("string") direction: string; // "up", "down", "left", "right"
+  @type("string") direction: string;
   @type("number") maxRange: number = 10;
   @type("boolean") active: boolean = false;
   @type("string") color: string = "#FF0000";
   @type("number") activeDuration: number = 1000;
   @type("number") inactiveDuration: number = 1000;
   @type("number") delay: number = 0;
+  public currentRange: number = 0;
 
   private timeSinceStateChange: number = 0;
   private isWaitingDelay: boolean = true;
@@ -18,7 +19,6 @@ export class Laser extends Schema {
   update(deltaTime: number) {
     this.timeSinceStateChange += deltaTime;
 
-    // Like in the test room, wait for the initial delay before starting the cycle
     if (this.isWaitingDelay) {
       if (this.timeSinceStateChange >= this.delay) {
         this.isWaitingDelay = false;
@@ -39,7 +39,7 @@ export class Laser extends Schema {
 
 export class LaserState extends Schema {
   @type({ map: Laser }) lasers = new MapSchema<Laser>();
-  @type({ map: "string" }) positionMap = new MapSchema<string>(); // key: "x_y", value: laserId
+  @type({ map: "string" }) positionMap = new MapSchema<string>(); 
 
   createLaser(
     id: string,

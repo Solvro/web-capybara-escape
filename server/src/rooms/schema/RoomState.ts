@@ -321,10 +321,12 @@ export class RoomState extends Schema {
     let results = [];
     for (const laser of this.laserState.lasers.values()) {
       const prevActive = laser.active;
+      const prevRange = laser.currentRange;
+
       laser.update(deltaTime);
 
-      if (prevActive !== laser.active) {
-        const result = this.fireLaser(laser.id);
+      const result = this.fireLaser(laser.id);
+      if (prevActive !== laser.active || result.range !== prevRange || result.cratesDestroyed.length > 0) {
         results.push(result);
       }
     }
@@ -342,8 +344,8 @@ export class RoomState extends Schema {
       return { laserId, active: false, cratesDestroyed: [], range: 0 };
     }
 
-    // If turning off, return empty path
     if (!laser.active) {
+      laser.currentRange = 0;
       return { laserId, active: false, cratesDestroyed: [], range: 0 };
     }
 
@@ -372,7 +374,6 @@ export class RoomState extends Schema {
 
     let range = 0;
     for (let i = 0; i < laser.maxRange; i++) {
-      // Stop if out of bounds
       if (
         currentX < 0 ||
         currentX >= this.width ||
@@ -383,14 +384,17 @@ export class RoomState extends Schema {
         break;
       }
 
-      // Stop if hit a wall
       const cell = this.getCellValue(currentX, currentY);
       if (cell === undefined || cell.startsWith("w")) {
         range = i;
         break;
       }
+      
+      if (!this.doorState.isOpenOrEmptyAt(currentX, currentY)) {
+        range = i;
+        break;
+      }
 
-      // Check for crate at this position and destroy it
       const crate = this.crateState.getCrateAt(currentX, currentY);
       if (crate) {
         cratesDestroyed.push({
@@ -405,6 +409,7 @@ export class RoomState extends Schema {
       currentY += dy;
     }
 
+    laser.currentRange = range;
     return { laserId, active: true, cratesDestroyed, range };
   }
 
@@ -476,7 +481,8 @@ export class RoomState extends Schema {
         x: laser.position.x,
         y: laser.position.y,
         direction: laser.direction,
-        range: laser.maxRange,
+        range: laser.currentRange,
+        active: laser.active,
       })),
       vents: Array.from(this.ventState.vents.values()).map((vent) => ({
         id: vent.id,

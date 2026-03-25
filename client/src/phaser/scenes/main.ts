@@ -10,7 +10,6 @@ import {
 import type { Button as ButtonType } from "../../types/button";
 import type { Crate as CrateType } from "../../types/crate";
 import type { Door as DoorType } from "../../types/door";
-import type { Laser as LaserType } from "../../types/laser";
 import type {Wire as WireType} from "../../types/wire";
 import type {Cable as CableType} from "../../types/cable";
 import type {
@@ -415,7 +414,7 @@ export class Main extends Phaser.Scene {
     this.crates.set(crateInfo.crateId, crate);
   }
 
-  private addLaser(laserInfo: LaserType) {
+  private addLaser(laserInfo: any) {
     const laser = new Laser(
       this,
       laserInfo.x,
@@ -428,7 +427,7 @@ export class Main extends Phaser.Scene {
     // console.log("Adding laser:", laserInfo);
     this.add.existing(laser);
     this.lasers.set(laserInfo.laserId, laser);
-    laser.launch(false, laserInfo.range);
+    laser.launch(laserInfo.active ?? false, laserInfo.range);
   }
   
   private addCable(cableInfo: CableType){
