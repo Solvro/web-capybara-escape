@@ -59,7 +59,7 @@
       "type": "wire",
       "x": 6,
       "y": 4,
-      "direction": "up"
+      "direction": "up-right"
     },
     {
       "type": "wire",
@@ -92,6 +92,12 @@
       "activeDuration": 2000,
       "inactiveDuration": 2000,
       "delay": 2000
+    },
+    {
+      "type": "wire",
+      "x": 7,
+      "y": 3,
+      "direction": "socket"
     }
   ],
   "entities": {
