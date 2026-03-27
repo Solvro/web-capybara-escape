@@ -10,8 +10,8 @@ export function Creator() {
   const [dims, setDims] = useState<[number, number]>([7, 8]);
 
   return (
-    <div className="mx-4 flex w-full flex-col gap-4 text-center">
-      <div className="flex w-full items-stretch gap-4">
+    <div className="mx-4 mt-[2dvh] mb-[2dvh] flex w-full flex-col gap-[2dvh] text-center">
+      <div className="flex h-[14dvh] w-full items-stretch gap-4">
         <div className="w-2/5">
           <CreatorName levelName={levelName} setLevelName={setLevelName} />
         </div>
@@ -19,7 +19,7 @@ export function Creator() {
           <CreatorControl dims={dims} setDims={setDims} />
         </div>
       </div>
-      <div className="flex w-full gap-4">
+      <div className="flex h-[80dvh] w-full items-stretch gap-4">
         <div className="w-2/5">
           <CreatorItemsSelect />
         </div>
