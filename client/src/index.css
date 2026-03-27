@@ -1,3 +1,21 @@
+/* Custom scrollbar for creator items select menu */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 10px;
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #a78bfa;
+  border-radius: 8px;
+  border: 2px solid #4b2a86;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #4b2a86;
+  border-radius: 8px;
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #a78bfa #4b2a86;
+}
 @import "tailwindcss";
 
 @font-face {
