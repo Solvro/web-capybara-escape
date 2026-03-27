@@ -47,6 +47,7 @@
     },
     {
       "type": "cable",
+      "id": "1",
       "x": 6,
       "y": 3,
       "direction": "up",

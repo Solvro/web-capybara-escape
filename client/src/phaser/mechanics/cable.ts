@@ -18,7 +18,7 @@ export class Cable extends Mechanic {
     scene: Phaser.Scene,
     x: number,
     y: number,
-    id: number,
+    id: string,
     damaged: boolean,
     timer: number,
     damageDuration: number,
@@ -30,7 +30,7 @@ export class Cable extends Mechanic {
 
     super(scene, x, y, damaged ? CABLE_FRAME_ON : CABLE_FRAME_OFF);
 
-    this.cableId = id.toString();
+    this.cableId = id;
     this.damage = damaged;
     this.timer = timer;
     this.damageDuration = damageDuration;

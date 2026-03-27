@@ -29,6 +29,7 @@ export class CableState extends Schema{
     // now accepts optional `id` (string). If omitted, generate numeric id as before.
     createCable(id: string | undefined, x: number, y: number, direction: string = "up", damageMs: number = 3000, safeMs: number = 2000, startDamaging: boolean = true): Cable {
         let assignedId: string;
+        
         if (typeof id === "string" && id.length > 0) {
             assignedId = id;
         } else {
@@ -36,8 +37,8 @@ export class CableState extends Schema{
             this.usedIds.add(numId);
             assignedId = numId.toString();
         }
-        
         const cable = new Cable();
+       
         cable.id = assignedId;
         cable.position = new Position();
         cable.position.x = x;
