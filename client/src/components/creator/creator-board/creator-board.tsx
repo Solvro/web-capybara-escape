@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CreatorTile } from "./creator-tile";
 
@@ -30,15 +30,18 @@ export function CreatorBoard({ dims }: CreatorBoardProps) {
     setTileSize(tileSize);
   }, [boardHeight, boardWidth, rows, cols]);
 
-  console.log("Board size: ", boardWidth, boardHeight);
-  console.log("Tile size: ", tileSize);
-
   const boardRows = Array.from({ length: rows }, (_, rowIndex) => rowIndex);
   const boardCols = Array.from({ length: cols }, (_, colIndex) => colIndex);
 
+  const tileIndexes = useMemo(
+    () =>
+      Array.from({ length: rows * cols }, () => Math.floor(Math.random() * 4)),
+    [rows, cols],
+  );
+
   return (
     <div
-      className="h-[80vh] overflow-hidden rounded-lg bg-[#4b2a86] p-4 shadow-lg"
+      className="h-full overflow-hidden rounded-lg bg-[#4b2a86] p-4 shadow-lg"
       ref={boardRef}
     >
       <div className="flex min-h-full items-center">
@@ -50,9 +53,16 @@ export function CreatorBoard({ dims }: CreatorBoardProps) {
           }}
         >
           {boardRows.map((row) =>
-            boardCols.map((col) => (
-              <CreatorTile key={`${row}-${col}`} sizePx={tileSize} />
-            )),
+            boardCols.map((col) => {
+              const tileIdx = row * cols + col;
+              return (
+                <CreatorTile
+                  key={`${row}-${col}`}
+                  sizePx={tileSize}
+                  tileIndex={tileIndexes[tileIdx]}
+                />
+              );
+            }),
           )}
         </div>
       </div>

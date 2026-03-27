@@ -1,13 +1,11 @@
-import { useMemo } from "react";
-
 interface CreatorTileProps {
   sizePx: number;
+  tileIndex: number;
 }
 
-export function CreatorTile({ sizePx }: CreatorTileProps) {
+export function CreatorTile({ sizePx, tileIndex }: CreatorTileProps) {
   const sourceTileSizePx = 24;
   const scale = sizePx / sourceTileSizePx;
-  const tileIndex = useMemo(() => Math.floor(Math.random() * 4), []);
 
   return (
     <div
