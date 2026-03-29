@@ -5,4 +5,5 @@ export interface Laser {
   y: number;
   direction: "left" | "right" | "up" | "down";
   range: number;
+  active: boolean;
 }
