@@ -1,12 +1,12 @@
 import type { Button } from "../types/button";
+import type { Cable } from "../types/cable";
 import type { Capybara } from "../types/capybara";
 import type { Crate } from "../types/crate";
 import type { Door } from "../types/door";
 import type { Laser } from "../types/laser";
 import type { Player } from "../types/player";
 import type { Vent } from "../types/vent";
-import type { Cable } from "../types/cable";
-import type { Wire}  from "../types/wire";
+import type { Wire } from "../types/wire";
 
 export interface MessageMapInfo {
   grid: string[][];
@@ -25,6 +25,10 @@ export interface MessageMapInfo {
 
 export interface MessageCratesUpdate {
   crates: { crateId: number; direction: "left" | "right" | "up" | "down" }[];
+}
+
+export interface MessageCablesUpdate {
+  cables: Cable[];
 }
 
 export interface MessageLasersUpdate {
@@ -62,6 +66,6 @@ export interface MessageGenerateLines {
 }
 
 export interface MessageRoomReset {
-  message: string;      
-  timestamp: number;    
+  message: string;
+  timestamp: number;
 }

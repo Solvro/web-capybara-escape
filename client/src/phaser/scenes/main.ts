@@ -13,6 +13,7 @@ import type { Crate as CrateType } from "../../types/crate";
 import type { Door as DoorType } from "../../types/door";
 import type { Laser as LaserType } from "../../types/laser";
 import type {
+  MessageCablesUpdate,
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
   MessageGenerateLines,
@@ -298,57 +299,21 @@ export class Main extends Phaser.Scene {
       });
 
       room.onMessage("roomReset", () => {
-        console.log(`Resetting scene graphics...`);
+        // console.log(`Resetting scene graphics...`);
 
         this.resetGraphics();
 
         this.room.send("getMapInfo");
       });
 
+      room.onMessage("cablesUpdate", (cables: MessageCablesUpdate) => {
+        this.handleCablesUpdate(cables);
+      });
+
       this.room.send("getMapInfo");
     } catch (error) {
       console.error("Error setting up Colyseus message handlers:", error);
     }
-
-    // forward Colyseus messages to this scene so mechaniki (np. kable) obsłużą je tak jak inne feature'y [DO ZMIANY PO UJEDNOLICENIU REPOZYTORIUM]
-    const room = this.game.registry.get("room");
-    if (room) {
-      const onMapInfo = (mapInfo: any) => this.events.emit("mapInfo", mapInfo);
-      const onCables = (payload: any) => {
-        const list = payload?.cables ?? payload?.toggled ?? payload ?? [];
-        this.events.emit("cables:update", list);
-      };
-      const onPlayerDamaged = (p: any) => this.events.emit("player:damaged", p);
-
-      room.onMessage("mapInfo", onMapInfo);
-      room.onMessage("cablesUpdate", onCables);
-      room.onMessage("playerDamaged", onPlayerDamaged);
-
-      this.sys.events.once("shutdown", () => {
-        try {
-          room.offMessage("mapInfo", onMapInfo);
-          room.offMessage("cablesUpdate", onCables);
-          room.offMessage("playerDamaged", onPlayerDamaged);
-        } catch {}
-      });
-    }
-
-    // react to cable toggles forwarded to this scene
-    this.events.on("cables:update", (list: any[]) => {
-      for (const t of list) {
-        const id = t.cableId ?? t.id;
-        if (!id) {
-          continue;
-        }
-        const cable = this.cables.get(id);
-        if (cable) {
-          cable.applyState(
-            Boolean(t.damage),
-            typeof t.timer === "number" ? t.timer : cable.timer,
-          );
-        }
-      }
-    });
   }
 
   displayBubble(text: string, target: Player, sessionId: string) {
@@ -432,7 +397,7 @@ export class Main extends Phaser.Scene {
   }
 
   private addCable(cableInfo: CableType) {
-    console.log("addCable called", cableInfo);
+    // console.log("addCable called", cableInfo);
     const cable = new Cable(
       this,
       cableInfo.x,
@@ -445,7 +410,7 @@ export class Main extends Phaser.Scene {
       cableInfo.direction,
     );
     this.add.existing(cable);
-    console.log("added cable object", cable, "frame:", cable.frame?.name);
+    //console.log("added cable object", cable, "frame:", cable.frame?.name);
     this.cables.set(cableInfo.cableId, cable);
   }
   private addWire(wireInfo: WireType) {
@@ -568,7 +533,7 @@ export class Main extends Phaser.Scene {
   }
 
   private resetGraphics() {
-    console.log("Resetting scene graphics...");
+    //("Resetting scene graphics...");
 
     const mapsToDestroy = [
       this.cables,
@@ -589,5 +554,15 @@ export class Main extends Phaser.Scene {
     });
 
     this.children.removeAll();
+  }
+
+  private handleCablesUpdate(cables: MessageCablesUpdate) {
+    for (const t of cables.cables) {
+      const id = t.cableId;
+      const cable = this.cables.get(id);
+      if (cable !== undefined) {
+        cable.applyState(t.damage, cable.timer);
+      }
+    }
   }
 }
