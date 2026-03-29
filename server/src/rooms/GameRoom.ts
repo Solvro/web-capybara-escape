@@ -73,7 +73,7 @@ export class GameRoom extends Room<RoomState> {
         this.broadcast("cablesUpdate", { cables: toggled });
       }
 
-      this.state.updateCapybara();
+      this.state.updateCapybara(deltaTime);
       if (this.state.capybara) {
         this.broadcast("capybaraUpdate", {
           x: this.state.capybara.position.x,
@@ -98,15 +98,18 @@ export class GameRoom extends Room<RoomState> {
       this.clients.forEach((c) => {
         const player = this.state.playerState.players.get(c.sessionId);
         if (player) {
-            const startPos = this.state.startingPositions[player.index % this.state.startingPositions.length];
-            player.position.x = startPos.x;
-            player.position.y = startPos.y;
+          const startPos =
+            this.state.startingPositions[
+              player.index % this.state.startingPositions.length
+            ];
+          player.position.x = startPos.x;
+          player.position.y = startPos.y;
         }
-    });
+      });
 
       this.broadcast("roomReset", {
         message: "Level has been reset",
-        mapInfo: this.state.getMapInfo()
+        mapInfo: this.state.getMapInfo(),
       });
     });
   }
