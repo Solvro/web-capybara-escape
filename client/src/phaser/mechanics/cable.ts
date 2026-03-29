@@ -1,4 +1,4 @@
-import * as Phaser from "phaser";
+import type * as Phaser from "phaser";
 
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE } from "../../constants/global";
@@ -40,18 +40,22 @@ export class Cable extends Mechanic {
     this.direction = direction;
 
     switch (this.direction) {
-      case "up":
+      case "up": {
         this.setAngle(270);
         break;
-      case "right":
+      }
+      case "right": {
         this.setAngle(0);
         break;
-      case "down":
+      }
+      case "down": {
         this.setAngle(90);
         break;
-      case "left":
+      }
+      case "left": {
         this.setAngle(180);
         break;
+      }
     }
 
     this.setDepth(posY);
