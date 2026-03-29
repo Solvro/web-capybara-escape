@@ -8,10 +8,10 @@ import {
   TILE_SIZE_OLD,
 } from "../../constants/global";
 import type { Button as ButtonType } from "../../types/button";
+import type { Cable as CableType } from "../../types/cable";
 import type { Crate as CrateType } from "../../types/crate";
 import type { Door as DoorType } from "../../types/door";
-import type {Wire as WireType} from "../../types/wire";
-import type {Cable as CableType} from "../../types/cable";
+import type { Laser as LaserType } from "../../types/laser";
 import type {
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
@@ -23,6 +23,7 @@ import type {
   MessagePositionUpdate,
 } from "../../types/messages";
 import type { Player as PlayerType } from "../../types/player";
+import type { Wire as WireType } from "../../types/wire";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
@@ -35,10 +36,10 @@ import {
 import type { SpriteAnimator } from "../lib/sprite-animator";
 import { Button } from "../mechanics/button";
 import { Cable } from "../mechanics/cable";
-import { Wire } from "../mechanics/wire";
 import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
+import { Wire } from "../mechanics/wire";
 import { SpeechBubble } from "../speech-bubbles/speech-bubble";
 
 // Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)
@@ -184,13 +185,12 @@ export class Main extends Phaser.Scene {
         for (const laser of message.lasers) {
           this.addLaser(laser);
         }
-        for (const cable of message.cables){
+        for (const cable of message.cables) {
           this.addCable(cable);
         }
-        for (const wire of message.wires){
+        for (const wire of message.wires) {
           this.addWire(wire);
         }
-
 
         if (message.vents) {
           for (const vent of message.vents) {
@@ -414,7 +414,7 @@ export class Main extends Phaser.Scene {
     this.crates.set(crateInfo.crateId, crate);
   }
 
-  private addLaser(laserInfo: any) {
+  private addLaser(laserInfo: LaserType) {
     const laser = new Laser(
       this,
       laserInfo.x,
@@ -429,8 +429,8 @@ export class Main extends Phaser.Scene {
     this.lasers.set(laserInfo.laserId, laser);
     laser.launch(laserInfo.active ?? false, laserInfo.range);
   }
-  
-  private addCable(cableInfo: CableType){
+
+  private addCable(cableInfo: CableType) {
     console.log("addCable called", cableInfo);
     const cable = new Cable(
       this,
@@ -447,7 +447,7 @@ export class Main extends Phaser.Scene {
     console.log("added cable object", cable, "frame:", cable.frame?.name);
     this.cables.set(cableInfo.cableId, cable);
   }
-  private addWire(wireInfo: WireType){
+  private addWire(wireInfo: WireType) {
     const wire = new Wire(
       this,
       wireInfo.x,

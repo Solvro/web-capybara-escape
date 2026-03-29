@@ -2,7 +2,6 @@ import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 import { Mechanic } from "./mechanic";
 
-<<<<<<< HEAD
 const GHOST_IDLE_FRAMES: Record<"left" | "right" | "up" | "down", number> = {
   right: ASSETS.GHOST_IDLE_RIGHT,
   down: ASSETS.GHOST_IDLE_DOWN,
@@ -22,13 +21,6 @@ const GHOST_COLOR_FRAMES: Record<"left" | "right" | "up" | "down", number> = {
   down: ASSETS.GHOST_COLOR_DOWN,
   up: ASSETS.GHOST_COLOR_UP,
   left: ASSETS.GHOST_COLOR_RIGHT,
-=======
-const CANNON_ANGLE: Record<"left" | "right" | "up" | "down", number> = {
-  right: 0,
-  down: 90,
-  left: 180,
-  up: 270,
->>>>>>> 3531e68 (fix-laser-door-interaction)
 };
 
 export class Laser extends Mechanic {
@@ -37,11 +29,7 @@ export class Laser extends Mechanic {
   private launched: boolean;
   private direction: "left" | "right" | "up" | "down";
   private range: number;
-<<<<<<< HEAD
   private baseSprite: Phaser.GameObjects.Sprite;
-=======
-
->>>>>>> 3531e68 (fix-laser-door-interaction)
   private beamSprites: Phaser.GameObjects.Sprite[] = [];
 
   constructor(
@@ -54,7 +42,6 @@ export class Laser extends Mechanic {
     color: string,
     launched = false,
   ) {
-<<<<<<< HEAD
     super(
       scene,
       x,
@@ -78,10 +65,6 @@ export class Laser extends Mechanic {
       this.sprite.setAngle(180);
       this.baseSprite.setAngle(180);
     }
-=======
-    super(scene, x, y, ASSETS.LASER_GUN_RIGHT, false, color);
-    this.sprite.setAngle(CANNON_ANGLE[direction]);
->>>>>>> 3531e68 (fix-laser-door-interaction)
     this.laserId = laserId;
     this.color = color;
     this.launched = launched;
@@ -100,7 +83,6 @@ export class Laser extends Mechanic {
 
   public set isLaunched(value: boolean) {
     this.launched = value;
-<<<<<<< HEAD
 
     if (this.launched) {
       this.sprite.setFrame(GHOST_COLOR_FRAMES[this.direction]);
@@ -110,8 +92,6 @@ export class Laser extends Mechanic {
       this.baseSprite.setFrame(GHOST_IDLE_FRAMES[this.direction]);
     }
 
-=======
->>>>>>> 3531e68 (fix-laser-door-interaction)
     if (this.launched) {
       this.launchLaser();
     } else {
@@ -136,10 +116,6 @@ export class Laser extends Mechanic {
       ? ASSETS.LASER_BEAM_HORIZONTAL_TIP
       : ASSETS.LASER_BEAM_VERTICAL_TIP;
 
-<<<<<<< HEAD
-=======
-    const baseShift = 2 * SIZE_MULTIPLIER;
->>>>>>> 3531e68 (fix-laser-door-interaction)
     const beamAngle = this.direction === "left" ? 180 : 0;
     const colorInt = Phaser.Display.Color.HexStringToColor(this.color).color;
 
@@ -157,50 +133,15 @@ export class Laser extends Mechanic {
           break;
         }
         case "up": {
-<<<<<<< HEAD
           offsetY = -index * CELL_SIZE;
           break;
         }
         case "down": {
           offsetY = index * CELL_SIZE;
-=======
-          offsetX = -2 * SIZE_MULTIPLIER; 
-          offsetY = -index * CELL_SIZE + baseShift;
-          break;
-        }
-        case "down": {
-          offsetX = 2 * SIZE_MULTIPLIER; 
-          offsetY = index * CELL_SIZE - baseShift;
->>>>>>> 3531e68 (fix-laser-door-interaction)
           break;
         }
       }
 
-<<<<<<< HEAD
-=======
-      if (index === this.range) {
-        const extraShift = 2 * SIZE_MULTIPLIER;
-        switch (this.direction) {
-          case "left": {
-            offsetX += extraShift;
-            break;
-          }
-          case "right": {
-            offsetX -= extraShift;
-            break;
-          }
-          case "up": {
-            offsetY += extraShift;
-            break;
-          }
-          case "down": {
-            offsetY -= extraShift;
-            break;
-          }
-        }
-      }
-
->>>>>>> 3531e68 (fix-laser-door-interaction)
       const frame = index === this.range ? tipFrame : baseFrame;
       const segment = this.scene.add.sprite(offsetX, offsetY, "tileset", frame);
 
