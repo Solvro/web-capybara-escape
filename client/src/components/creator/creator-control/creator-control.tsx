@@ -27,7 +27,11 @@ export function CreatorControl({ dims, setDims }: CreatorControlProps) {
   const isColsMax = cols >= MAX_DIM;
 
   return (
-    <div className="flex h-full items-center gap-6 rounded-lg bg-[#4b2a86] py-4 pr-4 pl-6 shadow-lg">
+    <div
+      className="flex h-full w-full items-center gap-6 rounded-lg bg-[#4b2a86] p-4 shadow-lg"
+      style={{ position: "relative" }}
+    >
+      {/* Removed inline <style>; using Tailwind classes below */}
       <div className="flex flex-col gap-3">
         {/* Rows Control */}
         <div className="flex items-center gap-3">
@@ -83,14 +87,22 @@ export function CreatorControl({ dims, setDims }: CreatorControlProps) {
       </div>
 
       {/* Action Buttons */}
-      <div className="ml-auto flex items-center gap-2">
-        <button className="rounded-md bg-violet-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-violet-400">
+      <div className="creator-control-actions ml-auto flex flex-row gap-2">
+        <button className="h-8 min-w-[70px] rounded-md bg-violet-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-violet-400">
           Reset
         </button>
-        <button className="rounded-md bg-emerald-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-emerald-400">
+        <button className="h-8 min-w-[70px] rounded-md bg-emerald-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-emerald-400">
           Create
         </button>
       </div>
+      {/* Responsive: stack vertically on small screens */}
+      <style>{`
+        @media (max-width: 800px) {
+          .creator-control-actions {
+            flex-direction: column !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

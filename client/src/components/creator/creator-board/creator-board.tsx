@@ -42,7 +42,7 @@ export function CreatorBoard({ dims }: CreatorBoardProps) {
 
   return (
     <div
-      className="h-full overflow-hidden rounded-lg bg-[#4b2a86] p-4 shadow-lg"
+      className="h-full w-full overflow-hidden rounded-lg bg-[#4b2a86] p-4 shadow-lg"
       ref={boardRef}
     >
       <div className="flex min-h-full items-center">

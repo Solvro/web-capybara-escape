@@ -29,14 +29,17 @@ export function CreatorName({ levelName, setLevelName }: CreatorNameProps) {
   };
 
   return (
-    <div className="flex h-full flex-col items-start justify-center gap-2 rounded-lg bg-[#4b2a86] pt-5 pr-4 pb-3 pl-6 text-left shadow-lg">
+    <div className="flex h-full w-full flex-col items-start justify-center gap-2 rounded-lg bg-[#4b2a86] p-4 text-left shadow-lg">
       <label className="px-3 text-xs font-semibold tracking-wide whitespace-nowrap text-violet-200 uppercase">
         Level Name
       </label>
 
       {!isEditing ? (
         <div onClick={handleEdit} className="group w-full cursor-pointer">
-          <p className="flex h-9 items-center rounded-md border-2 border-transparent px-3 text-left text-base font-bold text-amber-300 transition-colors group-hover:text-amber-200">
+          <p
+            className="flex h-9 w-full items-center overflow-hidden rounded-md border-2 border-transparent px-3 text-left text-xs font-bold text-ellipsis whitespace-nowrap text-amber-300 transition-colors group-hover:text-amber-200 md:text-sm"
+            title={levelName || "Untitled Level"}
+          >
             {levelName || "Untitled Level"}
           </p>
         </div>
