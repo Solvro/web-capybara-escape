@@ -16,7 +16,12 @@ export class Crate extends Entity implements INetworkInterface<CrateType> {
     return this.crateId;
   }
 
-  public syncState(data: Partial<CrateType>): void {
-    this.setPosition(data.x, data.y);
+  public syncState(
+    data: Partial<{
+      crateId: number;
+      direction: "left" | "right" | "up" | "down";
+    }>,
+  ): void {
+    this.move(data.direction);
   }
 }

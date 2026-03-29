@@ -10,7 +10,6 @@ import { WireState } from "./WireState.js";
 import { VentState } from "./VentState.js";
 import { Capybara } from "./Capybara.js";
 
-
 export class RoomState extends Schema {
   @type(["string"]) grid = new ArraySchema<string>();
   @type("number") width: number = 10;
@@ -29,11 +28,13 @@ export class RoomState extends Schema {
   @type(Capybara) capybara: Capybara;
 
   private capybaraPath: { x: number; y: number }[] = [];
+  private capybaraVelocity: number = 1000;
+  private capybaraTimer: number = 0;
 
   loadRoomFromJson(jsonData: any) {
     try {
       this.clearState();
-      
+
       this.width = jsonData.width;
       this.height = jsonData.height;
 
@@ -95,7 +96,7 @@ export class RoomState extends Schema {
           mechanicData.delay ?? 0,
         );
       } else if (mechanicType === "cable") {
-        // pass mechanic id so cable uses same id defined in room JSON 
+        // pass mechanic id so cable uses same id defined in room JSON
         this.cableState.createCable(
           mechanicData.id,
           mechanicData.x,
@@ -105,8 +106,7 @@ export class RoomState extends Schema {
           mechanicData.safeMs ?? mechanicData.safeDuration,
           mechanicData.startDamaging ?? mechanicData.startDamage ?? false,
         );
-      }
-        else if (mechanicType === "wire"){
+      } else if (mechanicType === "wire") {
         this.wireState.createWire(
           mechanicData.id,
           mechanicData.x,
@@ -239,7 +239,7 @@ export class RoomState extends Schema {
     return null;
   }
 
-  updateCapybara() {
+  updateCapybara(deltaTime: number) {
     if (!this.capybara) return;
 
     if (this.capybaraPath.length === 0) {
@@ -252,6 +252,12 @@ export class RoomState extends Schema {
     }
 
     if (this.capybaraPath.length > 0) {
+      this.capybaraTimer += deltaTime;
+
+      if (this.capybaraTimer < this.capybaraVelocity) {
+        return;
+      }
+      this.capybaraTimer = 0;
       const nextStep = this.capybaraPath.shift();
 
       if (nextStep) {
@@ -326,7 +332,11 @@ export class RoomState extends Schema {
       laser.update(deltaTime);
 
       const result = this.fireLaser(laser.id);
-      if (prevActive !== laser.active || result.range !== prevRange || result.cratesDestroyed.length > 0) {
+      if (
+        prevActive !== laser.active ||
+        result.range !== prevRange ||
+        result.cratesDestroyed.length > 0
+      ) {
         results.push(result);
       }
     }
@@ -389,7 +399,7 @@ export class RoomState extends Schema {
         range = i;
         break;
       }
-      
+
       if (!this.doorState.isOpenOrEmptyAt(currentX, currentY)) {
         range = i;
         break;
@@ -453,7 +463,7 @@ export class RoomState extends Schema {
           timer: cable.timer,
         };
       }),
-      wires: Array.from(this.wireState.wires.values()).map((wire) =>{
+      wires: Array.from(this.wireState.wires.values()).map((wire) => {
         return {
           wireId: wire.id,
           x: wire.position.x,
@@ -519,8 +529,6 @@ export class RoomState extends Schema {
   despawnCrate(id: string) {
     this.crateState.removeCrate(id);
   }
-
-  
 
   // expose toggles/moves for broadcasting
   getAndClearToggledCables() {
@@ -593,11 +601,10 @@ export class RoomState extends Schema {
     this.cableState.cables.clear();
     this.wireState.wires.clear();
     this.ventState.vents.clear();
-    
+
     this.grid.clear();
     this.startingPositions.clear();
     this.capybaraPath = [];
     this.capybara = undefined;
-    
-}
+  }
 }
