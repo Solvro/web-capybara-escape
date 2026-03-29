@@ -27,11 +27,7 @@ export function CreatorControl({ dims, setDims }: CreatorControlProps) {
   const isColsMax = cols >= MAX_DIM;
 
   return (
-    <div
-      className="flex h-full w-full items-center gap-6 rounded-lg bg-[#4b2a86] p-4 shadow-lg"
-      style={{ position: "relative" }}
-    >
-      {/* Removed inline <style>; using Tailwind classes below */}
+    <div className="relative flex h-full w-full items-center gap-6 rounded-lg bg-[#4b2a86] p-4 shadow-lg">
       <div className="flex flex-col gap-3">
         {/* Rows Control */}
         <div className="flex items-center gap-3">
@@ -87,7 +83,7 @@ export function CreatorControl({ dims, setDims }: CreatorControlProps) {
       </div>
 
       {/* Action Buttons */}
-      <div className="creator-control-actions ml-auto flex flex-row gap-2">
+      <div className="creator-control-actions ml-auto flex flex-col gap-2 md:flex-row">
         <button className="h-8 min-w-[70px] rounded-md bg-violet-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-violet-400">
           Reset
         </button>
@@ -95,14 +91,6 @@ export function CreatorControl({ dims, setDims }: CreatorControlProps) {
           Create
         </button>
       </div>
-      {/* Responsive: stack vertically on small screens */}
-      <style>{`
-        @media (max-width: 800px) {
-          .creator-control-actions {
-            flex-direction: column !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
