@@ -59,17 +59,8 @@ export class Cable extends Mechanic {
     this.updateVisual();
   }
 
-  applyState(
-    damage: boolean,
-    timer: number,
-    damageDuration?: number,
-    safeDuration?: number,
-  ) {
+  applyState(damage: boolean) {
     this.damage = damage;
-    this.timer = timer;
-    if (typeof damageDuration === "number")
-      this.damageDuration = damageDuration;
-    if (typeof safeDuration === "number") this.safeDuration = safeDuration;
     this.updateVisual();
   }
 
@@ -77,9 +68,7 @@ export class Cable extends Mechanic {
     const frame = this.damage
       ? ASSETS.CABLE_END_ACTIVE
       : ASSETS.CABLE_END_INACTIVE;
-    if ((this as any).setFrame) {
-      this.setFrame(frame);
-    }
+    this.setFrame(frame);
   }
 
   destroy(fromScene?: boolean) {
