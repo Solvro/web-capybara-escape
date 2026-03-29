@@ -3,19 +3,19 @@ import { CloseCode } from "@colyseus/shared-types";
 
 import { getMoveVectorFromDirection } from "../shared/utils/vectorUtils";
 import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
-import room from "./json/examples/room1.json";
+import fallbackRoom from "./json/examples/default.json";
 import { RoomState } from "./schema/RoomState";
-
-// import room from "./json/examples/room2.json";
-// import room from "./json/examples/room3.json";
+import { getRoomForGame } from "./lib/roomLoader";
 
 export class GameRoom extends Room<{ state: RoomState }> {
   maxClients = 4;
   state = new RoomState();
+  private roomData = fallbackRoom;
 
-  onCreate(options: any) {
-    this.maxClients = room.maxClients ?? this.maxClients;
-    this.state.loadRoomFromJson(room);
+  async onCreate(options: any) {
+    this.roomData = await getRoomForGame(options?.levelSlug);
+    this.maxClients = this.roomData.maxClients ?? this.maxClients;
+    this.state.loadRoomFromJson(this.roomData);
     this.onMessage("move", (client, message) => {
       const player = this.state.playerState.players.get(client.sessionId);
       if (!player) return;
@@ -96,7 +96,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.onMessage("reset", (client) => {
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
 
-      this.state.loadRoomFromJson(room);
+      this.state.loadRoomFromJson(this.roomData);
 
       this.clients.forEach((c) => {
         const player = this.state.playerState.players.get(c.sessionId);

@@ -14,6 +14,9 @@
     "build": "npm run clean && tsc",
     "clean": "rimraf build",
     "start": "tsx watch src/index.ts",
+    "loadtest": "tsx loadtest/example.ts --room game_room --numClients 2",
+    "import:levels": "tsx src/scripts/export-levels.ts",
+    "import:levels:force": "tsx src/scripts/export-levels.ts --force",
     "test": "mocha -r tsx test/**_test.ts --exit --timeout 15000"
   },
   "dependencies": {
@@ -21,12 +24,15 @@
     "@colyseus/playground": "^0.17.12",
     "@colyseus/tools": "^0.17.19",
     "colyseus": "^0.17.10",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongodb": "^6.16.0"
   },
   "devDependencies": {
+    "@colyseus/loadtest": "^0.16.0",
     "@colyseus/testing": "^0.17.11",
     "@types/express": "^5.0.6",
     "@types/mocha": "^10.0.1",
+    "@types/node": "^24.6.1",
     "mocha": "^11.7.5",
     "rimraf": "^6.1.3",
     "tsx": "^4.21.0",
