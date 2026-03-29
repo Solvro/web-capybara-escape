@@ -32,7 +32,7 @@
     {
       "type": "button",
       "id": "button-red-1",
-      "x": 0,
+      "x": 8,
       "y": 3,
       "color": "#FF3B30",
       "doorId": "door-red-1"
@@ -65,7 +65,7 @@
       "type": "wire",
       "x": 7,
       "y": 4,
-      "direction": "left"
+      "direction": "up-left"
     },
     {
       "type": "laser",
@@ -82,7 +82,7 @@
     },
     {
       "type": "laser",
-      "x": 0,
+      "x": 6,
       "y": 5,
       "id": "laser-h",
       "direction": "right",
