@@ -10,7 +10,7 @@ export class Mechanic extends Phaser.GameObjects.Container {
     scene: Phaser.Scene,
     gridX: number,
     gridY: number,
-    frameKey = ASSETS.DOOR_OPEN,
+    frameKey = ASSETS.DOOR_BASE,
     isColorized = false,
     color = "#ffffff",
   ) {

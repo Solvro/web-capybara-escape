@@ -44,33 +44,43 @@ export class Wire extends Mechanic {
     this.direction = direction;
 
     switch (this.direction) {
-      case "up":
+      case "up": {
         this.setAngle(270);
         break;
-      case "up-right":
+      }
+      case "up-right": {
         this.setAngle(270);
         break;
-      case "up-left":
+      }
+      case "up-left": {
         this.setAngle(180);
         break;
-      case "right":
+      }
+
+      case "right": {
         this.setAngle(0);
         break;
-      case "down-right":
+      }
+      case "down-right": {
         this.setAngle(0);
         break;
-      case "down":
+      }
+      case "down": {
         this.setAngle(90);
         break;
-      case "down-left":
+      }
+      case "down-left": {
         this.setAngle(90);
         break;
-      case "left":
+      }
+      case "left": {
         this.setAngle(180);
         break;
-      case "socket":
+      }
+      case "socket": {
         this.setAngle(0);
         break;
+      }
     }
 
     this.setDepth(posY);
