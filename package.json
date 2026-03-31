@@ -1,0 +1,25 @@
+{
+  "name": "web-capybara-escape",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run start --prefix server\" \"npm run dev --prefix client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Solvro/web-capybara-escape.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Solvro/web-capybara-escape/issues"
+  },
+  "homepage": "https://github.com/Solvro/web-capybara-escape#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
