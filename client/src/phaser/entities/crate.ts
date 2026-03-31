@@ -22,6 +22,8 @@ export class Crate extends Entity implements INetworkInterface<CrateType> {
       direction: "left" | "right" | "up" | "down";
     }>,
   ): void {
-    this.move(data.direction);
+    if (data.direction) {
+      this.move(data.direction);
+    }
   }
 }

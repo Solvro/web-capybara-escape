@@ -68,7 +68,7 @@ export class Main extends Phaser.Scene {
   private spawnEntity<
     DataType,
     EntityClass extends Phaser.GameObjects.GameObject &
-      INetworkEntity<DataType>,
+      INetworkInterface<DataType>,
   >(
     mapCollection: Map<any, EntityClass>,
     EntityConstructor: new (scene: Phaser.Scene, data: DataType) => EntityClass,
