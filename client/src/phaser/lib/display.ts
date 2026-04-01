@@ -62,12 +62,12 @@ export class Display {
   }
 
   remove(
-    layer:
-      | "background"
-      | "floor decoys"
-      | "entities"
-      | "wall decoys"
-      | "effects",
+    layer: //Layery są tu poukładane od najgłębszego do najpłytszego
+      | "background" //ściany i podłoga
+      | "floor decoys" //wszystko co na podłodze - venty, guziki, kable
+      | "entities" //gracz kapibara i rzeczy które "stoją na podłodze"
+      | "wall decoys" //rzeczy typu drzwi
+      | "effects", //efekty - np dymki
     object: Phaser.GameObjects.GameObject,
   ) {
     this.layerMap.get(layer)?.remove(object);

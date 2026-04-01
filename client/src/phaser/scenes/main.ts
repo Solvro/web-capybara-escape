@@ -72,9 +72,15 @@ export class Main extends Phaser.Scene {
     mapCollection: Map<any, EntityClass>,
     EntityConstructor: new (scene: Phaser.Scene, data: DataType) => EntityClass,
     data: DataType,
+    layer:
+      | "background"
+      | "floor decoys"
+      | "entities"
+      | "wall decoys"
+      | "effects",
   ) {
     const entity = new EntityConstructor(this, data);
-    this.add.existing(entity);
+    this.displayHandler.add(layer, entity);
     mapCollection.set(entity.networkId, entity);
   }
 
@@ -154,29 +160,28 @@ export class Main extends Phaser.Scene {
         }
 
         for (const crate of message.crates) {
-          this.spawnEntity(this.crates, Crate, crate);
+          this.spawnEntity(this.crates, Crate, crate, "entities");
         }
 
         for (const button of message.buttons) {
-          this.spawnEntity(this.buttons, Button, button);
+          this.spawnEntity(this.buttons, Button, button, "floor decoys");
         }
 
         for (const door of message.doors) {
-          this.spawnEntity(this.doors, Door, door);
+          this.spawnEntity(this.doors, Door, door, "wall decoys");
         }
 
         for (const laser of message.lasers) {
-          this.spawnEntity(this.lasers, Laser, laser);
+          this.spawnEntity(this.lasers, Laser, laser, "entities");
         }
         for (const cable of message.cables) {
-          this.spawnEntity(this.cables, Cable, cable);
+          this.spawnEntity(this.cables, Cable, cable, "floor decoys");
         }
         for (const wire of message.wires) {
-          this.spawnEntity(this.wires, Wire, wire);
+          this.spawnEntity(this.wires, Wire, wire, "floor decoys");
         }
-
         for (const vent of message.vents) {
-          this.spawnEntity(this.vents, Vent, vent);
+          this.spawnEntity(this.vents, Vent, vent, "floor decoys");
         }
 
         this.addCapybara(message.capybara);
