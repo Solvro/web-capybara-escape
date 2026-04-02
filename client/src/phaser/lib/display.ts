@@ -63,11 +63,11 @@ export class Display {
 
   remove(
     layer: //Layery są tu poukładane od najgłębszego do najpłytszego
-      | "background" //ściany i podłoga
-      | "floor decoys" //wszystko co na podłodze - venty, guziki, kable
-      | "entities" //gracz kapibara i rzeczy które "stoją na podłodze"
-      | "wall decoys" //rzeczy typu drzwi
-      | "effects", //efekty - np dymki
+      | "background" //floors and base wall tiles
+      | "floor decoys" //everything laying on the floor - buttons, cables ect.
+      | "entities" //player, capybara, and things standing on the floor like lasers
+      | "wall decoys" //things like doors
+      | "effects", //effects rendered on top
     object: Phaser.GameObjects.GameObject,
   ) {
     this.layerMap.get(layer)?.remove(object);
@@ -82,7 +82,7 @@ export class Display {
 
         const config = TILE_MAPPING[tileType];
 
-        if (tileType !== "") { //To jest potencjalnie do zamiany, ale działa i jest mniej kodu
+        if (tileType !== "") {
           this.layerMap
             .get("background")
             ?.add(
