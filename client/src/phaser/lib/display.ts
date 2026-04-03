@@ -1,57 +1,26 @@
-import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
+import { CELL_SIZE, SIZE_MULTIPLIER, LAYERS } from "../../constants/global";
+import type {LayerNames} from "../../constants/global";
+import { TILE_MAPPING } from "../../constants/blocks";
 
-const TILE_MAPPING: Record<
-  string,
-  { frame: number; isTall?: boolean; frameSecond?: number }
-> = {
-  w1t: { frame: 0, frameSecond: 10, isTall: true },
-  w1: { frame: 0 },
-  w13: { frame: 9 },
-  w2t: { frame: 2, frameSecond: 4, isTall: true },
-  w2: { frame: 2 },
-  w3t: { frame: 3, frameSecond: 4, isTall: true },
-  w3: { frame: 3 },
-  w21: { frame: 8 },
-  f1: { frame: 6 },
-};
+
 
 export class Display {
   private scene: Phaser.Scene;
   private layerMap: Map<string, Phaser.GameObjects.Layer>;
-  private BACKGROUND: Phaser.GameObjects.Layer;
-  private FLOOR_DECOYS: Phaser.GameObjects.Layer;
-  private ENTITIES: Phaser.GameObjects.Layer;
-  private WALL_DECOYS: Phaser.GameObjects.Layer;
-  private EFFECTS: Phaser.GameObjects.Layer;
+
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
-    this.BACKGROUND = this.scene.add.layer();
-    this.FLOOR_DECOYS = this.scene.add.layer();
-    this.ENTITIES = this.scene.add.layer();
-    this.WALL_DECOYS = this.scene.add.layer();
-    this.EFFECTS = this.scene.add.layer();
-    this.layerMap = new Map<string, Phaser.GameObjects.Layer>([
-      ["background", this.BACKGROUND],
-      ["floor decoys", this.FLOOR_DECOYS],
-      ["entities", this.ENTITIES],
-      ["wall decoys", this.WALL_DECOYS],
-      ["effects", this.EFFECTS],
-    ]);
-    this.BACKGROUND.setDepth(0);
-    this.FLOOR_DECOYS.setDepth(1);
-    this.ENTITIES.setDepth(2);
-    this.WALL_DECOYS.setDepth(3);
-    this.EFFECTS.setDepth(4);
+    this.layerMap = new Map();
+    for(const layerName of LAYERS){
+      const layer = this.scene.add.layer();
+      layer.setDepth(LAYERS.indexOf(layerName));
+      this.layerMap.set(layerName, layer);
+    }
   }
 
   add(
-    layer:
-      | "background"
-      | "floor decoys"
-      | "entities"
-      | "wall decoys"
-      | "effects",
+    layer: LayerNames,
     object: Phaser.GameObjects.GameObject,
     isUsingPreUpdate? : boolean
   ) {
@@ -62,12 +31,7 @@ export class Display {
   }
 
   remove(
-    layer: //Layery są tu poukładane od najgłębszego do najpłytszego
-      | "background" //floors and base wall tiles
-      | "floor decoys" //everything laying on the floor - buttons, cables ect.
-      | "entities" //player, capybara, and things standing on the floor like lasers
-      | "wall decoys" //things like doors
-      | "effects", //effects rendered on top
+    layer: LayerNames,
     object: Phaser.GameObjects.GameObject,
   ) {
     this.layerMap.get(layer)?.remove(object);
