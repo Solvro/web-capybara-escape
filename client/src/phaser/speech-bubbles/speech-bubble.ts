@@ -39,8 +39,6 @@ export class SpeechBubble extends Phaser.GameObjects.Container {
 
     this.add(this.bubbleSprite);
     this.add(this.bubbleText);
-    this.scene.add.existing(this);
-    this.setDepth(this.target.depth + 100); //TEMP dopóki nie będzie jakiegoś systemu ogarniętego
   }
 
   preUpdate() {

@@ -1,7 +1,8 @@
 import type { Room } from "colyseus.js";
 import * as Phaser from "phaser";
 
-import { CELL_SIZE, TILE_SIZE, TILE_SIZE_OLD } from "../../constants/global";
+import { CELL_SIZE, LAYER_NAMES, TILE_SIZE, TILE_SIZE_OLD  } from "../../constants/global";
+import type {LAYER_NAME} from "../../constants/global";
 import type {
   MessageCablesUpdate,
   MessageCratesUpdate,
@@ -18,7 +19,7 @@ import type { Player as PlayerType } from "../../types/player";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
-import { createMap } from "../lib/map-creator";
+import { Display } from "../lib/display";
 import {
   PLAYER_TEXTURE_KEYS,
   createPlayerAnimators,
@@ -36,6 +37,7 @@ import { SpeechBubble } from "../speech-bubbles/speech-bubble";
 
 export class Main extends Phaser.Scene {
   private room!: Room;
+  displayHandler!: Display;
   private capybara: Capybara | null = null;
   private players = new Map<string, Player>();
   private crates = new Map<number, Crate>();
@@ -71,9 +73,10 @@ export class Main extends Phaser.Scene {
     mapCollection: Map<any, EntityClass>,
     EntityConstructor: new (scene: Phaser.Scene, data: DataType) => EntityClass,
     data: DataType,
+    layer: LAYER_NAME
   ) {
     const entity = new EntityConstructor(this, data);
-    this.add.existing(entity);
+    this.displayHandler.add(layer, entity);
     mapCollection.set(entity.networkId, entity);
   }
 
@@ -82,6 +85,7 @@ export class Main extends Phaser.Scene {
       throw new Error("Room not found in registry");
     }
     this.room = this.registry.get("room") as Room;
+    this.displayHandler = new Display(this);
   }
 
   preload() {
@@ -141,36 +145,39 @@ export class Main extends Phaser.Scene {
       const room = this.registry.get("room") as Room;
 
       room.onMessage("mapInfo", (message: MessageMapInfo) => {
-        createMap(message.grid, message.width, message.height, this);
+        this.displayHandler.createMap(
+          message.grid,
+          message.width,
+          message.height,
+        );
 
         for (const player of message.players) {
           this.addPlayer(player);
         }
 
         for (const crate of message.crates) {
-          this.spawnEntity(this.crates, Crate, crate);
+          this.spawnEntity(this.crates, Crate, crate, LAYER_NAMES.ENTITIES);
         }
 
         for (const button of message.buttons) {
-          this.spawnEntity(this.buttons, Button, button);
+          this.spawnEntity(this.buttons, Button, button, LAYER_NAMES.FLOOR_DECOYS);
         }
 
         for (const door of message.doors) {
-          this.spawnEntity(this.doors, Door, door);
+          this.spawnEntity(this.doors, Door, door, LAYER_NAMES.WALL_DECOYS);
         }
 
         for (const laser of message.lasers) {
-          this.spawnEntity(this.lasers, Laser, laser);
+          this.spawnEntity(this.lasers, Laser, laser, LAYER_NAMES.ENTITIES);
         }
         for (const cable of message.cables) {
-          this.spawnEntity(this.cables, Cable, cable);
+          this.spawnEntity(this.cables, Cable, cable, LAYER_NAMES.FLOOR_DECOYS);
         }
         for (const wire of message.wires) {
-          this.spawnEntity(this.wires, Wire, wire);
+          this.spawnEntity(this.wires, Wire, wire, LAYER_NAMES.FLOOR_DECOYS);
         }
-
         for (const vent of message.vents) {
-          this.spawnEntity(this.vents, Vent, vent);
+          this.spawnEntity(this.vents, Vent, vent, LAYER_NAMES.FLOOR_DECOYS);
         }
 
         this.addCapybara(message.capybara);
@@ -290,10 +297,9 @@ export class Main extends Phaser.Scene {
       this.speechBubbles.delete(sessionId);
       this.bubbleTimer.remove();
     }
-    this.speechBubbles.set(
-      sessionId,
-      new SpeechBubble(this, target, text, sessionId),
-    );
+    const bubble = new SpeechBubble(this, target, text, sessionId);
+    this.speechBubbles.set(sessionId, bubble);
+    this.displayHandler.add("effects", bubble, true);
 
     this.bubbleTimer = this.time.delayedCall(
       text.split(" ").length * 600 + 2000,
@@ -339,7 +345,7 @@ export class Main extends Phaser.Scene {
       animator,
     );
     this.players.set(playerSpawnInfo.sessionId, player);
-    this.add.existing(player);
+    this.displayHandler.add(LAYER_NAMES.ENTITIES, player);
   }
 
   private addCapybara(capybaraInfo: { x: number; y: number }) {
@@ -348,7 +354,7 @@ export class Main extends Phaser.Scene {
     }
 
     this.capybara = new Capybara(this, capybaraInfo.x, capybaraInfo.y);
-    this.add.existing(this.capybara);
+    this.displayHandler.add("entities", this.capybara);
   }
 
   handleInput(time: number) {
