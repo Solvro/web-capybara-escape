@@ -1,7 +1,8 @@
 import type { Room } from "colyseus.js";
 import * as Phaser from "phaser";
 
-import { CELL_SIZE, TILE_SIZE, TILE_SIZE_OLD } from "../../constants/global";
+import { CELL_SIZE, LAYER_NAMES, TILE_SIZE, TILE_SIZE_OLD  } from "../../constants/global";
+import type {LAYER_NAME} from "../../constants/global";
 import type {
   MessageCablesUpdate,
   MessageCratesUpdate,
@@ -72,12 +73,7 @@ export class Main extends Phaser.Scene {
     mapCollection: Map<any, EntityClass>,
     EntityConstructor: new (scene: Phaser.Scene, data: DataType) => EntityClass,
     data: DataType,
-    layer:
-      | "background"
-      | "floor decoys"
-      | "entities"
-      | "wall decoys"
-      | "effects",
+    layer: LAYER_NAME
   ) {
     const entity = new EntityConstructor(this, data);
     this.displayHandler.add(layer, entity);
@@ -160,28 +156,28 @@ export class Main extends Phaser.Scene {
         }
 
         for (const crate of message.crates) {
-          this.spawnEntity(this.crates, Crate, crate, "entities");
+          this.spawnEntity(this.crates, Crate, crate, LAYER_NAMES.ENTITIES);
         }
 
         for (const button of message.buttons) {
-          this.spawnEntity(this.buttons, Button, button, "floor decoys");
+          this.spawnEntity(this.buttons, Button, button, LAYER_NAMES.FLOOR_DECOYS);
         }
 
         for (const door of message.doors) {
-          this.spawnEntity(this.doors, Door, door, "wall decoys");
+          this.spawnEntity(this.doors, Door, door, LAYER_NAMES.WALL_DECOYS);
         }
 
         for (const laser of message.lasers) {
-          this.spawnEntity(this.lasers, Laser, laser, "entities");
+          this.spawnEntity(this.lasers, Laser, laser, LAYER_NAMES.ENTITIES);
         }
         for (const cable of message.cables) {
-          this.spawnEntity(this.cables, Cable, cable, "floor decoys");
+          this.spawnEntity(this.cables, Cable, cable, LAYER_NAMES.FLOOR_DECOYS);
         }
         for (const wire of message.wires) {
-          this.spawnEntity(this.wires, Wire, wire, "floor decoys");
+          this.spawnEntity(this.wires, Wire, wire, LAYER_NAMES.FLOOR_DECOYS);
         }
         for (const vent of message.vents) {
-          this.spawnEntity(this.vents, Vent, vent, "floor decoys");
+          this.spawnEntity(this.vents, Vent, vent, LAYER_NAMES.FLOOR_DECOYS);
         }
 
         this.addCapybara(message.capybara);
@@ -349,7 +345,7 @@ export class Main extends Phaser.Scene {
       animator,
     );
     this.players.set(playerSpawnInfo.sessionId, player);
-    this.displayHandler.add("entities", player);
+    this.displayHandler.add(LAYER_NAMES.ENTITIES, player);
   }
 
   private addCapybara(capybaraInfo: { x: number; y: number }) {

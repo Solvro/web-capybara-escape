@@ -1,5 +1,5 @@
-import { CELL_SIZE, SIZE_MULTIPLIER, LAYERS } from "../../constants/global";
-import type {LayerNames} from "../../constants/global";
+import { CELL_SIZE, SIZE_MULTIPLIER, LAYERS, LAYER_NAMES } from "../../constants/global";
+import type {LAYER_NAME} from "../../constants/global";
 import { TILE_MAPPING } from "../../constants/blocks";
 
 
@@ -20,7 +20,7 @@ export class Display {
   }
 
   add(
-    layer: LayerNames,
+    layer: LAYER_NAME,
     object: Phaser.GameObjects.GameObject,
     isUsingPreUpdate? : boolean
   ) {
@@ -31,7 +31,7 @@ export class Display {
   }
 
   remove(
-    layer: LayerNames,
+    layer: LAYER_NAME,
     object: Phaser.GameObjects.GameObject,
   ) {
     this.layerMap.get(layer)?.remove(object);
@@ -48,7 +48,7 @@ export class Display {
 
         if (tileType !== "") {
           this.layerMap
-            .get("background")
+            .get(LAYER_NAMES.BACKGROUND)
             ?.add(
               this.scene.add
                 .image(posX, posY, "tileset", config.frame)
@@ -56,7 +56,7 @@ export class Display {
             );
           if (config.isTall ?? false) {
             this.layerMap
-              .get("wall decoys")
+              .get(LAYER_NAMES.WALL_DECOYS)
               ?.add(
                 this.scene.add
                   .image(posX, posY - CELL_SIZE, "tileset", config.frameSecond)
