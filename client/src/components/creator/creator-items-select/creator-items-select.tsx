@@ -69,11 +69,36 @@ export function CreatorItemsSelect({ activeBlock, setActiveBlock }: CreatorItems
 
   const items = LAYER_ITEMS[selectedLayer] ?? [];
 
+  const findLayerForBlock = (blockKey: string): string | null => {
+    for (const [layerKey, layerItems] of Object.entries(LAYER_ITEMS)) {
+      if (layerItems.some((item) => item.key === blockKey)) {
+        return layerKey;
+      }
+    }
+    return null;
+  };
+
+  const handleActiveBlockClick = () => {
+    if (activeBlock === null) {
+      return;
+    }
+    const layer = findLayerForBlock(activeBlock.key);
+    if (layer !== null) {
+      setSelectedLayer(layer);
+    }
+  };
+
   return (
     <div className="flex h-full flex-col rounded-lg bg-[#4b2a86] p-4 shadow-lg">
       <div className="flex h-full w-full max-w-full flex-col">
-        {/* Active Block — above categories */}
-        <div className="mb-4 flex items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3">
+        {/* Active Block — above categories, click to jump to its layer */}
+        <button
+          type="button"
+          className={`mb-4 flex items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3 transition-colors ${activeBlock === null ? "" : "cursor-pointer hover:bg-violet-800/50"}`}
+          style={{ minHeight: "72px" }}
+          onClick={handleActiveBlockClick}
+          disabled={activeBlock === null}
+        >
           <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wider shrink-0">Active Block</h3>
           {activeBlock === null ? (
             <span className="text-xs italic text-violet-300 opacity-60">None selected</span>
@@ -99,7 +124,7 @@ export function CreatorItemsSelect({ activeBlock, setActiveBlock }: CreatorItems
               <span className="text-sm font-bold text-violet-50">{activeBlock.label}</span>
             </>
           )}
-        </div>
+        </button>
 
         {/* Layer tabs */}
         <div className="mb-4">
