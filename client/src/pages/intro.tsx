@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../components/button";
+import { CustomInput } from "../components/custom-input";
 import { ErrorContainer } from "../components/error-container";
-import { Input } from "../components/input";
 import { IntroContainer } from "../components/intro-container";
 import { TitleHeader } from "../components/title-header";
 import { useRoom } from "../lib/use-room";
@@ -114,13 +114,14 @@ export function Intro() {
         </div>
       ) : (
         <>
-          <Input
+          <CustomInput
             value={name}
             placeholder="Elek..."
             setValue={(value) => {
               setName(value.toUpperCase());
             }}
             disabled={status === "loading"}
+            className="my-4"
           />
 
           <Button

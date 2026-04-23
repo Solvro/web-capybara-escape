@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { LAYER_NAMES } from "../../../constants/global";
 import { ASSETS, TILE_MAPPING } from "../../../constants/blocks";
+import { LAYER_NAMES } from "../../../constants/global";
 
 interface LayerItem {
   key: string;
@@ -26,11 +26,19 @@ const LAYER_ITEMS: Record<string, LayerItem[]> = {
   ],
   [LAYER_NAMES.FLOOR_DECOYS]: [
     { key: "button", label: "Button", frame: ASSETS.BUTTON_RELEASED },
-    { key: "buttonPressed", label: "Button Pressed", frame: ASSETS.BUTTON_PRESSED },
+    {
+      key: "buttonPressed",
+      label: "Button Pressed",
+      frame: ASSETS.BUTTON_PRESSED,
+    },
     { key: "buttonBase", label: "Button Base", frame: ASSETS.BUTTON_BASE },
     { key: "pointButton", label: "Point Button", frame: ASSETS.POINT_BUTTON },
     { key: "cable", label: "Cable Active", frame: ASSETS.CABLE_END_ACTIVE },
-    { key: "cableInactive", label: "Cable Inactive", frame: ASSETS.CABLE_END_INACTIVE },
+    {
+      key: "cableInactive",
+      label: "Cable Inactive",
+      frame: ASSETS.CABLE_END_INACTIVE,
+    },
     { key: "socket", label: "Socket", frame: ASSETS.SOCKET },
     { key: "wire", label: "Wire", frame: ASSETS.WIRE },
     { key: "wireCurve", label: "Wire Curve", frame: ASSETS.WIRE_CURVE },
@@ -40,11 +48,31 @@ const LAYER_ITEMS: Record<string, LayerItem[]> = {
   [LAYER_NAMES.ENTITIES]: [
     { key: "crate", label: "Crate", frame: ASSETS.CRATE },
     { key: "laserGun", label: "Laser Gun", frame: ASSETS.LASER_GUN },
-    { key: "laserGunFired", label: "Laser Fired", frame: ASSETS.LASER_GUN_FIRED },
-    { key: "laserBeamH", label: "Beam Horiz.", frame: ASSETS.LASER_BEAM_HORIZONTAL },
-    { key: "laserBeamV", label: "Beam Vert.", frame: ASSETS.LASER_BEAM_VERTICAL },
-    { key: "laserBeamHTip", label: "Beam H Tip", frame: ASSETS.LASER_BEAM_HORIZONTAL_TIP },
-    { key: "laserBeamVTip", label: "Beam V Tip", frame: ASSETS.LASER_BEAM_VERTICAL_TIP },
+    {
+      key: "laserGunFired",
+      label: "Laser Fired",
+      frame: ASSETS.LASER_GUN_FIRED,
+    },
+    {
+      key: "laserBeamH",
+      label: "Beam Horiz.",
+      frame: ASSETS.LASER_BEAM_HORIZONTAL,
+    },
+    {
+      key: "laserBeamV",
+      label: "Beam Vert.",
+      frame: ASSETS.LASER_BEAM_VERTICAL,
+    },
+    {
+      key: "laserBeamHTip",
+      label: "Beam H Tip",
+      frame: ASSETS.LASER_BEAM_HORIZONTAL_TIP,
+    },
+    {
+      key: "laserBeamVTip",
+      label: "Beam V Tip",
+      frame: ASSETS.LASER_BEAM_VERTICAL_TIP,
+    },
   ],
   [LAYER_NAMES.WALL_DECOYS]: [
     { key: "door", label: "Door Closed", frame: ASSETS.DOOR_CLOSED },
@@ -61,10 +89,15 @@ const LAYER_TABS = [
 
 interface CreatorItemsSelectProps {
   activeBlock: { key: string; frame: number; label: string } | null;
-  setActiveBlock: (block: { key: string; frame: number; label: string } | null) => void;
+  setActiveBlock: (
+    block: { key: string; frame: number; label: string } | null,
+  ) => void;
 }
 
-export function CreatorItemsSelect({ activeBlock, setActiveBlock }: CreatorItemsSelectProps) {
+export function CreatorItemsSelect({
+  activeBlock,
+  setActiveBlock,
+}: CreatorItemsSelectProps) {
   const [selectedLayer, setSelectedLayer] = useState<string>(LAYER_TABS[0].key);
 
   const items = LAYER_ITEMS[selectedLayer] ?? [];
@@ -95,19 +128,20 @@ export function CreatorItemsSelect({ activeBlock, setActiveBlock }: CreatorItems
         <button
           type="button"
           className={`mb-4 flex items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3 transition-colors ${activeBlock === null ? "" : "cursor-pointer hover:bg-violet-800/50"}`}
-          style={{ minHeight: "72px" }}
+          className={`mb-4 flex items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3 transition-colors ${activeBlock === null ? "" : "cursor-pointer hover:bg-violet-800/50"} min-h-[72px]`}
           onClick={handleActiveBlockClick}
           disabled={activeBlock === null}
         >
-          <h3 className="text-xs font-bold text-amber-300 uppercase tracking-wider shrink-0">Active Block</h3>
+          <h3 className="shrink-0 text-xs font-bold tracking-wider text-amber-300 uppercase">
+            Active Block
+          </h3>
           {activeBlock === null ? (
-            <span className="text-xs italic text-violet-300 opacity-60">None selected</span>
+            <span className="text-xs text-violet-300 italic opacity-60">
+              None selected
+            </span>
           ) : (
             <>
-              <div
-                className="overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]"
-                style={{ width: "48px", height: "48px" }}
-              >
+              <div className="h-12 w-12 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
                 <div
                   style={{
                     width: "24px",
@@ -119,9 +153,12 @@ export function CreatorItemsSelect({ activeBlock, setActiveBlock }: CreatorItems
                     transform: "scale(2)",
                     transformOrigin: "top left",
                   }}
+                  className="h-6 w-6"
                 />
               </div>
-              <span className="text-sm font-bold text-violet-50">{activeBlock.label}</span>
+              <span className="text-sm font-bold text-violet-50">
+                {activeBlock.label}
+              </span>
             </>
           )}
         </button>
@@ -138,11 +175,11 @@ export function CreatorItemsSelect({ activeBlock, setActiveBlock }: CreatorItems
                 onClick={() => {
                   setSelectedLayer(tab.key);
                 }}
-                className={`rounded-md px-6 py-2 text-center text-sm font-semibold tracking-wide whitespace-nowrap transition-colors ${
+                className={`rounded-lg px-5 py-2 text-center font-mono text-base font-bold tracking-wide whitespace-nowrap transition-colors ${
                   selectedLayer === tab.key
-                    ? "bg-amber-400 text-violet-900 shadow"
-                    : "bg-violet-500/70 text-amber-100 hover:bg-violet-400/80"
-                } `}
+                    ? "border border-amber-300 bg-transparent text-amber-300"
+                    : "border border-transparent bg-transparent text-gray-300 hover:text-white"
+                }`}
               >
                 {tab.label}
               </button>
@@ -169,13 +206,7 @@ export function CreatorItemsSelect({ activeBlock, setActiveBlock }: CreatorItems
                 }`}
                 title={item.label}
               >
-                <div
-                  className="overflow-hidden border-4 border-emerald-950 bg-blue-400"
-                  style={{
-                    width: "96px",
-                    height: "96px",
-                  }}
-                >
+                <div className="h-24 w-24 overflow-hidden border-4 border-emerald-950 bg-blue-400">
                   <div
                     style={{
                       width: "24px",
@@ -187,9 +218,10 @@ export function CreatorItemsSelect({ activeBlock, setActiveBlock }: CreatorItems
                       transform: "scale(4)",
                       transformOrigin: "top left",
                     }}
+                    className="h-6 w-6"
                   />
                 </div>
-                <span className="max-w-[96px] text-center text-[11px] font-medium leading-tight text-violet-200">
+                <span className="max-w-[96px] text-center text-[11px] leading-tight font-medium text-violet-200">
                   {item.label}
                 </span>
               </button>
