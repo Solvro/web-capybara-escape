@@ -4,6 +4,7 @@ import { CreatorTile } from "./creator-tile";
 
 interface CreatorBoardProps {
   dims: [number, number];
+  activeBlock?: { key: string; frame: number; label: string } | null;
 }
 
 export function CreatorBoard({ dims }: CreatorBoardProps) {
