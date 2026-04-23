@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+import { colorVariants } from "../../../constants/color-variants";
+import { CustomInput } from "../../custom-input";
+
 interface CreatorNameProps {
   levelName?: string;
   setLevelName: (name: string) => void;
@@ -30,7 +33,7 @@ export function CreatorName({ levelName, setLevelName }: CreatorNameProps) {
 
   return (
     <div className="flex h-full w-full flex-col items-start justify-center gap-2 rounded-lg bg-[#4b2a86] p-4 text-left shadow-lg">
-      <label className="px-3 text-xs font-semibold tracking-wide whitespace-nowrap text-violet-200 uppercase">
+      <label className="my-1 px-3 text-xs font-semibold tracking-wide whitespace-nowrap text-violet-200 uppercase">
         Level Name
       </label>
 
@@ -44,15 +47,16 @@ export function CreatorName({ levelName, setLevelName }: CreatorNameProps) {
           </p>
         </div>
       ) : (
-        <input
-          type="text"
+        <CustomInput
           value={tempName}
-          onChange={(e) => setTempName(e.target.value)}
+          setValue={setTempName}
+          disabled={false}
+          placeholder="Enter level name"
+          textColor={colorVariants.text.slate}
+          className="w-full"
           onKeyDown={handleKeyDown}
           onBlur={handleSave}
           autoFocus
-          className="h-9 w-full rounded-md border-2 border-amber-400 bg-white px-3 text-base font-bold text-gray-900 placeholder:text-gray-500 focus:border-amber-500 focus:outline-none"
-          placeholder="Enter level name"
         />
       )}
     </div>
