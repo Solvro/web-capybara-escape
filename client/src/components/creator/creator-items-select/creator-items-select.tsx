@@ -177,11 +177,11 @@ export function CreatorItemsSelect({
                 onClick={() => {
                   setSelectedLayer(tab.key);
                 }}
-                className={`rounded-md px-6 py-2 text-center text-sm font-semibold tracking-wide whitespace-nowrap transition-colors ${
+                className={`rounded-lg px-5 py-2 text-center font-mono text-base font-bold tracking-wide whitespace-nowrap transition-colors ${
                   selectedLayer === tab.key
-                    ? "bg-amber-400 text-violet-900 shadow"
-                    : "bg-violet-500/70 text-amber-100 hover:bg-violet-400/80"
-                } `}
+                    ? "border border-amber-300 bg-transparent text-amber-300"
+                    : "border border-transparent bg-transparent text-gray-300 hover:text-white"
+                }`}
               >
                 {tab.label}
               </button>
