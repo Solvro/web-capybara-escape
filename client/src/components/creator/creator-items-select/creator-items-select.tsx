@@ -128,7 +128,7 @@ export function CreatorItemsSelect({
         <button
           type="button"
           className={`mb-4 flex items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3 transition-colors ${activeBlock === null ? "" : "cursor-pointer hover:bg-violet-800/50"}`}
-          style={{ minHeight: "72px" }}
+          className={`mb-4 flex items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3 transition-colors ${activeBlock === null ? "" : "cursor-pointer hover:bg-violet-800/50"} min-h-[72px]`}
           onClick={handleActiveBlockClick}
           disabled={activeBlock === null}
         >
@@ -141,10 +141,7 @@ export function CreatorItemsSelect({
             </span>
           ) : (
             <>
-              <div
-                className="overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]"
-                style={{ width: "48px", height: "48px" }}
-              >
+              <div className="h-12 w-12 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
                 <div
                   style={{
                     width: "24px",
@@ -156,6 +153,7 @@ export function CreatorItemsSelect({
                     transform: "scale(2)",
                     transformOrigin: "top left",
                   }}
+                  className="h-6 w-6"
                 />
               </div>
               <span className="text-sm font-bold text-violet-50">
@@ -208,13 +206,7 @@ export function CreatorItemsSelect({
                 }`}
                 title={item.label}
               >
-                <div
-                  className="overflow-hidden border-4 border-emerald-950 bg-blue-400"
-                  style={{
-                    width: "96px",
-                    height: "96px",
-                  }}
-                >
+                <div className="h-24 w-24 overflow-hidden border-4 border-emerald-950 bg-blue-400">
                   <div
                     style={{
                       width: "24px",
@@ -226,6 +218,7 @@ export function CreatorItemsSelect({
                       transform: "scale(4)",
                       transformOrigin: "top left",
                     }}
+                    className="h-6 w-6"
                   />
                 </div>
                 <span className="max-w-[96px] text-center text-[11px] leading-tight font-medium text-violet-200">
