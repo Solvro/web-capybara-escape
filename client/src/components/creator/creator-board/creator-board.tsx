@@ -1,13 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { LAYER_ORDER } from "../../../constants/layer-items";
+import type { LayerItem } from "../../../constants/layer-items";
 import { CreatorTile } from "./creator-tile";
 
 interface CreatorBoardProps {
   dims: [number, number];
-  activeBlock?: { key: string; frame: number; label: string } | null;
+  activeBlock: LayerItem | null;
+  tileIndices: (number | null)[][];
+  setTileIndices: React.Dispatch<React.SetStateAction<(number | null)[][]>>;
 }
 
-export function CreatorBoard({ dims }: CreatorBoardProps) {
+export function CreatorBoard({
+  dims,
+  activeBlock,
+  tileIndices,
+  setTileIndices,
+}: CreatorBoardProps) {
   const boardRef = useRef<HTMLDivElement | null>(null);
 
   const [rows, cols] = dims;
@@ -34,11 +43,19 @@ export function CreatorBoard({ dims }: CreatorBoardProps) {
   const boardRows = Array.from({ length: rows }, (_, rowIndex) => rowIndex);
   const boardCols = Array.from({ length: cols }, (_, colIndex) => colIndex);
 
-  const tileIndexes = useMemo(
-    () =>
-      Array.from({ length: rows * cols }, () => Math.floor(Math.random() * 4)),
-    [rows, cols],
-  );
+  const handleTileClick = (tileIdx: number) => {
+    if (activeBlock) {
+      const layerIdx = LAYER_ORDER.indexOf(
+        activeBlock.layer as (typeof LAYER_ORDER)[number],
+      );
+      if (layerIdx === -1) return; // Layer not found, do nothing
+      setTileIndices((prev) => {
+        const next = prev.map((arr) => [...arr]);
+        next[tileIdx][layerIdx] = activeBlock.frame;
+        return next;
+      });
+    }
+  };
 
   return (
     <div
@@ -57,11 +74,16 @@ export function CreatorBoard({ dims }: CreatorBoardProps) {
             boardCols.map((col) => {
               const tileIdx = row * cols + col;
               return (
-                <CreatorTile
+                <div
                   key={`${row}-${col}`}
-                  sizePx={tileSize}
-                  tileIndex={tileIndexes[tileIdx]}
-                />
+                  onClick={() => handleTileClick(tileIdx)}
+                  style={{ cursor: activeBlock ? "pointer" : undefined }}
+                >
+                  <CreatorTile
+                    sizePx={tileSize}
+                    tileIndices={tileIndices[tileIdx]}
+                  />
+                </div>
               );
             }),
           )}

@@ -1,9 +1,11 @@
+
 interface CreatorControlProps {
   dims: [number, number];
   setDims: (dims: [number, number]) => void;
+  onReset?: () => void;
 }
 
-export function CreatorControl({ dims, setDims }: CreatorControlProps) {
+export function CreatorControl({ dims, setDims, onReset }: CreatorControlProps) {
   const [rows, cols] = dims;
   const MIN_DIM = 3;
   const MAX_DIM = 12;
@@ -84,7 +86,10 @@ export function CreatorControl({ dims, setDims }: CreatorControlProps) {
 
       {/* Action Buttons */}
       <div className="creator-control-actions ml-auto flex flex-col gap-2 md:flex-row">
-        <button className="h-8 min-w-[70px] rounded-md bg-violet-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-violet-400">
+        <button
+          className="h-8 min-w-[70px] rounded-md bg-violet-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-violet-400"
+          onClick={onReset}
+        >
           Reset
         </button>
         <button className="h-8 min-w-[70px] rounded-md bg-emerald-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-emerald-400">

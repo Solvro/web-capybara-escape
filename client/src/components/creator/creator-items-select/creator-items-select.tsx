@@ -1,84 +1,8 @@
 import { useState } from "react";
 
-import { ASSETS, TILE_MAPPING } from "../../../constants/blocks";
 import { LAYER_NAMES } from "../../../constants/global";
-
-interface LayerItem {
-  key: string;
-  label: string;
-  frame: number;
-}
-
-const LAYER_ITEMS: Record<string, LayerItem[]> = {
-  [LAYER_NAMES.BACKGROUND]: [
-    { key: "f1", label: "Floor", frame: TILE_MAPPING.f1.frame },
-    { key: "w1t", label: "Wall 1 Top", frame: TILE_MAPPING.w1t.frame },
-    { key: "w1t-upper", label: "Wall 1 Upper", frame: 10 },
-    { key: "w1", label: "Wall 1", frame: TILE_MAPPING.w1.frame },
-    { key: "w13", label: "Wall 1-3", frame: TILE_MAPPING.w13.frame },
-    { key: "w2t", label: "Wall 2 Top", frame: TILE_MAPPING.w2t.frame },
-    { key: "w2t-upper", label: "Wall 2/3 Upper", frame: 4 },
-    { key: "w2", label: "Wall 2", frame: TILE_MAPPING.w2.frame },
-    { key: "w3t", label: "Wall 3 Top", frame: TILE_MAPPING.w3t.frame },
-    { key: "w3", label: "Wall 3", frame: TILE_MAPPING.w3.frame },
-    { key: "w21", label: "Wall 2-1", frame: TILE_MAPPING.w21.frame },
-    { key: "empty", label: "Empty", frame: ASSETS.EMPTY },
-  ],
-  [LAYER_NAMES.FLOOR_DECOYS]: [
-    { key: "button", label: "Button", frame: ASSETS.BUTTON_RELEASED },
-    {
-      key: "buttonPressed",
-      label: "Button Pressed",
-      frame: ASSETS.BUTTON_PRESSED,
-    },
-    { key: "buttonBase", label: "Button Base", frame: ASSETS.BUTTON_BASE },
-    { key: "pointButton", label: "Point Button", frame: ASSETS.POINT_BUTTON },
-    { key: "cable", label: "Cable Active", frame: ASSETS.CABLE_END_ACTIVE },
-    {
-      key: "cableInactive",
-      label: "Cable Inactive",
-      frame: ASSETS.CABLE_END_INACTIVE,
-    },
-    { key: "socket", label: "Socket", frame: ASSETS.SOCKET },
-    { key: "wire", label: "Wire", frame: ASSETS.WIRE },
-    { key: "wireCurve", label: "Wire Curve", frame: ASSETS.WIRE_CURVE },
-    { key: "ventOpen", label: "Vent Open", frame: ASSETS.VENT_OPEN },
-    { key: "ventClosed", label: "Vent Closed", frame: ASSETS.VENT_CLOSED },
-  ],
-  [LAYER_NAMES.ENTITIES]: [
-    { key: "crate", label: "Crate", frame: ASSETS.CRATE },
-    { key: "laserGun", label: "Laser Gun", frame: ASSETS.LASER_GUN },
-    {
-      key: "laserGunFired",
-      label: "Laser Fired",
-      frame: ASSETS.LASER_GUN_FIRED,
-    },
-    {
-      key: "laserBeamH",
-      label: "Beam Horiz.",
-      frame: ASSETS.LASER_BEAM_HORIZONTAL,
-    },
-    {
-      key: "laserBeamV",
-      label: "Beam Vert.",
-      frame: ASSETS.LASER_BEAM_VERTICAL,
-    },
-    {
-      key: "laserBeamHTip",
-      label: "Beam H Tip",
-      frame: ASSETS.LASER_BEAM_HORIZONTAL_TIP,
-    },
-    {
-      key: "laserBeamVTip",
-      label: "Beam V Tip",
-      frame: ASSETS.LASER_BEAM_VERTICAL_TIP,
-    },
-  ],
-  [LAYER_NAMES.WALL_DECOYS]: [
-    { key: "door", label: "Door Closed", frame: ASSETS.DOOR_CLOSED },
-    { key: "doorBase", label: "Door Base", frame: ASSETS.DOOR_BASE },
-  ],
-};
+import { LAYER_ITEMS, type LayerItem } from "../../../constants/layer-items";
+import { getTilesetBackgroundPosition } from "../../../utils/tileset-utils";
 
 const LAYER_TABS = [
   { key: LAYER_NAMES.BACKGROUND, label: "Background" },
@@ -88,10 +12,8 @@ const LAYER_TABS = [
 ];
 
 interface CreatorItemsSelectProps {
-  activeBlock: { key: string; frame: number; label: string } | null;
-  setActiveBlock: (
-    block: { key: string; frame: number; label: string } | null,
-  ) => void;
+  activeBlock: LayerItem | null;
+  setActiveBlock: (block: LayerItem | null) => void;
 }
 
 export function CreatorItemsSelect({
@@ -140,7 +62,7 @@ export function CreatorItemsSelect({
             </span>
           ) : (
             <>
-              <div className="h-12 w-12 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
+              <div className="h-13 w-13 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
                 <div
                   style={{
                     width: "24px",
@@ -189,9 +111,11 @@ export function CreatorItemsSelect({
         {/* Item grid — bigger cells */}
         <div className="custom-scrollbar flex min-h-0 flex-1 flex-wrap content-start items-start justify-center gap-4 overflow-y-auto rounded-lg bg-violet-900/40 p-4">
           {items.map((item) => {
-            const posX = -(item.frame % 6) * 24;
-            const posY = -Math.floor(item.frame / 6) * 24;
-
+            const { x: posX, y: posY } = getTilesetBackgroundPosition(
+              item.frame,
+              6,
+              24,
+            );
             return (
               <button
                 key={item.key}
@@ -205,7 +129,7 @@ export function CreatorItemsSelect({
                 }`}
                 title={item.label}
               >
-                <div className="h-24 w-24 overflow-hidden border-4 border-emerald-950 bg-blue-400">
+                <div className="h-20 w-20 overflow-hidden border-4 border-emerald-950 bg-blue-400">
                   <div
                     style={{
                       width: "24px",
@@ -214,7 +138,7 @@ export function CreatorItemsSelect({
                       backgroundPosition: `${String(posX)}px ${String(posY)}px`,
                       backgroundRepeat: "no-repeat",
                       imageRendering: "pixelated",
-                      transform: "scale(4)",
+                      transform: "scale(3)",
                       transformOrigin: "top left",
                     }}
                     className="h-6 w-6"
