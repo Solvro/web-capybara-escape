@@ -127,8 +127,7 @@ export function CreatorItemsSelect({
         {/* Active Block — above categories, click to jump to its layer */}
         <button
           type="button"
-          className={`mb-4 flex items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3 transition-colors ${activeBlock === null ? "" : "cursor-pointer hover:bg-violet-800/50"}`}
-          className={`mb-4 flex items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3 transition-colors ${activeBlock === null ? "" : "cursor-pointer hover:bg-violet-800/50"} min-h-[72px]`}
+          className={`mb-4 flex min-h-[72px] items-center gap-4 rounded-lg bg-violet-900/40 px-4 py-3 transition-colors ${activeBlock === null ? "" : "cursor-pointer hover:bg-violet-800/50"}`}
           onClick={handleActiveBlockClick}
           disabled={activeBlock === null}
         >
