@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
-    "@tailwindcss/vite": "^4.1.17",
+    "@tailwindcss/vite": "^4.2.4",
     "colyseus.js": "^0.16.22",
     "phaser": "^3.90.0",
     "react": "^19.2.0",
