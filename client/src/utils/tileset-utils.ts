@@ -27,18 +27,30 @@ export function generateInitialTiles(
     if (frame === TILE_MAPPING.w2.frame) {
       return [frame, null, null, null];
     }
-    const floorDecoy =
-      Math.random() < 0.2
-        ? floorDecoys[Math.floor(Math.random() * floorDecoys.length)]
-        : null;
-    const entity =
-      Math.random() < 0.15
-        ? entities[Math.floor(Math.random() * entities.length)]
-        : null;
-    const wallDecoy =
-      Math.random() < 0.1
-        ? wallDecoys[Math.floor(Math.random() * wallDecoys.length)]
-        : null;
+
+    const layerTypes = [
+      () =>
+        Math.random() < 0.2
+          ? floorDecoys[Math.floor(Math.random() * floorDecoys.length)]
+          : null,
+      () =>
+        Math.random() < 0.15
+          ? entities[Math.floor(Math.random() * entities.length)]
+          : null,
+      () =>
+        Math.random() < 0.1
+          ? wallDecoys[Math.floor(Math.random() * wallDecoys.length)]
+          : null,
+    ];
+
+    const which = Math.floor(Math.random() * 4);
+    let floorDecoy = null,
+      entity = null,
+      wallDecoy = null;
+    if (which === 0) floorDecoy = layerTypes[0]();
+    else if (which === 1) entity = layerTypes[1]();
+    else if (which === 2) wallDecoy = layerTypes[2]();
+
     return [frame, floorDecoy, entity, wallDecoy];
   });
 }

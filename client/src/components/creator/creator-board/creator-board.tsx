@@ -48,10 +48,17 @@ export function CreatorBoard({
       const layerIdx = LAYER_ORDER.indexOf(
         activeBlock.layer as (typeof LAYER_ORDER)[number],
       );
-      if (layerIdx === -1) return; // Layer not found, do nothing
+      if (layerIdx === -1) return;
       setTileIndices((prev) => {
         const next = prev.map((arr) => [...arr]);
-        next[tileIdx][layerIdx] = activeBlock.frame;
+
+        if (layerIdx === 0) {
+          next[tileIdx][0] = activeBlock.frame;
+        } else {
+          for (let i = 1; i <= 3; i++) {
+            next[tileIdx][i] = i === layerIdx ? activeBlock.frame : null;
+          }
+        }
         return next;
       });
     }
