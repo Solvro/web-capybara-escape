@@ -18,7 +18,7 @@ export class ButtonState extends Schema {
     color: string,
     x: number,
     y: number,
-    doorId: string
+    doorId: string,
   ): Button {
     const button = new Button();
     button.id = id;

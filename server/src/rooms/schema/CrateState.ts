@@ -67,7 +67,7 @@ export class CrateState extends Schema {
     oldX: number,
     oldY: number,
     dx: number,
-    dy: number
+    dy: number,
   ) {
     const oldKey = this.getPositionKey(oldX, oldY);
     this.positionToCrateId.delete(oldKey); // delete old mapping
@@ -85,7 +85,7 @@ export class CrateState extends Schema {
     targetX: number,
     targetY: number,
     dx: number,
-    dy: number
+    dy: number,
   ): boolean {
     while (oldX !== targetX || oldY !== targetY) {
       targetX -= dx;

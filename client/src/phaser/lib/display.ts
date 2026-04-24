@@ -1,18 +1,20 @@
-import { CELL_SIZE, SIZE_MULTIPLIER, LAYERS, LAYER_NAMES } from "../../constants/global";
-import type {LAYER_NAME} from "../../constants/global";
+import {
+  CELL_SIZE,
+  SIZE_MULTIPLIER,
+  LAYERS,
+  LAYER_NAMES,
+} from "../../constants/global";
+import type { LAYER_NAME } from "../../constants/global";
 import { TILE_MAPPING } from "../../constants/blocks";
-
-
 
 export class Display {
   private scene: Phaser.Scene;
   private layerMap: Map<string, Phaser.GameObjects.Layer>;
 
-
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.layerMap = new Map();
-    for(const layerName of LAYERS){
+    for (const layerName of LAYERS) {
       const layer = this.scene.add.layer();
       layer.setDepth(LAYERS.indexOf(layerName));
       this.layerMap.set(layerName, layer);
@@ -22,18 +24,15 @@ export class Display {
   add(
     layer: LAYER_NAME,
     object: Phaser.GameObjects.GameObject,
-    isUsingPreUpdate? : boolean
+    isUsingPreUpdate?: boolean,
   ) {
     this.layerMap.get(layer)?.add(object);
-    if(isUsingPreUpdate ?? false){
+    if (isUsingPreUpdate ?? false) {
       this.scene.sys.updateList.add(object); //żeby się updatowało (inaczej PreUpdate sie wywala)
     }
   }
 
-  remove(
-    layer: LAYER_NAME,
-    object: Phaser.GameObjects.GameObject,
-  ) {
+  remove(layer: LAYER_NAME, object: Phaser.GameObjects.GameObject) {
     this.layerMap.get(layer)?.remove(object);
   }
 

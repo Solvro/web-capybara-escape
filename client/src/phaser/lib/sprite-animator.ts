@@ -70,9 +70,9 @@ export class SpriteAnimator {
     animName: string,
     idleAnimName?: string,
   ): void {
-    if (!sprite.active || typeof sprite.stop !== 'function') {
-    return;
-  }
+    if (!sprite.active || typeof sprite.stop !== "function") {
+      return;
+    }
     sprite.stop();
     if (idleAnimName !== undefined && this.hasAnimation(idleAnimName)) {
       this.play(sprite, idleAnimName);

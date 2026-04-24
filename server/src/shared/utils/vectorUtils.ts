@@ -12,7 +12,7 @@ export const getMoveVectorFromDirection = (direction: Direction) => {
 
 export const getDirectionFromMoveVector = (
   dx: number,
-  dy: number
+  dy: number,
 ): Direction => {
   if (dx === -1 && dy === 0) return "left";
   if (dx === 1 && dy === 0) return "right";

@@ -2,24 +2,37 @@
   "name": "web-capybara-escape",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run start --prefix server\" \"npm run dev --prefix client\""
+  "keywords": [],
+  "homepage": "https://github.com/Solvro/web-capybara-escape#readme",
+  "bugs": {
+    "url": "https://github.com/Solvro/web-capybara-escape/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Solvro/web-capybara-escape.git"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
+  "author": "",
   "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Solvro/web-capybara-escape/issues"
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run start --prefix server\" \"npm run dev --prefix client\"",
+    "format": "prettier --write client server",
+    "format:check": "prettier --check client server",
+    "prepare": "husky",
+    "test": "npm run test:server",
+    "test:server": "npm run test --prefix server"
   },
-  "homepage": "https://github.com/Solvro/web-capybara-escape#readme",
+  "lint-staged": {
+    "*": "prettier -w --ignore-unknown"
+  },
+  "prettier": "@solvro/config/prettier",
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "@commitlint/cli": "^20.1.0",
+    "@solvro/config": "^2.0.7",
+    "concurrently": "^9.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.6.2"
   }
 }

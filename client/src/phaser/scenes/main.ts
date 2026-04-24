@@ -1,8 +1,13 @@
 import type { Room } from "colyseus.js";
 import * as Phaser from "phaser";
 
-import { CELL_SIZE, LAYER_NAMES, TILE_SIZE, TILE_SIZE_OLD  } from "../../constants/global";
-import type {LAYER_NAME} from "../../constants/global";
+import {
+  CELL_SIZE,
+  LAYER_NAMES,
+  TILE_SIZE,
+  TILE_SIZE_OLD,
+} from "../../constants/global";
+import type { LAYER_NAME } from "../../constants/global";
 import type {
   MessageCablesUpdate,
   MessageCratesUpdate,
@@ -73,7 +78,7 @@ export class Main extends Phaser.Scene {
     mapCollection: Map<any, EntityClass>,
     EntityConstructor: new (scene: Phaser.Scene, data: DataType) => EntityClass,
     data: DataType,
-    layer: LAYER_NAME
+    layer: LAYER_NAME,
   ) {
     const entity = new EntityConstructor(this, data);
     this.displayHandler.add(layer, entity);
@@ -160,7 +165,12 @@ export class Main extends Phaser.Scene {
         }
 
         for (const button of message.buttons) {
-          this.spawnEntity(this.buttons, Button, button, LAYER_NAMES.FLOOR_DECOYS);
+          this.spawnEntity(
+            this.buttons,
+            Button,
+            button,
+            LAYER_NAMES.FLOOR_DECOYS,
+          );
         }
 
         for (const door of message.doors) {
