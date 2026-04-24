@@ -5,6 +5,7 @@ import { Creator } from "./pages/creator";
 import { Game } from "./pages/game";
 import { Intro } from "./pages/intro";
 import { Playground } from "./pages/playground";
+import { Start } from "./pages/start";
 
 export function App() {
   return (
@@ -12,6 +13,7 @@ export function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Intro />} />
+          <Route path="/start" element={<Start />} />
           <Route path="/game" element={<Game />} />
           <Route path="/creator" element={<Creator />} />
           <Route path="/playground" element={<Playground />} />

@@ -7,11 +7,20 @@ import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
 // import room from "./json/examples/room3.json";
 
 export class GameRoom extends Room<RoomState> {
-  maxClients = 4;
+  maxClients = 2;
   state = new RoomState();
 
   onCreate(options: any) {
+    this.setMetadata({
+        isPrivate: !!options.isPrivate
+    });
+
     this.maxClients = room.maxClients ?? this.maxClients;
+
+    if (options.private) {
+            this.setPrivate(true);
+    }
+
     this.state.loadRoomFromJson(room);
     this.onMessage("move", (client, message) => {
       const player = this.state.playerState.players.get(client.sessionId);
@@ -115,12 +124,22 @@ export class GameRoom extends Room<RoomState> {
   }
 
   onJoin(client: Client, options: any) {
-    this.state.spawnNewPlayer(client.sessionId, options.name);
+    const nickname = options.name || `Capy_${client.sessionId.slice(0, 3)}`;
+
+    this.state.spawnNewPlayer(client.sessionId, nickname);
+
     const player = this.state.playerState.players.get(client.sessionId);
+
+    // Player index 0 = Sol
+    // Player index 1 = Vron
+    const character = player.index === 0 ? "Sol" : "Vron";
+
+    console.log(`Gracz ${player.name} dołączył jako ${player.index === 0 ? "Sol" : "Vron"}`);
 
     this.broadcast("onAddPlayer", {
       sessionId: client.sessionId,
       playerName: player.name,
+      character: character,
       position: player.position,
       index: player.index,
     });
@@ -134,7 +153,7 @@ export class GameRoom extends Room<RoomState> {
       }
 
       // allow disconnected client to reconnect into this room until 20 seconds
-      await this.allowReconnection(client, 0);
+      await this.allowReconnection(client, 20);
     } catch (e) {
       this.broadcast("onRemovePlayer", {
         sessionId: client.sessionId,
