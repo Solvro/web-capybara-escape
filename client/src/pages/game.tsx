@@ -54,6 +54,10 @@ export function Game() {
   return (
     <div className="flex h-[560px] w-[800px] items-center justify-center overflow-hidden rounded-2xl bg-violet-950">
       <PhaserGame room={room} />
+      <div className="absolute top-4 left-4 rounded bg-black/50 p-2 text-white">
+        KOD POKOJU:{" "}
+        <span className="font-bold text-amber-400">{room.roomId}</span>
+      </div>
     </div>
   );
 }

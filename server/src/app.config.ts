@@ -13,6 +13,7 @@ export default config({
      * Define your room handlers:
      */
     gameServer.define("game_room", GameRoom);
+     // .filterBy(['isPrivate']);
   },
 
   initializeExpress: (app) => {

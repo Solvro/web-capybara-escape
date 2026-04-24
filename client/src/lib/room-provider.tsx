@@ -3,6 +3,7 @@ import type { Room } from "colyseus.js";
 import React, { useEffect, useState } from "react";
 
 import { RoomContext } from "./use-room";
+import type { ConnectOptions } from "./use-room";
 
 const host = window.location.hostname;
 
@@ -23,20 +24,45 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [joinError, setJoinError] = useState(false);
 
-  const connect = async (playerName: string) => {
+  const connect = async ({
+    playerName,
+    mode,
+    roomCode,
+    isPrivate,
+  }: ConnectOptions) => {
     try {
-      const newRoom = await client.joinOrCreate("game_room", {
-        name: playerName,
-      });
-      setRoom(newRoom);
+      setJoinError(false);
+      let joinedRoom: Room;
+
+      console.warn({playerName,
+    mode,
+    roomCode,
+    isPrivate,});
+
+      if (mode === "create") {
+        joinedRoom = await client.create("game_room", {
+          name: playerName,
+          isPrivate,
+        });
+      } else if (
+        mode === "join" &&
+        roomCode !== undefined &&
+        roomCode.length > 0
+      ) {
+        joinedRoom = await client.joinById(roomCode, {
+          name: playerName,
+          //isPrivate: true,
+        });
+      } else {
+        joinedRoom = await client.joinOrCreate("game_room", {
+          name: playerName, 
+          isPrivate: false,
+        });
+      }
+      
+      setRoom(joinedRoom);
       setIsConnected(true);
-      localStorage.setItem(
-        "reconnection",
-        JSON.stringify({
-          token: newRoom.reconnectionToken,
-          playerName,
-        }),
-      );
+
     } catch (error) {
       console.error("Join error", error);
       setJoinError(true);
