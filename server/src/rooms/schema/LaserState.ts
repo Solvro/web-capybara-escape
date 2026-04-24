@@ -39,7 +39,7 @@ export class Laser extends Schema {
 
 export class LaserState extends Schema {
   @type({ map: Laser }) lasers = new MapSchema<Laser>();
-  @type({ map: "string" }) positionMap = new MapSchema<string>(); 
+  @type({ map: "string" }) positionMap = new MapSchema<string>();
 
   createLaser(
     id: string,

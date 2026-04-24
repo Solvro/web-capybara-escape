@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      - PORT=2567
+    ports:
+      - "2567:2567"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - VITE_COLYSEUS_URL=http://localhost:2567
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - backend

@@ -4,7 +4,11 @@ import React, { useEffect, useState } from "react";
 
 import { RoomContext } from "./use-room";
 
-const client = new Client("ws://localhost:2567");
+const host = window.location.hostname;
+
+const url =
+  (import.meta.env.VITE_COLYSEUS_URL as string) || `http://${host}:2567`;
+const client = new Client(url);
 
 interface CachedReconnection {
   token: string;

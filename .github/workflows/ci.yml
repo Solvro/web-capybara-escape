@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+env:
+  HUSKY: 0
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Install (root)
+        run: npm ci
+
+      - name: Install (client)
+        run: npm ci --prefix client
+
+      - name: Install (server)
+        run: npm ci --prefix server
+
+      - name: Check commit messages
+        if: github.event_name == 'pull_request'
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Server tests
+        run: npm run test:server
+
+      - name: Client build
+        run: npm run build --prefix client
+
+      - name: Server build
+        run: npm run build --prefix server

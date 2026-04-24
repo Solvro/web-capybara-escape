@@ -21,11 +21,13 @@ export class SpeechBubble {
   }
 
   pickRandomLine(lineType: "positive" | "neutral" | "negative") {
-    return this.lineTypeMap.get(lineType).at(Math.floor(Math.random() * this.lineTypeMap.get(lineType).length));
+    return this.lineTypeMap
+      .get(lineType)
+      .at(Math.floor(Math.random() * this.lineTypeMap.get(lineType).length));
   }
 
-  static getInstance(){
-    if(!SpeechBubble.instance){
+  static getInstance() {
+    if (!SpeechBubble.instance) {
       SpeechBubble.instance = new SpeechBubble();
     }
     return SpeechBubble.instance;
