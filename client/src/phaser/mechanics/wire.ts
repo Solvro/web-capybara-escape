@@ -78,6 +78,7 @@ export class Wire extends Mechanic implements INetworkInterface<WireType> {
 
   public syncState(_: WireType) {
     // Wire state is static, so no need to implement this method
+    console.log("syncState", _);
   }
 
   public get id(): string {
