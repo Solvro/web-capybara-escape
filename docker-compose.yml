@@ -6,9 +6,9 @@ services:
       context: ./server
       dockerfile: Dockerfile
     environment:
-      - PORT=3000
+      - PORT=2567
     ports:
-      - "3000:3000"
+      - "2567:2567"
     restart: unless-stopped
 
   frontend:
@@ -16,7 +16,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        - VITE_COLYSEUS_URL=ws://localhost:3000
+        - VITE_COLYSEUS_URL=http://localhost:2567
     ports:
       - "8080:80"
     restart: unless-stopped
