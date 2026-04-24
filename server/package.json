@@ -7,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/colyseus/create-colyseus/issues"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "author": "",
   "main": "build/index.js",
   "scripts": {
