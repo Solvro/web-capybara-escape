@@ -1,4 +1,4 @@
-import { type, Schema } from "@colyseus/schema";
+import { Schema, type } from "@colyseus/schema";
 
 export class Position extends Schema {
   @type("number") x: number = 0;
