@@ -1,6 +1,7 @@
 {
   "name": "web-capybara-escape",
   "version": "1.0.0",
+  "private": true,
   "description": "",
   "keywords": [],
   "homepage": "https://github.com/Solvro/web-capybara-escape#readme",
