@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { LAYER_ORDER } from "../../../constants/layer-items";
 import type { LayerItem } from "../../../constants/layer-items";
