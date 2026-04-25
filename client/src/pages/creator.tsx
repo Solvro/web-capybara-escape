@@ -11,7 +11,7 @@ import { generateInitialTiles } from "../utils/tileset-utils";
 export function Creator() {
   const [levelName, setLevelName] = useState<string>();
   const [dims, setDims] = useState<[number, number]>([7, 8]);
-  
+
   const [activeBlock, setActiveBlock] = useState<LayerItem | null>(null);
 
   const floorDecoys = [

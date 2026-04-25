@@ -1,11 +1,14 @@
-
 interface CreatorControlProps {
   dims: [number, number];
   setDims: (dims: [number, number]) => void;
   onReset?: () => void;
 }
 
-export function CreatorControl({ dims, setDims, onReset }: CreatorControlProps) {
+export function CreatorControl({
+  dims,
+  setDims,
+  onReset,
+}: CreatorControlProps) {
   const [rows, cols] = dims;
   const MIN_DIM = 3;
   const MAX_DIM = 12;
