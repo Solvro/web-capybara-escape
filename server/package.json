@@ -17,7 +17,7 @@
     "test": "mocha -r tsx test/**_test.ts --exit --timeout 15000"
   },
   "dependencies": {
-    "@colyseus/monitor": "^0.16.0",
+    "@colyseus/monitor": "^0.17.8",
     "@colyseus/playground": "^0.16.0",
     "@colyseus/tools": "^0.16.0",
     "colyseus": "^0.16.0",
