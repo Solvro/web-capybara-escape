@@ -1,5 +1,4 @@
-import type { Room } from "colyseus.js";
-import * as Phaser from "phaser";
+import type { Room } from "@colyseus/sdk";
 
 import {
   CELL_SIZE,

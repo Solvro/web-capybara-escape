@@ -1,5 +1,3 @@
-import type * as Phaser from "phaser";
-
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE } from "../../constants/global";
 import type { Cable as CableType } from "../../types/cable";

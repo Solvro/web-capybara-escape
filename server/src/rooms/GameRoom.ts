@@ -1,4 +1,5 @@
 import { Client, Room } from "@colyseus/core";
+import { CloseCode } from "@colyseus/shared-types";
 
 import { getMoveVectorFromDirection } from "../shared/utils/vectorUtils";
 import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
@@ -8,7 +9,7 @@ import { RoomState } from "./schema/RoomState";
 // import room from "./json/examples/room2.json";
 // import room from "./json/examples/room3.json";
 
-export class GameRoom extends Room<RoomState> {
+export class GameRoom extends Room<{ state: RoomState }> {
   maxClients = 4;
   state = new RoomState();
 
@@ -129,20 +130,21 @@ export class GameRoom extends Room<RoomState> {
     console.log(client.sessionId, "joined!");
   }
 
-  async onLeave(client: Client, consented: boolean) {
-    try {
-      if (consented) {
-        throw new Error("consented leave");
+  async onLeave(client: Client, code?: number) {
+    if (code !== CloseCode.CONSENTED) {
+      try {
+        // allow disconnected client to reconnect into this room until 20 seconds
+        await this.allowReconnection(client, 20);
+        return;
+      } catch {
+        // reconnection failed or timed out — clean up below
       }
-
-      // allow disconnected client to reconnect into this room until 20 seconds
-      await this.allowReconnection(client, 0);
-    } catch (e) {
-      this.broadcast("onRemovePlayer", {
-        sessionId: client.sessionId,
-      });
-      this.state.despawnPlayer(client.sessionId);
     }
+
+    this.broadcast("onRemovePlayer", {
+      sessionId: client.sessionId,
+    });
+    this.state.despawnPlayer(client.sessionId);
   }
 
   onDispose() {
