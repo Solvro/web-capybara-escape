@@ -6,5 +6,6 @@ export class Player extends Schema {
   @type("string") sessionId: string;
   @type("number") index: number;
   @type("string") name: string;
-  @type(Position) position: Position;
+  @type(Position) position: Position = new Position();
+  @type("boolean") ready: boolean = false;
 }

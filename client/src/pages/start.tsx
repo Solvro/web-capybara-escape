@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../components/button";
+import { CustomInput } from "../components/custom-input";
 import { ErrorContainer } from "../components/error-container";
 import { IntroContainer } from "../components/intro-container";
 import { TitleHeader } from "../components/title-header";
 import { useRoom } from "../lib/use-room";
-import { CustomInput } from "../components/custom-input";
 
 export function Start() {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ export function Start() {
         roomCode: mode === "join" ? roomCode.trim() : undefined,
         isPrivate: mode === "create" ? isPrivate : undefined,
       });
-      await navigate("/game");
+      await navigate("/lobby");
     } catch {
       setErrorMessage("Nie udało się dołaczyć do gry. Spróbuj ponownie.");
       setStatus("error");
@@ -72,7 +72,7 @@ export function Start() {
       if (cachedReconnection === null) {
         setStatus("idle");
       } else {
-        void navigate("/game");
+        void navigate("/lobby");
       }
     }, 1000);
 

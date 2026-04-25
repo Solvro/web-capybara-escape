@@ -14,17 +14,46 @@ export class GameRoom extends Room<RoomState> {
 
   onCreate(options: any) {
     this.setMetadata({
-        isPrivate: !!options.isPrivate
+      isPrivate: !!options.isPrivate,
     });
 
     this.maxClients = room.maxClients ?? this.maxClients;
 
     if (options.private) {
-            this.setPrivate(true);
+      this.setPrivate(true);
     }
 
-    this.state.loadRoomFromJson(room);
+    this.onMessage("toggle_ready", (client) => {
+      const player = this.state.playerState.players.get(client.sessionId);
+      if (player) {
+        player.ready = !player.ready;
+      }
+
+      if (this.clients.length === 2) {
+        const allReady = Array.from(
+          this.state.playerState.players.values(),
+        ).every((p) => p.ready);
+        if (allReady) {
+          this.state.gameStarted = true;
+          this.state.loadRoomFromJson(room);
+          this.clients.forEach((client) => {
+            const p = this.state.playerState.players.get(client.sessionId);
+            const startPos =
+              this.state.startingPositions[
+                p.index % this.state.startingPositions.length
+              ];
+            if (p && startPos) {
+              p.position.x = startPos.x;
+              p.position.y = startPos.y;
+            }
+          });
+        }
+      }
+    });
+
     this.onMessage("move", (client, message) => {
+      if (!this.state.gameStarted) return;
+
       const player = this.state.playerState.players.get(client.sessionId);
       if (!player) return;
 
@@ -74,6 +103,8 @@ export class GameRoom extends Room<RoomState> {
     });
 
     this.setSimulationInterval((deltaTime) => {
+      if (!this.state.gameStarted) return;
+
       const result = this.state.updateLasers(deltaTime);
       if (result.length > 0) {
         this.broadcast("lasersUpdated", { lasers: result });
@@ -126,7 +157,7 @@ export class GameRoom extends Room<RoomState> {
   }
 
   onJoin(client: Client, options: any) {
-    const nickname = options.name || `Capy_${client.sessionId.slice(0, 3)}`;
+    const nickname = options.name;
 
     this.state.spawnNewPlayer(client.sessionId, nickname);
 
@@ -136,16 +167,9 @@ export class GameRoom extends Room<RoomState> {
     // Player index 1 = Vron
     const character = player.index === 0 ? "Sol" : "Vron";
 
-    console.log(`Gracz ${player.name} dołączył jako ${player.index === 0 ? "Sol" : "Vron"}`);
-
-    this.broadcast("onAddPlayer", {
-      sessionId: client.sessionId,
-      playerName: player.name,
-      character: character,
-      position: player.position,
-      index: player.index,
-    });
-    console.log(client.sessionId, "joined!");
+    console.log(
+      `Gracz ${player.name} dołączył jako ${player.index === 0 ? "Sol" : "Vron"}`,
+    );
   }
 
   async onLeave(client: Client, consented: boolean) {

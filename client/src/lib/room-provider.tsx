@@ -34,11 +34,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       setJoinError(false);
       let joinedRoom: Room;
 
-      console.warn({playerName,
-    mode,
-    roomCode,
-    isPrivate,});
-
+      console.warn({ playerName, mode, roomCode, isPrivate });
       if (mode === "create") {
         joinedRoom = await client.create("game_room", {
           name: playerName,
@@ -55,14 +51,13 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         });
       } else {
         joinedRoom = await client.joinOrCreate("game_room", {
-          name: playerName, 
+          name: playerName,
           isPrivate: false,
         });
       }
-      
+
       setRoom(joinedRoom);
       setIsConnected(true);
-
     } catch (error) {
       console.error("Join error", error);
       setJoinError(true);
