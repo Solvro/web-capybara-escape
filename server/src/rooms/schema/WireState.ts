@@ -1,4 +1,5 @@
-import { type, Schema, MapSchema } from "@colyseus/schema";
+import { MapSchema, Schema, type } from "@colyseus/schema";
+
 import { Position } from "./Position";
 
 export class Wire extends Schema {

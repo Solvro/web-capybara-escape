@@ -1,4 +1,5 @@
-import { type, Schema } from "@colyseus/schema";
+import { Schema, type } from "@colyseus/schema";
+
 import { Position } from "./Position";
 
 export class Player extends Schema {

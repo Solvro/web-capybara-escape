@@ -1,14 +1,15 @@
-import { type, Schema, ArraySchema } from "@colyseus/schema";
-import { Position } from "./Position.js";
-import { PlayerState } from "./PlayerState.js";
-import { CrateState } from "./CrateState.js";
+import { ArraySchema, Schema, type } from "@colyseus/schema";
+
 import { ButtonState } from "./ButtonState.js";
+import { CableState } from "./CableState.js";
+import { Capybara } from "./Capybara.js";
+import { CrateState } from "./CrateState.js";
 import { DoorState } from "./DoorState.js";
 import { LaserState } from "./LaserState.js";
-import { CableState } from "./CableState.js";
-import { WireState } from "./WireState.js";
+import { PlayerState } from "./PlayerState.js";
+import { Position } from "./Position.js";
 import { VentState } from "./VentState.js";
-import { Capybara } from "./Capybara.js";
+import { WireState } from "./WireState.js";
 
 export class RoomState extends Schema {
   @type(["string"]) grid = new ArraySchema<string>();

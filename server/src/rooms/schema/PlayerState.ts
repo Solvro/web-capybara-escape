@@ -1,4 +1,5 @@
-import { Schema, type, MapSchema, SetSchema } from "@colyseus/schema";
+import { MapSchema, Schema, SetSchema, type } from "@colyseus/schema";
+
 import { Player } from "./Player";
 import { Position } from "./Position";
 

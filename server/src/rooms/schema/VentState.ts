@@ -1,4 +1,5 @@
-import { Schema, MapSchema, type } from "@colyseus/schema";
+import { MapSchema, Schema, type } from "@colyseus/schema";
+
 import { Position } from "./Position";
 
 export class Vent extends Schema {

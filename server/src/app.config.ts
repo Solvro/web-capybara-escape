@@ -1,10 +1,10 @@
-import config from "@colyseus/tools";
-import { monitor } from "@colyseus/monitor";
-import { playground } from "@colyseus/playground";
-
 /**
  * Import your Room files
  */
+import { monitor } from "@colyseus/monitor";
+import { playground } from "@colyseus/playground";
+import config from "@colyseus/tools";
+
 import { GameRoom } from "./rooms/GameRoom";
 
 export default config({

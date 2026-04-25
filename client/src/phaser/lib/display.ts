@@ -1,11 +1,11 @@
+import { TILE_MAPPING } from "../../constants/blocks";
 import {
   CELL_SIZE,
-  SIZE_MULTIPLIER,
   LAYERS,
   LAYER_NAMES,
+  SIZE_MULTIPLIER,
 } from "../../constants/global";
 import type { LAYER_NAME } from "../../constants/global";
-import { TILE_MAPPING } from "../../constants/blocks";
 
 export class Display {
   private scene: Phaser.Scene;

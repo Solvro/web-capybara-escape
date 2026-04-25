@@ -1,7 +1,8 @@
-import { type, Schema, MapSchema, SetSchema } from "@colyseus/schema";
-import { Position } from "./Position";
+import { MapSchema, Schema, SetSchema, type } from "@colyseus/schema";
+
 import type { Direction } from "../../shared/utils/vectorUtils";
 import { getDirectionFromMoveVector } from "../../shared/utils/vectorUtils";
+import { Position } from "./Position";
 
 export class Crate extends Schema {
   @type("string") id: string;

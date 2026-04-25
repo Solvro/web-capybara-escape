@@ -1,4 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
+
 import { Position } from "./Position";
 
 export class Capybara extends Schema {
