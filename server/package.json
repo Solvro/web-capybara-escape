@@ -20,7 +20,7 @@
     "@colyseus/monitor": "^0.16.0",
     "@colyseus/playground": "^0.16.0",
     "@colyseus/tools": "^0.16.0",
-    "colyseus": "^0.16.0",
+    "colyseus": "^0.17.10",
     "express": "^4.18.2"
   },
   "devDependencies": {
