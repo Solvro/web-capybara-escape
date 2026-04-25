@@ -15,6 +15,10 @@
   "author": "",
   "type": "commonjs",
   "main": "index.js",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run start --prefix server\" \"npm run dev --prefix client\"",
     "format": "prettier --write client server",

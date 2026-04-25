@@ -36,7 +36,7 @@ npm install
 npm run dev
 ```
 
-Pierwsze `npm install` w roocie instaluje też zależności narzędziowe (Husky, Prettier itd.) i uruchamia `prepare` — **hooki Gita wymagają instalacji w tym właśnie katalogu**. Front i backend startują razem dzięki `concurrently`.
+Pierwsze `npm install` instaluje zależności client i server. Narzędzia w root husky, prettier itd. również są instalowane oraz uruchamia się `prepare` - hooki Gita wymagają instalacji w tym właśnie katalogu. Front i backend startują razem dzięki `concurrently`.
 
 I to tyle, możesz testować lokalnie nasz domyślny poziom 🥱
 
