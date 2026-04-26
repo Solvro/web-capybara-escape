@@ -68,10 +68,6 @@ export function Creator() {
             activeBlock={activeBlock}
             setActiveBlock={setActiveBlock}
           />
-          <CreatorItemsSelect
-            activeBlock={activeBlock}
-            setActiveBlock={setActiveBlock}
-          />
         </div>
         <div className="w-[64dvw]">
           <CreatorBoard

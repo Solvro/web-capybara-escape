@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { LAYER_ORDER } from "../../../constants/layer-items";
+import { LAYER_NAMES } from "../../../constants/global";
 import type { LayerItem } from "../../../constants/layer-items";
 import { CreatorTile } from "./creator-tile";
 
@@ -45,13 +45,16 @@ export function CreatorBoard({
 
   const handleTileClick = (tileIdx: number) => {
     if (activeBlock) {
-      const layerIdx = LAYER_ORDER.indexOf(
-        activeBlock.layer as (typeof LAYER_ORDER)[number],
-      );
-      if (layerIdx === -1) return;
+      const layerNameToIndex: Record<string, number> = {
+        [LAYER_NAMES.BACKGROUND]: 0,
+        [LAYER_NAMES.FLOOR_DECOYS]: 1,
+        [LAYER_NAMES.ENTITIES]: 2,
+        [LAYER_NAMES.WALL_DECOYS]: 3,
+      };
+      const layerIdx = layerNameToIndex[activeBlock.layer];
+      if (layerIdx === undefined) return;
       setTileIndices((prev) => {
         const next = prev.map((arr) => [...arr]);
-
         if (layerIdx === 0) {
           next[tileIdx][0] = activeBlock.frame;
         } else {

@@ -1,13 +1,6 @@
 import { ASSETS, TILE_MAPPING } from "./blocks";
 import { LAYER_NAMES } from "./global";
 
-export const LAYER_ORDER = [
-  LAYER_NAMES.BACKGROUND,
-  LAYER_NAMES.FLOOR_DECOYS,
-  LAYER_NAMES.ENTITIES,
-  LAYER_NAMES.WALL_DECOYS,
-];
-
 export interface LayerItem {
   key: string;
   label: string;
