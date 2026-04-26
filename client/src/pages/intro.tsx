@@ -34,7 +34,10 @@ export function Intro() {
 
     setStatus("loading");
     try {
-      await connect(name.trim());
+      await connect({
+        playerName: name.trim(),
+        mode: "create",
+      });
       await navigate("/game");
     } catch {
       setErrorMessage("Nie udało się dołaczyć do gry. Spróbuj ponownie.");
