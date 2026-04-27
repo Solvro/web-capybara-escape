@@ -1,13 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { LAYER_NAMES } from "../../../constants/global";
+import type { LayerItem } from "../../../constants/layer-items";
 import { CreatorTile } from "./creator-tile";
 
 interface CreatorBoardProps {
   dims: [number, number];
-  activeBlock?: { key: string; frame: number; label: string } | null;
+  activeBlock: LayerItem | null;
+  tileIndices: (number | null)[][];
+  setTileIndices: React.Dispatch<React.SetStateAction<(number | null)[][]>>;
 }
 
-export function CreatorBoard({ dims }: CreatorBoardProps) {
+export function CreatorBoard({
+  dims,
+  activeBlock,
+  tileIndices,
+  setTileIndices,
+}: CreatorBoardProps) {
   const boardRef = useRef<HTMLDivElement | null>(null);
 
   const [rows, cols] = dims;
@@ -34,11 +43,29 @@ export function CreatorBoard({ dims }: CreatorBoardProps) {
   const boardRows = Array.from({ length: rows }, (_, rowIndex) => rowIndex);
   const boardCols = Array.from({ length: cols }, (_, colIndex) => colIndex);
 
-  const tileIndexes = useMemo(
-    () =>
-      Array.from({ length: rows * cols }, () => Math.floor(Math.random() * 4)),
-    [rows, cols],
-  );
+  const handleTileClick = (tileIdx: number) => {
+    if (activeBlock) {
+      const layerNameToIndex: Record<string, number> = {
+        [LAYER_NAMES.BACKGROUND]: 0,
+        [LAYER_NAMES.FLOOR_DECOYS]: 1,
+        [LAYER_NAMES.ENTITIES]: 2,
+        [LAYER_NAMES.WALL_DECOYS]: 3,
+      };
+      const layerIdx = layerNameToIndex[activeBlock.layer];
+      if (layerIdx === undefined) return;
+      setTileIndices((prev) => {
+        const next = prev.map((arr) => [...arr]);
+        if (layerIdx === 0) {
+          next[tileIdx][0] = activeBlock.frame;
+        } else {
+          for (let i = 1; i <= 3; i++) {
+            next[tileIdx][i] = i === layerIdx ? activeBlock.frame : null;
+          }
+        }
+        return next;
+      });
+    }
+  };
 
   return (
     <div
@@ -57,11 +84,16 @@ export function CreatorBoard({ dims }: CreatorBoardProps) {
             boardCols.map((col) => {
               const tileIdx = row * cols + col;
               return (
-                <CreatorTile
+                <div
                   key={`${row}-${col}`}
-                  sizePx={tileSize}
-                  tileIndex={tileIndexes[tileIdx]}
-                />
+                  onClick={() => handleTileClick(tileIdx)}
+                  style={{ cursor: activeBlock ? "pointer" : undefined }}
+                >
+                  <CreatorTile
+                    sizePx={tileSize}
+                    tileIndices={tileIndices[tileIdx]}
+                  />
+                </div>
               );
             }),
           )}

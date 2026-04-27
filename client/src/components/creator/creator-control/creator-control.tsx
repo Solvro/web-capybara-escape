@@ -1,9 +1,18 @@
+import { CreatorActionButtons } from "./parts/creator-action-buttons";
+import { CreatorColumnsControl } from "./parts/creator-columns-control";
+import { CreatorRowsControl } from "./parts/creator-rows-control";
+
 interface CreatorControlProps {
   dims: [number, number];
   setDims: (dims: [number, number]) => void;
+  onReset?: () => void;
 }
 
-export function CreatorControl({ dims, setDims }: CreatorControlProps) {
+export function CreatorControl({
+  dims,
+  setDims,
+  onReset,
+}: CreatorControlProps) {
   const [rows, cols] = dims;
   const MIN_DIM = 3;
   const MAX_DIM = 12;
@@ -29,68 +38,21 @@ export function CreatorControl({ dims, setDims }: CreatorControlProps) {
   return (
     <div className="relative flex h-full w-full items-center gap-6 rounded-lg bg-[#4b2a86] p-4 shadow-lg">
       <div className="flex flex-col gap-3">
-        {/* Rows Control */}
-        <div className="flex items-center gap-3">
-          <label className="w-16 text-xs font-semibold text-violet-200 uppercase">
-            Rows
-          </label>
-          <div className="ml-2 flex items-center gap-3">
-            <button
-              onClick={() => handleRowsChange(-1)}
-              disabled={isRowsMin}
-              className="h-8 w-8 rounded-md border border-violet-300/40 bg-violet-500/70 font-bold text-violet-50 transition-colors hover:bg-violet-400/80 disabled:cursor-not-allowed disabled:border-violet-300/20 disabled:bg-violet-300/30 disabled:text-violet-100/70"
-            >
-              −
-            </button>
-            <span className="w-8 text-center text-base font-bold text-amber-300">
-              {rows}
-            </span>
-            <button
-              onClick={() => handleRowsChange(1)}
-              disabled={isRowsMax}
-              className="h-8 w-8 rounded-md border border-violet-300/40 bg-violet-500/70 font-bold text-violet-50 transition-colors hover:bg-violet-400/80 disabled:cursor-not-allowed disabled:border-violet-300/20 disabled:bg-violet-300/30 disabled:text-violet-100/70"
-            >
-              +
-            </button>
-          </div>
-        </div>
-
-        {/* Columns Control */}
-        <div className="flex items-center gap-3">
-          <label className="w-16 text-xs font-semibold text-violet-200 uppercase">
-            Cols
-          </label>
-          <div className="ml-2 flex items-center gap-3">
-            <button
-              onClick={() => handleColsChange(-1)}
-              disabled={isColsMin}
-              className="h-8 w-8 rounded-md border border-violet-300/40 bg-violet-500/70 font-bold text-violet-50 transition-colors hover:bg-violet-400/80 disabled:cursor-not-allowed disabled:border-violet-300/20 disabled:bg-violet-300/30 disabled:text-violet-100/70"
-            >
-              −
-            </button>
-            <span className="w-8 text-center text-base font-bold text-amber-300">
-              {cols}
-            </span>
-            <button
-              onClick={() => handleColsChange(1)}
-              disabled={isColsMax}
-              className="h-8 w-8 rounded-md border border-violet-300/40 bg-violet-500/70 font-bold text-violet-50 transition-colors hover:bg-violet-400/80 disabled:cursor-not-allowed disabled:border-violet-300/20 disabled:bg-violet-300/30 disabled:text-violet-100/70"
-            >
-              +
-            </button>
-          </div>
-        </div>
+        <CreatorRowsControl
+          rows={rows}
+          isRowsMin={isRowsMin}
+          isRowsMax={isRowsMax}
+          onChange={handleRowsChange}
+        />
+        <CreatorColumnsControl
+          cols={cols}
+          isColsMin={isColsMin}
+          isColsMax={isColsMax}
+          onChange={handleColsChange}
+        />
       </div>
 
-      {/* Action Buttons */}
-      <div className="creator-control-actions ml-auto flex flex-col gap-2 md:flex-row">
-        <button className="h-8 min-w-[70px] rounded-md bg-violet-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-violet-400">
-          Reset
-        </button>
-        <button className="h-8 min-w-[70px] rounded-md bg-emerald-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-emerald-400">
-          Create
-        </button>
-      </div>
+      <CreatorActionButtons onReset={onReset} />
     </div>
   );
 }
