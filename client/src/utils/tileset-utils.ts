@@ -1,10 +1,15 @@
+import { TILE_MAPPING } from "../constants/blocks";
+
 export function getTilesetBackgroundPosition(
   frame: number,
   tilesetCols = 6,
   tileSize = 24,
 ) {
   const x = -(frame % tilesetCols) * tileSize;
-  const y = -Math.floor(frame / tilesetCols) * tileSize;
+  const y =
+    frame == TILE_MAPPING.w1t.frame || frame == TILE_MAPPING.w2t.frame
+      ? -Math.floor(frame / tilesetCols) * tileSize + 0.5 * tileSize
+      : -Math.floor(frame / tilesetCols) * tileSize;
   return { x, y };
 }
 
@@ -20,11 +25,11 @@ export function generateInitialTiles(
     const row = Math.floor(idx / cols);
     const col = idx % cols;
     if (row === 0 || row === rows - 1 || col === 0 || col === cols - 1) {
-      return [TILE_MAPPING.w1.frame, null, null, null];
+      return [TILE_MAPPING.w1t.frame, null, null, null];
     }
     const frame =
-      Math.random() < 0.8 ? TILE_MAPPING.f1.frame : TILE_MAPPING.w2.frame;
-    if (frame === TILE_MAPPING.w2.frame) {
+      Math.random() < 0.8 ? TILE_MAPPING.f1.frame : TILE_MAPPING.w2t.frame;
+    if (frame === TILE_MAPPING.w2t.frame) {
       return [frame, null, null, null];
     }
 

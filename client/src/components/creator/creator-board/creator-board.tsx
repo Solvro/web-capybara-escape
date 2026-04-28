@@ -53,12 +53,32 @@ export function CreatorBoard({
     if (!boardHeight || !boardWidth) return;
     const innerW = Math.max(0, boardWidth - 32);
     const innerH = Math.max(0, boardHeight - 32);
-    const next = Math.min(innerH / rows - 6, innerW / cols - 4);
+    const next = Math.min(innerH / rows - 6, innerW / cols - 4); //ZOBACZ CZY DZIAŁA
     setTileSize(Math.max(1, next));
   }, [boardHeight, boardWidth, rows, cols]);
 
   const boardRows = Array.from({ length: rows }, (_, rowIndex) => rowIndex);
   const boardCols = Array.from({ length: cols }, (_, colIndex) => colIndex);
+
+  const handleBoardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!boardRef.current) return;
+
+    const position = boardRef.current.getBoundingClientRect();
+
+    const left = (boardWidth - tileSize * cols) / 2;
+    const top = (boardHeight - tileSize * rows) / 2;
+
+    const x = e.clientX - position.left - left;
+    const y = e.clientY - position.y - top;
+
+    const col = Math.floor(x / tileSize);
+    const row = Math.floor(y / tileSize) == -1 ? 0 : Math.floor(y / tileSize);
+
+    if (row >= 0 && row < rows && col >= 0 && col < cols) {
+      const tileIdx = row * cols + col;
+      handleTileClick(tileIdx);
+    }
+  };
 
   const handleTileClick = (tileIdx: number) => {
     if (activeBlock) {
@@ -121,10 +141,10 @@ export function CreatorBoard({
               const tileIdx = row * cols + col;
               return (
                 <div
-                  key={`${row}-${col}`}
-                  onClick={() => handleTileClick(tileIdx)}
-                  onContextMenu={(e) => handleRightClick(e, tileIdx)}
-                  style={{ cursor: activeBlock ? "pointer" : undefined }}
+                  // key={`${row}-${col}`}
+                  // onClick={() => handleTileClick(tileIdx)}
+                  onClick={handleBoardClick}
+                  // style={{ cursor: activeBlock ? "pointer" : undefined }}
                 >
                   <CreatorTile
                     sizePx={tileSize}

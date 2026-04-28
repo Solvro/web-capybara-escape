@@ -1,5 +1,5 @@
 export const ASSETS = {
-  EMPTY: 7,
+  EMPTY: 0,
   BUTTON_PRESSED: 13,
   BUTTON_RELEASED: 14,
   BUTTON_BASE: 15,
@@ -40,13 +40,7 @@ export const TILE_MAPPING: Record<
   string,
   { frame: number; isTall?: boolean; frameSecond?: number }
 > = {
-  w1t: { frame: 0, frameSecond: 10, isTall: true },
-  w1: { frame: 0 },
-  w13: { frame: 9 },
-  w2t: { frame: 2, frameSecond: 4, isTall: true },
-  w2: { frame: 2 },
-  w3t: { frame: 3, frameSecond: 4, isTall: true },
-  w3: { frame: 3 },
-  w21: { frame: 8 },
-  f1: { frame: 6 },
+  w1t: { frame: 7, frameSecond: 1, isTall: true }, //brick wall
+  w2t: { frame: 8, frameSecond: 2, isTall: true }, //server wall
+  f1: { frame: 6 }, //floor tile
 };

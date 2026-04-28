@@ -29,11 +29,12 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
   // Render in stacking order: first index at the bottom
   return (
     <div
-      className="overflow-hidden border-4 border-emerald-950 bg-blue-400"
+      className="overflow-hidden bg-blue-400"
       style={{
         position: "relative",
         width: `${sizePx}px`,
-        height: `${sizePx}px`,
+        height: `${sizePx * 1.5}px`,
+        marginTop: `${-sizePx * 0.5}px`,
         overflow: "hidden",
         border: "2px solid #333",
         background: "transparent",
@@ -51,10 +52,13 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
             key={layerId}
             style={{
               position: "absolute",
-              top: 0,
+              top:
+                tileIndices[0] == 7 || tileIndices[0] == 8
+                  ? 0
+                  : `${sizePx * 0.5}px`, // AAAAAAAAAA SINGLE SOURCE OF TRUTH
               left: 0,
               width: `${sourceTileSizePx}px`,
-              height: `${sourceTileSizePx}px`,
+              height: `${sourceTileSizePx * 1.5}px`,
               backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
               backgroundPosition: `${x}px ${y}px`,
               backgroundRepeat: "no-repeat",
