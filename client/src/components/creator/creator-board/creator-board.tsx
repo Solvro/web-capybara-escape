@@ -141,10 +141,9 @@ export function CreatorBoard({
               const tileIdx = row * cols + col;
               return (
                 <div
-                  // key={`${row}-${col}`}
-                  // onClick={() => handleTileClick(tileIdx)}
+                  key={`${row}-${col}`}
                   onClick={handleBoardClick}
-                  // style={{ cursor: activeBlock ? "pointer" : undefined }}
+                  style={{ cursor: activeBlock ? "pointer" : undefined }}
                 >
                   <CreatorTile
                     sizePx={tileSize}

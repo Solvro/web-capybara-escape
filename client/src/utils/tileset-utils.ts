@@ -4,10 +4,12 @@ export function getTilesetBackgroundPosition(
   frame: number,
   tilesetCols = 6,
   tileSize = 24,
+  withOffset?: boolean,
 ) {
   const x = -(frame % tilesetCols) * tileSize;
   const y =
-    frame == TILE_MAPPING.w1t.frame || frame == TILE_MAPPING.w2t.frame
+    (frame == TILE_MAPPING.w1t.frame || frame == TILE_MAPPING.w2t.frame) &&
+    withOffset
       ? -Math.floor(frame / tilesetCols) * tileSize + 0.5 * tileSize
       : -Math.floor(frame / tilesetCols) * tileSize;
   return { x, y };

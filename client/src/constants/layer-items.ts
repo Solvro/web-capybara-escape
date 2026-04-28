@@ -18,26 +18,14 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
     },
     {
       key: "w1t",
-      label: "Wall 1 Top",
+      label: "Brick wall",
       frame: TILE_MAPPING.w1t.frame,
       layer: LAYER_NAMES.BACKGROUND,
     },
     {
-      key: "w1t-upper",
-      label: "Wall 1 Upper",
-      frame: 10,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
       key: "w2t",
-      label: "Wall 2 Top",
+      label: "Server wall",
       frame: TILE_MAPPING.w2t.frame,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
-      key: "w2t-upper",
-      label: "Wall 2/3 Upper",
-      frame: 4,
       layer: LAYER_NAMES.BACKGROUND,
     },
     {
