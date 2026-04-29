@@ -25,6 +25,10 @@ export function CreatorBoard({
 
   const [boardHeight, setBoardHeight] = useState<number>(0);
   const [boardWidth, setBoardWidth] = useState<number>(0);
+  const [isMouseOver, setMouseOver] = useState<{ row: number; col: number }>({
+    row: -1,
+    col: -1,
+  });
 
   const [tileSize, setTileSize] = useState<number>(0);
 
@@ -60,8 +64,10 @@ export function CreatorBoard({
   const boardRows = Array.from({ length: rows }, (_, rowIndex) => rowIndex);
   const boardCols = Array.from({ length: cols }, (_, colIndex) => colIndex);
 
-  const handleBoardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!boardRef.current) return;
+  const handleBoardMouse = (
+    e: React.MouseEvent<HTMLDivElement>,
+  ): { row: number; col: number } => {
+    if (!boardRef.current) return { row: -1, col: -1 };
 
     const position = boardRef.current.getBoundingClientRect();
 
@@ -74,13 +80,25 @@ export function CreatorBoard({
     const col = Math.floor(x / tileSize);
     const row = Math.floor(y / tileSize) == -1 ? 0 : Math.floor(y / tileSize);
 
-    if (row >= 0 && row < rows && col >= 0 && col < cols) {
-      const tileIdx = row * cols + col;
-      handleTileClick(tileIdx);
-    }
+    return { row: row, col: col };
   };
 
-  const handleTileClick = (tileIdx: number) => {
+  const handleMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { row, col } = handleBoardMouse(e);
+    console.log(row, col);
+    setMouseOver({ row: row, col: col });
+  };
+
+  const handleMouseLeave = () => {
+    setMouseOver({ row: -1, col: -1 });
+  };
+
+  const handleTileClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { row, col } = handleBoardMouse(e);
+    if (row < 0 && row >= rows && col < 0 && col >= cols) {
+      return;
+    }
+    const tileIdx = row * cols + col;
     if (activeBlock) {
       const layerIdx = layerNameToIndex[activeBlock.layer];
 
@@ -134,6 +152,7 @@ export function CreatorBoard({
           style={{
             gridTemplateColumns: `repeat(${cols}, ${tileSize}px)`,
             gap: 0,
+            boxSizing: "border-box",
           }}
         >
           {boardRows.map((row) =>
@@ -142,8 +161,17 @@ export function CreatorBoard({
               return (
                 <div
                   key={`${row}-${col}`}
-                  onClick={handleBoardClick}
-                  style={{ cursor: activeBlock ? "pointer" : undefined }}
+                  onClick={handleTileClick}
+                  onMouseMove={handleMouseOver}
+                  onMouseLeave={handleMouseLeave}
+                  style={{
+                    cursor: activeBlock ? "pointer" : undefined,
+                    boxSizing: "border-box",
+                    filter:
+                      isMouseOver.col == col && isMouseOver.row == row
+                        ? "brightness(1.3)"
+                        : "",
+                  }}
                 >
                   <CreatorTile
                     sizePx={tileSize}

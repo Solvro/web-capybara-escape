@@ -36,7 +36,6 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
         height: `${sizePx * 1.5}px`,
         marginTop: `${-sizePx * 0.5}px`,
         overflow: "hidden",
-        border: "2px solid #333", //CO Z TYM
         background: "transparent",
       }}
     >
