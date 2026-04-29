@@ -22,19 +22,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            client/package-lock.json
-            server/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      - name: Install (root)
+      - name: Install
         run: npm ci
-
-      - name: Install (client)
-        run: npm ci --prefix client
-
-      - name: Install (server)
-        run: npm ci --prefix server
 
       - name: Check commit messages
         if: github.event_name == 'pull_request'

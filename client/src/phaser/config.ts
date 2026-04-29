@@ -1,10 +1,8 @@
-import { AUTO } from "phaser";
-
 import { CELL_SIZE } from "../constants/global";
 import { Main } from "./scenes/main";
 
 export const phaserConfig: Phaser.Types.Core.GameConfig = {
-  type: AUTO,
+  type: Phaser.AUTO,
   width: CELL_SIZE * 10,
   height: CELL_SIZE * 8.5,
   pixelArt: true,

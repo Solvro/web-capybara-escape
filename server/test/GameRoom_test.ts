@@ -1,6 +1,6 @@
+import type { Room } from "@colyseus/sdk";
 import { ColyseusTestServer, boot } from "@colyseus/testing";
 import assert from "assert";
-import type { Room } from "colyseus.js";
 import { after, before, beforeEach, describe, it } from "mocha";
 
 import appConfig from "../src/app.config";
