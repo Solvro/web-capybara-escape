@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { ASSETS } from "../../../constants/blocks";
 import { layerNameToIndex } from "../../../constants/global";
 import type { LayerItem } from "../../../constants/layer-items";
+import { Direction, type DirectionType } from "../../../types/direction";
+import { MAX_DIM, MIN_DIM, clampDim } from "../creator-control/creator-control";
+import { CreatorDimensionButtons } from "./creator-dimension-buttons";
 import { CreatorTile } from "./creator-tile";
 
 interface CreatorBoardProps {
@@ -10,6 +13,8 @@ interface CreatorBoardProps {
   activeBlock: LayerItem | null;
   tileIndices: (number | null)[][];
   setTileIndices: React.Dispatch<React.SetStateAction<(number | null)[][]>>;
+  setDims: (dims: [number, number]) => void;
+  setDirection: (direction: DirectionType) => void;
 }
 
 export function CreatorBoard({
@@ -17,6 +22,8 @@ export function CreatorBoard({
   activeBlock,
   tileIndices,
   setTileIndices,
+  setDims,
+  setDirection,
 }: CreatorBoardProps) {
   const boardRef = useRef<HTMLDivElement | null>(null);
 
@@ -118,6 +125,21 @@ export function CreatorBoard({
     }
   };
 
+  const handleRowsChange = (delta: number) => {
+    const newRows = clampDim(rows + delta);
+    setDims([newRows, cols]);
+  };
+
+  const handleColsChange = (delta: number) => {
+    const newCols = clampDim(cols + delta);
+    setDims([rows, newCols]);
+  };
+
+  const isRowsMin = rows <= MIN_DIM;
+  const isRowsMax = rows >= MAX_DIM;
+  const isColsMin = cols <= MIN_DIM;
+  const isColsMax = cols >= MAX_DIM;
+
   const handleRightClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     const { row, col } = handleBoardMouse(e);
@@ -143,10 +165,29 @@ export function CreatorBoard({
 
   return (
     <div
-      className="h-full w-full overflow-hidden rounded-lg bg-[#4b2a86] p-4 shadow-lg"
+      className="flex flex-col items-center justify-center h-full w-full overflow-hidden rounded-lg bg-[#4b2a86] p-4 shadow-lg"
       ref={boardRef}
     >
-      <div className="flex min-h-full items-center">
+      <CreatorDimensionButtons
+        dimension={rows}
+        onChange={(e) => {
+          handleRowsChange(e);
+          setDirection(Direction.TOP);
+        }}
+        isDimensionMax={isRowsMax}
+        isDimensionMin={isRowsMin}
+      />
+      <div className="flex w-full items-center flex-1">
+        <CreatorDimensionButtons
+          vertical
+          dimension={cols}
+          onChange={(e) => {
+            handleColsChange(e);
+            setDirection(Direction.LEFT);
+          }}
+          isDimensionMax={isColsMax}
+          isDimensionMin={isColsMin}
+        />
         <div
           className="mx-auto grid w-fit"
           style={{
@@ -183,7 +224,26 @@ export function CreatorBoard({
             }),
           )}
         </div>
+        <CreatorDimensionButtons
+          vertical
+          dimension={cols}
+          onChange={(e) => {
+            handleColsChange(e);
+            setDirection(Direction.RIGHT);
+          }}
+          isDimensionMax={isColsMax}
+          isDimensionMin={isColsMin}
+        />
       </div>
+      <CreatorDimensionButtons
+        dimension={rows}
+        onChange={(e) => {
+          handleRowsChange(e);
+          setDirection(Direction.BOTTOM);
+        }}
+        isDimensionMax={isRowsMax}
+        isDimensionMin={isRowsMin}
+      />
     </div>
   );
 }
