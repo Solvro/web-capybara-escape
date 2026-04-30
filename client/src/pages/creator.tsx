@@ -6,12 +6,13 @@ import { CreatorItemsSelect } from "../components/creator/creator-items-select/c
 import { CreatorName } from "../components/creator/creator-name/creator-name";
 import { ASSETS, TILE_MAPPING } from "../constants/blocks";
 import type { LayerItem } from "../constants/layer-items";
-import { generateInitialTiles } from "../utils/tileset-utils";
+import { type DirectionType } from "../types/direction";
+import { changeBoardSize, generateInitialTiles } from "../utils/tileset-utils";
 
 export function Creator() {
   const [levelName, setLevelName] = useState<string>();
   const [dims, setDims] = useState<[number, number]>([7, 8]);
-
+  const [direction, setDirection] = useState<DirectionType | null>(null);
   const [activeBlock, setActiveBlock] = useState<LayerItem | null>(null);
 
   const floorDecoys = [
@@ -29,15 +30,7 @@ export function Creator() {
 
   const [rows, cols] = dims;
   useEffect(() => {
-    setTileIndices(
-      generateInitialTiles(
-        [rows, cols],
-        floorDecoys,
-        entities,
-        wallDecoys,
-        TILE_MAPPING,
-      ),
-    );
+    setTileIndices(changeBoardSize([rows, cols], direction, tileIndices));
   }, [rows, cols]);
 
   const handleReset = () => {
@@ -59,7 +52,12 @@ export function Creator() {
           <CreatorName levelName={levelName} setLevelName={setLevelName} />
         </div>
         <div className="w-[64dvw]">
-          <CreatorControl dims={dims} setDims={setDims} onReset={handleReset} />
+          <CreatorControl
+            dims={dims}
+            setDims={setDims}
+            onReset={handleReset}
+            setDirection={setDirection}
+          />
         </div>
       </div>
       <div className="flex h-[80dvh] w-full items-stretch gap-[1dvw]">
@@ -72,6 +70,8 @@ export function Creator() {
         <div className="w-[64dvw]">
           <CreatorBoard
             dims={dims}
+            setDirection={setDirection}
+            setDims={setDims}
             activeBlock={activeBlock}
             tileIndices={tileIndices}
             setTileIndices={setTileIndices}

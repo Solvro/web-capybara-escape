@@ -1,3 +1,5 @@
+import { Direction, type DirectionType } from "../types/direction";
+
 export function getTilesetBackgroundPosition(
   frame: number,
   tilesetCols = 6,
@@ -53,4 +55,106 @@ export function generateInitialTiles(
 
     return [frame, floorDecoy, entity, wallDecoy];
   });
+}
+
+type Tile = (number | null)[];
+
+const WALL: Tile = [0, null, null, null];
+const FLOOR: Tile = [6, null, null, null];
+
+const createWallRow = (cols: number): Tile[] => {
+  return Array.from({ length: cols }, () => [...WALL]);
+};
+
+export function changeBoardSize(
+  dims: [number, number],
+  direction: DirectionType | null,
+  tileIndices: Tile[],
+): Tile[] {
+  const [rows, cols] = dims;
+  const bigger = rows * cols > tileIndices.length;
+  let nextBoard: Tile[] = [];
+
+  if (direction == Direction.TOP) {
+    const walls = createWallRow(cols);
+    if (bigger) {
+      nextBoard = [...tileIndices];
+      for (let i = 1; i < cols - 1; i++) {
+        nextBoard[i] = [...FLOOR];
+      }
+      return [...walls, ...nextBoard];
+    } else {
+      return [...walls, ...tileIndices.slice(cols * 2)];
+    }
+  }
+
+  if (direction == Direction.BOTTOM) {
+    const walls = createWallRow(cols);
+    if (bigger) {
+      nextBoard = [...tileIndices];
+      const oldBottomStart = (rows - 2) * cols;
+      for (let i = 1; i < cols - 1; i++) {
+        nextBoard[oldBottomStart + i] = [...FLOOR];
+      }
+      return [...nextBoard, ...walls];
+    } else {
+      return [...tileIndices.slice(0, -(cols * 2)), ...walls];
+    }
+  }
+
+  if (direction == Direction.LEFT) {
+    const oldCols = bigger ? cols - 1 : cols + 1;
+
+    for (let i = 0; i < tileIndices.length; i++) {
+      if (bigger) {
+        if (i % oldCols === 0) {
+          nextBoard.push([...WALL]);
+          const isCorner = i === 0 || i === oldCols * (rows - 1);
+          nextBoard.push(isCorner ? [...WALL] : [...FLOOR]);
+        } else {
+          nextBoard.push(tileIndices[i]);
+        }
+      } else {
+        const colIndex = i % oldCols;
+
+        if (colIndex === 0) continue;
+
+        if (colIndex === 1) {
+          nextBoard.push([...WALL]);
+        } else {
+          nextBoard.push(tileIndices[i]);
+        }
+      }
+    }
+    return nextBoard;
+  }
+
+  if (direction == Direction.RIGHT) {
+    const oldCols = bigger ? cols - 1 : cols + 1;
+
+    for (let i = 0; i < tileIndices.length; i++) {
+      if (bigger) {
+        if ((i + 1) % oldCols !== 0) {
+          nextBoard.push(tileIndices[i]);
+        } else {
+          const isCorner = i === oldCols - 1 || i === tileIndices.length - 1;
+          nextBoard.push(isCorner ? [...WALL] : [...FLOOR]);
+          nextBoard.push([...WALL]);
+        }
+      } else {
+        const colIndex = (i + 1) % oldCols;
+
+        if (colIndex === 0) continue;
+
+        if (colIndex === cols) {
+          nextBoard.push([...WALL]);
+        } else {
+          nextBoard.push(tileIndices[i]);
+        }
+      }
+    }
+    return nextBoard;
+  }
+
+  return tileIndices;
 }
