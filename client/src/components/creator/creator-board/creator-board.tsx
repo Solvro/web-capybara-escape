@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { LAYER_NAMES } from "../../../constants/global";
 import type { LayerItem } from "../../../constants/layer-items";
@@ -67,6 +67,33 @@ export function CreatorBoard({
     }
   };
 
+  const handleRightClick = (e: React.MouseEvent, tileIdx: number) => {
+    e.preventDefault();
+
+    if (e.shiftKey) {
+      setTileIndices((prev) => {
+        const next = prev.map((arr) => [...arr]);
+        next[tileIdx] = [null, null, null, null];
+        return next;
+      });
+    } else if (activeBlock) {
+      const layerNameToIndex: Record<string, number> = {
+        [LAYER_NAMES.BACKGROUND]: 0,
+        [LAYER_NAMES.FLOOR_DECOYS]: 1,
+        [LAYER_NAMES.ENTITIES]: 2,
+        [LAYER_NAMES.WALL_DECOYS]: 3,
+      };
+      const layerIdx = layerNameToIndex[activeBlock.layer];
+      if (layerIdx === undefined) return;
+
+      setTileIndices((prev) => {
+        const next = prev.map((arr) => [...arr]);
+        next[tileIdx][layerIdx] = null;
+        return next;
+      });
+    }
+  };
+
   return (
     <div
       className="h-full w-full overflow-hidden rounded-lg bg-[#4b2a86] p-4 shadow-lg"
@@ -87,6 +114,7 @@ export function CreatorBoard({
                 <div
                   key={`${row}-${col}`}
                   onClick={() => handleTileClick(tileIdx)}
+                  onContextMenu={(e) => handleRightClick(e, tileIdx)}
                   style={{ cursor: activeBlock ? "pointer" : undefined }}
                 >
                   <CreatorTile

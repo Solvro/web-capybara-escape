@@ -150,6 +150,12 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       frame: ASSETS.VENT_CLOSED,
       layer: LAYER_NAMES.FLOOR_DECOYS,
     },
+    {
+      key: "empty-floor",
+      label: "Empty",
+      frame: ASSETS.EMPTY,
+      layer: LAYER_NAMES.FLOOR_DECOYS,
+    },
   ],
   [LAYER_NAMES.ENTITIES]: [
     {
@@ -194,6 +200,12 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       frame: ASSETS.LASER_BEAM_VERTICAL_TIP,
       layer: LAYER_NAMES.ENTITIES,
     },
+    {
+      key: "empty-entities",
+      label: "Empty",
+      frame: ASSETS.EMPTY,
+      layer: LAYER_NAMES.ENTITIES,
+    },
   ],
   [LAYER_NAMES.WALL_DECOYS]: [
     {
@@ -206,6 +218,12 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       key: "doorBase",
       label: "Door Base",
       frame: ASSETS.DOOR_BASE,
+      layer: LAYER_NAMES.WALL_DECOYS,
+    },
+    {
+      key: "empty-walls",
+      label: "Empty",
+      frame: ASSETS.EMPTY,
       layer: LAYER_NAMES.WALL_DECOYS,
     },
   ],
