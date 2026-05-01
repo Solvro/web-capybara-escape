@@ -1,5 +1,5 @@
-import { Client } from "colyseus.js";
-import type { Room } from "colyseus.js";
+import { Client } from "@colyseus/sdk";
+import type { Room } from "@colyseus/sdk";
 import React, { useEffect, useState } from "react";
 
 import { RoomContext } from "./use-room";
@@ -66,7 +66,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(cached) as CachedReconnection;
           const { token } = parsed;
 
-          const reconnected = await client.reconnect(token);
+          const reconnected = await client.reconnect(token, "game_room");
 
           setRoom(reconnected);
           setIsConnected(true);

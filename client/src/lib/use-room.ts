@@ -1,4 +1,4 @@
-import type { Room } from "colyseus.js";
+import type { Room } from "@colyseus/sdk";
 import { createContext, useContext } from "react";
 
 interface RoomContextType {

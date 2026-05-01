@@ -10,22 +10,22 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@colyseus/sdk": "^0.17.42",
     "@headlessui/react": "^2.2.9",
-    "@tailwindcss/vite": "^4.1.17",
-    "colyseus.js": "^0.16.22",
-    "phaser": "^3.90.0",
+    "@tailwindcss/vite": "^4.2.4",
+    "phaser": "^4.0.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.6",
-    "tailwindcss": "^4.1.17"
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.2",
+    "tailwindcss": "^4.2.4"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.6.0",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "baseline-browser-mapping": "^2.10.21",
-    "typescript": "~5.9.3",
-    "vite": "^7.2.4"
+    "@vitejs/plugin-react": "^6.0.1",
+    "baseline-browser-mapping": "^2.10.23",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.10"
   }
 }
