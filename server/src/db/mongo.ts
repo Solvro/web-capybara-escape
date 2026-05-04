@@ -4,7 +4,7 @@ let client: MongoClient | null = null;
 let db: Db | null = null;
 
 export function isMongoConfigured() {
-  return Boolean(process.env.MONGODB_URI);
+  return Boolean(process.env.MONGODB_URI && process.env.MONGODB_DB_NAME);
 }
 
 export async function connectMongo() {

@@ -4,13 +4,17 @@ import { CloseCode } from "@colyseus/shared-types";
 import { getMoveVectorFromDirection } from "../shared/utils/vectorUtils";
 import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
 import fallbackRoom from "./json/examples/default.json";
-import { RoomState } from "./schema/RoomState";
 import { getRoomForGame } from "./lib/roomLoader";
+import { RoomState } from "./schema/RoomState";
+
+// import room from "./json/examples/room2.json";
+// import room from "./json/examples/room3.json";
 
 export class GameRoom extends Room<{ state: RoomState }> {
   maxClients = 4;
   state = new RoomState();
-  private roomData = fallbackRoom;
+
+  private roomData: any = fallbackRoom;
 
   async onCreate(options: any) {
     this.roomData = await getRoomForGame(options?.levelSlug);

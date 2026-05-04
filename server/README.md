@@ -20,7 +20,7 @@ npm start
 
 ### Required env vars
 
-Due to fact that levels are preferably read from MongDB database, the following enviromental variables are required:
+Due to fact that levels are preferably read from MongoDB database, the following environmental variables are required:
 
 - `MONGODB_URI`
 - `MONGODB_DB_NAME`
@@ -29,15 +29,17 @@ Due to fact that levels are preferably read from MongDB database, the following 
 
 You may find an example in .env.example ;)
 
-### Import existing room JSON files into MongoDB
+### Export room JSON files to MongoDB
 
-Room files from `src/rooms/json/examples` can be imported into `levels` with:
+Room files from `src/rooms/json/examples` (excluding `default.json`) can be exported into the `levels` collection with:
 
 ```bash
-npm run import:levels
+npm run import:levels          # skips levels that already exist in the database
+npm run import:levels:force    # overwrites existing levels
 ```
 
-The importer creates or updates levels by slug (based on file name) and marks them as published.
+The script creates new levels by slug (based on file name) and marks them as published.
+`default.json` is always skipped — it serves only as the offline fallback used when the database is unavailable.
 
 ## Structure
 

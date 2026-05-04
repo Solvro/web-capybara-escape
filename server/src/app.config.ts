@@ -1,13 +1,13 @@
+import config from "@colyseus/tools";
+import { monitor } from "@colyseus/monitor";
+import { playground } from "@colyseus/playground";
+import express from "express";
+
 /**
  * Import your Room files
  */
-import { monitor } from "@colyseus/monitor";
-import { playground } from "@colyseus/playground";
-import config from "@colyseus/tools";
-import express from "express";
-
 import { GameRoom } from "./rooms/GameRoom";
-import { closeMongoConnection, connectMongo } from "./db/mongo";
+import { connectMongo, closeMongoConnection } from "./db/mongo";
 import { createLevelsRouter } from "./routes/levels";
 import { levelRepository } from "./levels/level.repository";
 

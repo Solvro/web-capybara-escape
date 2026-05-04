@@ -14,6 +14,13 @@ function toErrorMessage(error: unknown) {
   return "Unknown error.";
 }
 
+function isAdminRequest(req: Request): boolean {
+  const token = process.env.ADMIN_API_TOKEN;
+  if (!token) return false;
+  const authorization = req.header("authorization") ?? "";
+  return authorization === `Bearer ${token}`;
+}
+
 function toLevelSummary(level: {
   slug: string;
   name: string;
@@ -42,14 +49,14 @@ export function createLevelsRouter() {
   const router = Router();
 
   router.get("/levels", async (req: Request, res: Response) => {
-    const publishedOnly = req.query.published === "true";
+    const publishedOnly = !isAdminRequest(req);
     const levels = await levelRepository.listLevels({ publishedOnly });
 
     return res.json({ levels: levels.map(toLevelSummary) });
   });
 
   router.get("/levels/:slug", async (req: Request, res: Response) => {
-    const publishedOnly = req.query.published === "true";
+    const publishedOnly = !isAdminRequest(req);
     const level = await levelRepository.getBySlug(req.params.slug, { publishedOnly });
 
     if (!level) {
