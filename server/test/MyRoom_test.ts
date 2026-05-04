@@ -1,5 +1,5 @@
-import assert from "assert";
 import { ColyseusTestServer, boot } from "@colyseus/testing";
+import assert from "assert";
 
 // import your "app.config.ts" file here.
 import appConfig from "../src/app.config";

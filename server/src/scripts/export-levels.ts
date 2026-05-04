@@ -1,8 +1,8 @@
+import dotenv from "dotenv";
 import fs from "node:fs/promises";
 import path from "node:path";
-import dotenv from "dotenv";
 
-import { connectMongo, closeMongoConnection } from "../db/mongo";
+import { closeMongoConnection, connectMongo } from "../db/mongo";
 import { levelRepository } from "../levels/level.repository";
 
 dotenv.config({ path: ".env.development" });
@@ -13,7 +13,9 @@ const SKIP_SLUGS = new Set(["default"]);
 async function exportLevels() {
   const db = await connectMongo();
   if (!db) {
-    throw new Error("MongoDB is not configured. Check MONGODB_URI and MONGODB_DB_NAME.");
+    throw new Error(
+      "MongoDB is not configured. Check MONGODB_URI and MONGODB_DB_NAME.",
+    );
   }
 
   await levelRepository.ensureIndexes();
@@ -23,7 +25,9 @@ async function exportLevels() {
   const jsonFiles = files.filter((fileName) => fileName.endsWith(".json"));
 
   if (jsonFiles.length === 0) {
-    console.log("[export-levels] No JSON files found in src/rooms/json/examples.");
+    console.log(
+      "[export-levels] No JSON files found in src/rooms/json/examples.",
+    );
     return;
   }
 
@@ -43,7 +47,9 @@ async function exportLevels() {
 
     if (existing) {
       if (!FORCE) {
-        console.log(`[export-levels] Skipped: ${slug} (already exists — use --force to overwrite)`);
+        console.log(
+          `[export-levels] Skipped: ${slug} (already exists — use --force to overwrite)`,
+        );
         continue;
       }
 

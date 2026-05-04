@@ -1,11 +1,12 @@
-import fallbackRoom from "../json/examples/room1.json";
 import { levelRepository } from "../../levels/level.repository";
+import fallbackRoom from "../json/examples/room1.json";
 
 type LoadedRoom = typeof fallbackRoom;
 
 export async function getRoomForGame(levelSlug?: string): Promise<LoadedRoom> {
   try {
-    const requestedSlug = levelSlug?.trim() || process.env.DEFAULT_LEVEL_SLUG?.trim();
+    const requestedSlug =
+      levelSlug?.trim() || process.env.DEFAULT_LEVEL_SLUG?.trim();
 
     if (requestedSlug) {
       const requested = await levelRepository.getBySlug(requestedSlug, {
@@ -24,7 +25,10 @@ export async function getRoomForGame(levelSlug?: string): Promise<LoadedRoom> {
       return firstPublished.data as LoadedRoom;
     }
   } catch (error) {
-    console.warn("[RoomLoader] Failed to load level from MongoDB. Using fallback room.", error);
+    console.warn(
+      "[RoomLoader] Failed to load level from MongoDB. Using fallback room.",
+      error,
+    );
   }
 
   return fallbackRoom;

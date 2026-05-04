@@ -1,4 +1,5 @@
 import { MongoServerError } from "mongodb";
+
 import { getMongoDb } from "../db/mongo";
 import {
   CreateLevelInput,
@@ -124,11 +125,15 @@ export class LevelRepository {
     };
 
     try {
-      await db.collection<LevelDocument>(LEVELS_COLLECTION).insertOne(levelDocument);
+      await db
+        .collection<LevelDocument>(LEVELS_COLLECTION)
+        .insertOne(levelDocument);
       return levelDocument;
     } catch (error: unknown) {
       if (error instanceof MongoServerError && error.code === 11000) {
-        throw new Error(`Level with slug '${levelDocument.slug}' already exists.`);
+        throw new Error(
+          `Level with slug '${levelDocument.slug}' already exists.`,
+        );
       }
 
       throw error;

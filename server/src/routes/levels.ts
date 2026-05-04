@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+
 import { levelRepository } from "../levels/level.repository";
 import { requireAdminAuth } from "../middleware/adminAuth";
 
@@ -57,7 +58,9 @@ export function createLevelsRouter() {
 
   router.get("/levels/:slug", async (req: Request, res: Response) => {
     const publishedOnly = !isAdminRequest(req);
-    const level = await levelRepository.getBySlug(req.params.slug, { publishedOnly });
+    const level = await levelRepository.getBySlug(req.params.slug, {
+      publishedOnly,
+    });
 
     if (!level) {
       return res.status(404).json({ error: "Level not found." });
@@ -66,35 +69,43 @@ export function createLevelsRouter() {
     return res.json({ level });
   });
 
-  router.post("/admin/levels", requireAdminAuth, async (req: Request, res: Response) => {
-    try {
-      const level = await levelRepository.createLevel({
-        ...req.body,
-        createdBy: req.header("x-admin-user") ?? "admin",
-      });
+  router.post(
+    "/admin/levels",
+    requireAdminAuth,
+    async (req: Request, res: Response) => {
+      try {
+        const level = await levelRepository.createLevel({
+          ...req.body,
+          createdBy: req.header("x-admin-user") ?? "admin",
+        });
 
-      return res.status(201).json({ level });
-    } catch (error: unknown) {
-      return res.status(400).json({ error: toErrorMessage(error) });
-    }
-  });
-
-  router.put("/admin/levels/:slug", requireAdminAuth, async (req: Request, res: Response) => {
-    try {
-      const level = await levelRepository.updateLevel(req.params.slug, {
-        ...req.body,
-        updatedBy: req.header("x-admin-user") ?? "admin",
-      });
-
-      if (!level) {
-        return res.status(404).json({ error: "Level not found." });
+        return res.status(201).json({ level });
+      } catch (error: unknown) {
+        return res.status(400).json({ error: toErrorMessage(error) });
       }
+    },
+  );
 
-      return res.json({ level });
-    } catch (error: unknown) {
-      return res.status(400).json({ error: toErrorMessage(error) });
-    }
-  });
+  router.put(
+    "/admin/levels/:slug",
+    requireAdminAuth,
+    async (req: Request, res: Response) => {
+      try {
+        const level = await levelRepository.updateLevel(req.params.slug, {
+          ...req.body,
+          updatedBy: req.header("x-admin-user") ?? "admin",
+        });
+
+        if (!level) {
+          return res.status(404).json({ error: "Level not found." });
+        }
+
+        return res.json({ level });
+      } catch (error: unknown) {
+        return res.status(400).json({ error: toErrorMessage(error) });
+      }
+    },
+  );
 
   router.post(
     "/admin/levels/:slug/publish",

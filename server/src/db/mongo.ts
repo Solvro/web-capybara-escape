@@ -12,7 +12,9 @@ export async function connectMongo() {
   const dbName = process.env.MONGODB_DB_NAME;
 
   if (!uri || !dbName) {
-    console.warn("[MongoDB] Missing MONGODB_URI or MONGODB_DB_NAME. Mongo integration is disabled.");
+    console.warn(
+      "[MongoDB] Missing MONGODB_URI or MONGODB_DB_NAME. Mongo integration is disabled.",
+    );
     return null;
   }
 
@@ -28,7 +30,10 @@ export async function connectMongo() {
     console.log(`[MongoDB] Connected to '${dbName}'.`);
     return db;
   } catch (error) {
-    console.warn("[MongoDB] Connection failed. Running without Mongo integration.", error);
+    console.warn(
+      "[MongoDB] Connection failed. Running without Mongo integration.",
+      error,
+    );
     client = null;
     db = null;
     return null;
