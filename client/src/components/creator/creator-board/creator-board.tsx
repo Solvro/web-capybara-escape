@@ -57,7 +57,7 @@ export function CreatorBoard({
     if (!boardHeight || !boardWidth) return;
     const innerW = Math.max(0, boardWidth - 32);
     const innerH = Math.max(0, boardHeight - 32);
-    const next = Math.min(innerH / rows - 6, innerW / cols - 4); //ZOBACZ CZY DZIAŁA
+    const next = Math.min(innerH / (rows + 1) - 6, innerW / cols - 4);
     setTileSize(Math.max(1, next));
   }, [boardHeight, boardWidth, rows, cols]);
 
