@@ -1,3 +1,8 @@
+import { TILE_MAPPING } from "../../../constants/blocks";
+import {
+  EXTRA_HEIGHT,
+  TALL_WALL_HEIGHT_MULTIPLIER,
+} from "../../../constants/global";
 import { getTilesetBackgroundPosition } from "../../../utils/tileset-utils";
 
 interface CreatorTileProps {
@@ -33,8 +38,8 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
       style={{
         position: "relative",
         width: `${sizePx}px`,
-        height: `${sizePx * 1.5}px`,
-        marginTop: `${-sizePx * 0.5}px`,
+        height: `${sizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
+        marginTop: `${-sizePx * EXTRA_HEIGHT}px`,
         overflow: "hidden",
         background: "transparent",
       }}
@@ -53,12 +58,13 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
             style={{
               position: "absolute",
               top:
-                tileIndices[0] == 7 || tileIndices[0] == 8
+                tileIndices[0] === TILE_MAPPING.w1t.frame ||
+                tileIndices[0] === TILE_MAPPING.w2t.frame
                   ? 0
-                  : `${sizePx * 0.5}px`, // AAAAAAAAAA SINGLE SOURCE OF TRUTH
+                  : `${sizePx * EXTRA_HEIGHT}px`, // AAAAAAAAAA SINGLE SOURCE OF TRUTH
               left: 0,
               width: `${sourceTileSizePx}px`,
-              height: `${sourceTileSizePx * 1.5}px`,
+              height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
               backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
               backgroundPosition: `${x}px ${y}px`,
               backgroundRepeat: "no-repeat",

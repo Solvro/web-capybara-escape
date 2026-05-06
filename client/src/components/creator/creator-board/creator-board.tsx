@@ -85,7 +85,6 @@ export function CreatorBoard({
 
   const handleMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
     const { row, col } = handleBoardMouse(e);
-    console.log(row, col);
     setMouseOver({ row: row, col: col });
   };
 
@@ -95,7 +94,7 @@ export function CreatorBoard({
 
   const handleTileClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const { row, col } = handleBoardMouse(e);
-    if (row < 0 && row >= rows && col < 0 && col >= cols) {
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
       return;
     }
     const tileIdx = row * cols + col;

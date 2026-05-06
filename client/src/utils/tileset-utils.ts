@@ -1,4 +1,5 @@
 import { TILE_MAPPING } from "../constants/blocks";
+import { EXTRA_HEIGHT } from "../constants/global";
 
 export function getTilesetBackgroundPosition(
   frame: number,
@@ -10,7 +11,7 @@ export function getTilesetBackgroundPosition(
   const y =
     (frame == TILE_MAPPING.w1t.frame || frame == TILE_MAPPING.w2t.frame) &&
     withOffset
-      ? -Math.floor(frame / tilesetCols) * tileSize + 0.5 * tileSize
+      ? -Math.floor(frame / tilesetCols) * tileSize + EXTRA_HEIGHT * tileSize
       : -Math.floor(frame / tilesetCols) * tileSize;
   return { x, y };
 }
