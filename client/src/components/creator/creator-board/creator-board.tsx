@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
 import { LAYER_NAMES } from "../../../constants/global";
+import { MAX_DIM_CREATOR, MIN_DIM_CREATOR } from "../../../constants/global";
 import type { LayerItem } from "../../../constants/layer-items";
 import { Direction, type DirectionType } from "../../../types/direction";
-import { MAX_DIM, MIN_DIM, clampDim } from "../creator-control/creator-control";
+import { clampDim } from "../creator-control/creator-control";
 import { CreatorDimensionButtons } from "./creator-dimension-buttons";
 import { CreatorTile } from "./creator-tile";
 
@@ -99,10 +100,10 @@ export function CreatorBoard({
     setDims([rows, newCols]);
   };
 
-  const isRowsMin = rows <= MIN_DIM;
-  const isRowsMax = rows >= MAX_DIM;
-  const isColsMin = cols <= MIN_DIM;
-  const isColsMax = cols >= MAX_DIM;
+  const isRowsMin = rows <= MIN_DIM_CREATOR;
+  const isRowsMax = rows >= MAX_DIM_CREATOR;
+  const isColsMin = cols <= MIN_DIM_CREATOR;
+  const isColsMax = cols >= MAX_DIM_CREATOR;
 
   return (
     <div

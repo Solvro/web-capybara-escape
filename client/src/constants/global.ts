@@ -6,6 +6,9 @@ export const CELL_SIZE = TILE_SIZE * SIZE_MULTIPLIER;
 export const TILE_SIZE_OLD = 64; // This is temporary tile size used for capybara and player sprites
 export const SCALE_FACTOR = TILE_SIZE / TILE_SIZE_OLD;
 
+export const MIN_DIM_CREATOR = 3;
+export const MAX_DIM_CREATOR = 12;
+
 export const LAYER_NAMES = {
   BACKGROUND: "background", //Floor tiles and wall tiles
   FLOOR_DECOYS: "floor decoys", //Things on the floor such as vents or buttons
