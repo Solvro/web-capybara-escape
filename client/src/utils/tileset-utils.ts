@@ -1,3 +1,4 @@
+import { TILE_MAPPING } from "../constants/blocks";
 import { Direction, type DirectionType } from "../types/direction";
 
 import { TILE_MAPPING } from "../constants/blocks";
@@ -67,8 +68,8 @@ export function generateInitialTiles(
 
 type Tile = (number | null)[];
 
-const WALL: Tile = [0, null, null, null];
-const FLOOR: Tile = [6, null, null, null];
+const WALL: Tile = [TILE_MAPPING.w1.frame, null, null, null];
+const FLOOR: Tile = [TILE_MAPPING.f1.frame, null, null, null];
 
 const createWallRow = (cols: number): Tile[] => {
   return Array.from({ length: cols }, () => [...WALL]);

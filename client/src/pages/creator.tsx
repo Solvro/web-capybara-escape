@@ -38,7 +38,7 @@ export function Creator() {
 
   const [rows, cols] = dims;
   useEffect(() => {
-    setTileIndices(changeBoardSize([rows, cols], direction, tileIndices));
+    setTileIndices((prev) => changeBoardSize([rows, cols], direction, prev));
   }, [rows, cols]);
 
   const handleReset = () => {
