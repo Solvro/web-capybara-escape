@@ -28,13 +28,14 @@ export function CreatorItemsSelect({
 
   const handleLayerChange = (layer: string) => {
     setSelectedLayer(layer);
-    const emptyBlockForLayer = LAYER_ITEMS[layer]?.find((item) => item.label === "Empty");
+    const emptyBlockForLayer = LAYER_ITEMS[layer]?.find(
+      (item) => item.label === "Empty",
+    );
     if (emptyBlockForLayer) {
-       setActiveBlock(emptyBlockForLayer);
+      setActiveBlock(emptyBlockForLayer);
     } else {
-       setActiveBlock(null);
+      setActiveBlock(null);
     }
-
   };
 
   const findLayerForBlock = (blockKey: string): string | null => {
