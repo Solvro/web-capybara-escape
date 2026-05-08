@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 
-import { LAYER_NAMES } from "../../../constants/global";
+import { layerNameToIndex } from "../../../constants/global";
 import type { LayerItem } from "../../../constants/layer-items";
 import { CreatorTile } from "./creator-tile";
 
@@ -60,12 +61,6 @@ export function CreatorBoard({
 
   const handleTileClick = (tileIdx: number) => {
     if (activeBlock) {
-      const layerNameToIndex: Record<string, number> = {
-        [LAYER_NAMES.BACKGROUND]: 0,
-        [LAYER_NAMES.FLOOR_DECOYS]: 1,
-        [LAYER_NAMES.ENTITIES]: 2,
-        [LAYER_NAMES.WALL_DECOYS]: 3,
-      };
       const layerIdx = layerNameToIndex[activeBlock.layer];
       if (layerIdx === undefined) return;
       setTileIndices((prev) => {
@@ -82,7 +77,7 @@ export function CreatorBoard({
     }
   };
 
-  const handleRightClick = (e: React.MouseEvent, tileIdx: number) => {
+  const handleRightClick = (e: MouseEvent, tileIdx: number) => {
     e.preventDefault();
 
     if (e.shiftKey) {
@@ -92,12 +87,6 @@ export function CreatorBoard({
         return next;
       });
     } else if (activeBlock) {
-      const layerNameToIndex: Record<string, number> = {
-        [LAYER_NAMES.BACKGROUND]: 0,
-        [LAYER_NAMES.FLOOR_DECOYS]: 1,
-        [LAYER_NAMES.ENTITIES]: 2,
-        [LAYER_NAMES.WALL_DECOYS]: 3,
-      };
       const layerIdx = layerNameToIndex[activeBlock.layer];
       if (layerIdx === undefined) return;
 
