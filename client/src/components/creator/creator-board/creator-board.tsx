@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { MouseEvent } from "react";
+
 import { ASSETS } from "../../../constants/blocks";
 import { layerNameToIndex } from "../../../constants/global";
 import type { LayerItem } from "../../../constants/layer-items";
@@ -63,7 +64,8 @@ export function CreatorBoard({
     if (activeBlock) {
       const layerIdx = layerNameToIndex[activeBlock.layer];
 
-      const valueToSet = activeBlock.frame === ASSETS.EMPTY ? null : activeBlock.frame;
+      const valueToSet =
+        activeBlock.frame === ASSETS.EMPTY ? null : activeBlock.frame;
 
       if (layerIdx === undefined) return;
       setTileIndices((prev) => {
