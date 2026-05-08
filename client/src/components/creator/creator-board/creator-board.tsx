@@ -27,17 +27,32 @@ export function CreatorBoard({
   const [tileSize, setTileSize] = useState<number>(0);
 
   useEffect(() => {
-    if (boardRef.current) {
-      const { width, height } = boardRef.current.getBoundingClientRect();
+    const el = boardRef.current;
+    if (!el) return;
+
+    const updateFromObserver = () => {
+      const { width, height } = el.getBoundingClientRect();
       setBoardWidth(width);
       setBoardHeight(height);
-    }
+    };
+
+    updateFromObserver();
+    const ro = new ResizeObserver(updateFromObserver);
+    ro.observe(el);
+    window.addEventListener("orientationchange", updateFromObserver);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("orientationchange", updateFromObserver);
+    };
   }, []);
 
   useEffect(() => {
     if (!boardHeight || !boardWidth) return;
-    const tileSize = Math.min(boardHeight / rows - 6, boardWidth / cols - 4);
-    setTileSize(tileSize);
+    const innerW = Math.max(0, boardWidth - 32);
+    const innerH = Math.max(0, boardHeight - 32);
+    const next = Math.min(innerH / rows - 6, innerW / cols - 4);
+    setTileSize(Math.max(1, next));
   }, [boardHeight, boardWidth, rows, cols]);
 
   const boardRows = Array.from({ length: rows }, (_, rowIndex) => rowIndex);
