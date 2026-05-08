@@ -8,11 +8,16 @@ import { ASSETS, TILE_MAPPING } from "../constants/blocks";
 import type { LayerItem } from "../constants/layer-items";
 import { generateInitialTiles } from "../utils/tileset-utils";
 
+import { LAYER_NAMES } from "../constants/global";
+import { LAYER_ITEMS } from "../constants/layer-items";
+
 export function Creator() {
   const [levelName, setLevelName] = useState<string>();
   const [dims, setDims] = useState<[number, number]>([7, 8]);
 
-  const [activeBlock, setActiveBlock] = useState<LayerItem | null>(null);
+  const [activeBlock, setActiveBlock] = useState<LayerItem | null>(() => {
+    return LAYER_ITEMS[LAYER_NAMES.BACKGROUND]?.find((item) => item.label === "Empty") || null;
+  });
 
   const floorDecoys = [
     ASSETS.VENT_OPEN,
