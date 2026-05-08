@@ -24,3 +24,10 @@ export const LAYERS = [
 ] as const;
 
 export type LAYER_NAME = (typeof LAYERS)[number];
+
+export const layerNameToIndex: Record<string, number> = {
+        [LAYER_NAMES.BACKGROUND]: 0,
+        [LAYER_NAMES.FLOOR_DECOYS]: 1,
+        [LAYER_NAMES.ENTITIES]: 2,
+        [LAYER_NAMES.WALL_DECOYS]: 3,
+      };
