@@ -10,9 +10,9 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
   const scale = sizePx / sourceTileSizePx;
 
   const safeTileIndices =
-    Array.isArray(tileIndices) && tileIndices.length === 4
+    Array.isArray(tileIndices) && tileIndices.length === 5
       ? tileIndices
-      : [null, null, null, null];
+      : [null, null, null, null, null];
 
   if (!safeTileIndices.some((idx) => idx !== null)) {
     return (

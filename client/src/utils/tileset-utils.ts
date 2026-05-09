@@ -23,12 +23,11 @@ export function generateInitialTiles(
     const row = Math.floor(idx / cols);
     const col = idx % cols;
     if (row === 0 || row === rows - 1 || col === 0 || col === cols - 1) {
-      return [TILE_MAPPING.w1.frame, null, null, null];
+      return [TILE_MAPPING.f1.frame, TILE_MAPPING.w1.frame, null, null, null];
     }
-    const frame =
-      Math.random() < 0.8 ? TILE_MAPPING.f1.frame : TILE_MAPPING.w2.frame;
+    const frame = Math.random() < 0.8 ? null : TILE_MAPPING.w2.frame;
     if (frame === TILE_MAPPING.w2.frame) {
-      return [frame, null, null, null];
+      return [TILE_MAPPING.f1.frame, frame, null, null, null];
     }
 
     const layerTypes = [
@@ -54,14 +53,14 @@ export function generateInitialTiles(
     else if (which === 1) entity = layerTypes[1]();
     else if (which === 2) wallDecoy = layerTypes[2]();
 
-    return [frame, floorDecoy, entity, wallDecoy];
+    return [TILE_MAPPING.f1.frame, frame, floorDecoy, entity, wallDecoy];
   });
 }
 
 type Tile = (number | null)[];
 
-const WALL: Tile = [TILE_MAPPING.w1.frame, null, null, null];
-const FLOOR: Tile = [TILE_MAPPING.f1.frame, null, null, null];
+const WALL: Tile = [null, TILE_MAPPING.w1.frame, null, null, null];
+const FLOOR: Tile = [TILE_MAPPING.f1.frame, null, null, null, null];
 
 const createWallRow = (cols: number): Tile[] => {
   return Array.from({ length: cols }, () => [...WALL]);
@@ -75,7 +74,7 @@ export function changeBoardSize(
   const [rows, cols] = dims;
   const bigger = rows * cols > tileIndices.length;
   let nextBoard: Tile[] = [];
-
+  console.log(tileIndices);
   if (direction == Direction.TOP) {
     const walls = createWallRow(cols);
     if (bigger) {

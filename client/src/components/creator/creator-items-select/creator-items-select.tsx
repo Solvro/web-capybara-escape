@@ -7,6 +7,7 @@ import { CreatorLayerTabs } from "./parts/creator-layer-tabs";
 import { CreatorSelectedBlock } from "./parts/creator-selected-block";
 
 const LAYER_TABS = [
+  { key: LAYER_NAMES.FLOOR, label: "Floor" },
   { key: LAYER_NAMES.BACKGROUND, label: "Background" },
   { key: LAYER_NAMES.FLOOR_DECOYS, label: "Floor Decoys" },
   { key: LAYER_NAMES.ENTITIES, label: "Entities" },

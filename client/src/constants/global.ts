@@ -10,7 +10,8 @@ export const MIN_DIM_CREATOR = 3;
 export const MAX_DIM_CREATOR = 12;
 
 export const LAYER_NAMES = {
-  BACKGROUND: "background", //Floor tiles and wall tiles
+  FLOOR: "floor", //Floor tiles
+  BACKGROUND: "background", //Wall tiles
   FLOOR_DECOYS: "floor decoys", //Things on the floor such as vents or buttons
   ENTITIES: "entities", //Players, enemies and things above floor decoys like lasers
   WALL_DECOYS: "wall decoys", //Upper parts of walls and doord
@@ -19,6 +20,7 @@ export const LAYER_NAMES = {
 
 export const LAYERS = [
   //Layers in order of deepest to shallowest
+  LAYER_NAMES.FLOOR,
   LAYER_NAMES.BACKGROUND,
   LAYER_NAMES.FLOOR_DECOYS,
   LAYER_NAMES.ENTITIES,

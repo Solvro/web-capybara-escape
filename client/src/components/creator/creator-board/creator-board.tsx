@@ -69,10 +69,11 @@ export function CreatorBoard({
   const handleTileClick = (tileIdx: number) => {
     if (activeBlock) {
       const layerNameToIndex: Record<string, number> = {
-        [LAYER_NAMES.BACKGROUND]: 0,
-        [LAYER_NAMES.FLOOR_DECOYS]: 1,
-        [LAYER_NAMES.ENTITIES]: 2,
-        [LAYER_NAMES.WALL_DECOYS]: 3,
+        [LAYER_NAMES.FLOOR]: 0,
+        [LAYER_NAMES.BACKGROUND]: 1,
+        [LAYER_NAMES.FLOOR_DECOYS]: 2,
+        [LAYER_NAMES.ENTITIES]: 3,
+        [LAYER_NAMES.WALL_DECOYS]: 4,
       };
       const layerIdx = layerNameToIndex[activeBlock.layer];
       if (layerIdx === undefined) return;
@@ -81,7 +82,7 @@ export function CreatorBoard({
         if (layerIdx === 0) {
           next[tileIdx][0] = activeBlock.frame;
         } else {
-          for (let i = 1; i <= 3; i++) {
+          for (let i = 1; i <= 4; i++) {
             next[tileIdx][i] = i === layerIdx ? activeBlock.frame : null;
           }
         }
