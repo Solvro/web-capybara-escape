@@ -1,11 +1,25 @@
-/**
- * Import your Room files
- */
 import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
 import config from "@colyseus/tools";
+import express from "express";
 
+import { closeMongoConnection, connectMongo } from "./db/mongo";
+import { levelRepository } from "./levels/level.repository";
+/**
+ * Import your Room files
+ */
 import { GameRoom } from "./rooms/GameRoom";
+import { createLevelsRouter } from "./routes/levels";
+
+async function gracefulShutdown(signal: string) {
+  console.log(`[Server] Received ${signal}. Closing MongoDB connection...`);
+  await closeMongoConnection();
+  console.log("[Server] MongoDB connection closed. Exiting.");
+  process.exit(0);
+}
+
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 
 export default config({
   initializeGameServer: (gameServer) => {
@@ -20,6 +34,9 @@ export default config({
      * Bind your custom express routes here:
      * Read more: https://expressjs.com/en/starter/basic-routing.html
      */
+    app.use(express.json({ limit: "1mb" }));
+    app.use("/api", createLevelsRouter());
+
     app.get("/hello_world", (req, res) => {
       res.send("It's time to kick ass and chew bubblegum!");
     });
@@ -40,9 +57,11 @@ export default config({
     app.use("/monitor", monitor());
   },
 
-  beforeListen: () => {
+  beforeListen: async () => {
     /**
      * Before before gameServer.listen() is called.
      */
+    await connectMongo();
+    await levelRepository.ensureIndexes();
   },
 });
