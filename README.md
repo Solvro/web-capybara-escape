@@ -82,11 +82,11 @@ Do połączenia z bazą danych wymagane są poniższe zmienne środowiskowe
 - `MONGODB_URI`
 - `MONGODB_DB_NAME`
 - `ADMIN_API_TOKEN`
-- `DEFAULT_LEVEL_SLUG`
+- `DEFAULT_LEVEL_SLUG` (opcjonalnie)
 
 ### Export poziomów do Mongo
 
-Pliki poziomów z `src/rooms/json/examples` (wyłączając `default.json`) zostaną wyeksportowane do kolekcji `levels`:
+Pliki poziomów z `server/src/rooms/json/examples` (wyłączając `default.json`) zostaną wyeksportowane do kolekcji `levels`:
 
 ```bash
 npm run export:levels          # pomija poziomy, które istnieją już w bazie
