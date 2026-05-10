@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 
-import { LAYER_NAMES } from "../../../constants/global";
+import { ASSETS } from "../../../constants/blocks";
+import { layerNameToIndex } from "../../../constants/global";
 import type { LayerItem } from "../../../constants/layer-items";
 import { CreatorTile } from "./creator-tile";
 
@@ -60,23 +62,42 @@ export function CreatorBoard({
 
   const handleTileClick = (tileIdx: number) => {
     if (activeBlock) {
-      const layerNameToIndex: Record<string, number> = {
-        [LAYER_NAMES.BACKGROUND]: 0,
-        [LAYER_NAMES.FLOOR_DECOYS]: 1,
-        [LAYER_NAMES.ENTITIES]: 2,
-        [LAYER_NAMES.WALL_DECOYS]: 3,
-      };
       const layerIdx = layerNameToIndex[activeBlock.layer];
+
+      const valueToSet =
+        activeBlock.frame === ASSETS.EMPTY ? null : activeBlock.frame;
+
       if (layerIdx === undefined) return;
       setTileIndices((prev) => {
         const next = prev.map((arr) => [...arr]);
         if (layerIdx === 0) {
-          next[tileIdx][0] = activeBlock.frame;
+          next[tileIdx][0] = valueToSet;
         } else {
           for (let i = 1; i <= 3; i++) {
-            next[tileIdx][i] = i === layerIdx ? activeBlock.frame : null;
+            next[tileIdx][i] = i === layerIdx ? valueToSet : null;
           }
         }
+        return next;
+      });
+    }
+  };
+
+  const handleRightClick = (e: MouseEvent, tileIdx: number) => {
+    e.preventDefault();
+
+    if (e.shiftKey) {
+      setTileIndices((prev) => {
+        const next = prev.map((arr) => [...arr]);
+        next[tileIdx] = [null, null, null, null];
+        return next;
+      });
+    } else if (activeBlock) {
+      const layerIdx = layerNameToIndex[activeBlock.layer];
+      if (layerIdx === undefined) return;
+
+      setTileIndices((prev) => {
+        const next = prev.map((arr) => [...arr]);
+        next[tileIdx][layerIdx] = null;
         return next;
       });
     }
@@ -102,6 +123,7 @@ export function CreatorBoard({
                 <div
                   key={`${row}-${col}`}
                   onClick={() => handleTileClick(tileIdx)}
+                  onContextMenu={(e) => handleRightClick(e, tileIdx)}
                   style={{ cursor: activeBlock ? "pointer" : undefined }}
                 >
                   <CreatorTile

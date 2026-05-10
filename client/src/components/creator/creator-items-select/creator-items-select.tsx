@@ -26,6 +26,18 @@ export function CreatorItemsSelect({
 
   const items = LAYER_ITEMS[selectedLayer] ?? [];
 
+  const handleLayerChange = (layer: string) => {
+    setSelectedLayer(layer);
+    const emptyBlockForLayer = LAYER_ITEMS[layer]?.find(
+      (item) => item.label === "Empty",
+    );
+    if (emptyBlockForLayer) {
+      setActiveBlock(emptyBlockForLayer);
+    } else {
+      setActiveBlock(null);
+    }
+  };
+
   const findLayerForBlock = (blockKey: string): string | null => {
     for (const [layerKey, layerItems] of Object.entries(LAYER_ITEMS)) {
       if (layerItems.some((item) => item.key === blockKey)) {
@@ -56,7 +68,7 @@ export function CreatorItemsSelect({
         <CreatorLayerTabs
           tabs={LAYER_TABS}
           selectedLayer={selectedLayer}
-          setSelectedLayer={setSelectedLayer}
+          setSelectedLayer={handleLayerChange}
         />
 
         <CreatorLayerOptionsGrid
