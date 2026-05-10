@@ -46,6 +46,16 @@ function toLevelSummary(level: {
   };
 }
 
+function slugFromParams(
+  param: string | string[] | undefined,
+): string | undefined {
+  return typeof param === "string"
+    ? param
+    : param !== undefined
+      ? param[0]
+      : undefined;
+}
+
 export function createLevelsRouter() {
   const router = Router();
 
@@ -57,8 +67,12 @@ export function createLevelsRouter() {
   });
 
   router.get("/levels/:slug", async (req: Request, res: Response) => {
+    const slug = slugFromParams(req.params.slug);
+    if (slug === undefined) {
+      return res.status(400).json({ error: "Invalid slug." });
+    }
     const publishedOnly = !isAdminRequest(req);
-    const level = await levelRepository.getBySlug(req.params.slug, {
+    const level = await levelRepository.getBySlug(slug, {
       publishedOnly,
     });
 
@@ -91,7 +105,11 @@ export function createLevelsRouter() {
     requireAdminAuth,
     async (req: Request, res: Response) => {
       try {
-        const level = await levelRepository.updateLevel(req.params.slug, {
+        const slug = slugFromParams(req.params.slug);
+        if (slug === undefined) {
+          return res.status(400).json({ error: "Invalid slug." });
+        }
+        const level = await levelRepository.updateLevel(slug, {
           ...req.body,
           updatedBy: req.header("x-admin-user") ?? "admin",
         });
@@ -111,7 +129,11 @@ export function createLevelsRouter() {
     "/admin/levels/:slug/publish",
     requireAdminAuth,
     async (req: Request, res: Response) => {
-      const level = await levelRepository.updateLevel(req.params.slug, {
+      const slug = slugFromParams(req.params.slug);
+      if (slug === undefined) {
+        return res.status(400).json({ error: "Invalid slug." });
+      }
+      const level = await levelRepository.updateLevel(slug, {
         isPublished: true,
         updatedBy: req.header("x-admin-user") ?? "admin",
       });
