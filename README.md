@@ -75,6 +75,27 @@ npm run build --prefix server
 
 **Husky:** przed commitem odpalane są `lint-staged` oraz `npm run test:server`. Commit nie przejdzie dopóki nie zostaną naprawione błędy
 
+## Baza danych
+
+Do połączenia z bazą danych wymagane są poniższe zmienne środowiskowe
+
+- `MONGODB_URI`
+- `MONGODB_DB_NAME`
+- `ADMIN_API_TOKEN`
+- `DEFAULT_LEVEL_SLUG`
+
+### Export poziomów do Mongo
+
+Pliki poziomów z `src/rooms/json/examples` (wyłączając `default.json`) zostaną wyeksportowane do kolekcji `levels`:
+
+```bash
+npm run export:levels          # pomija poziomy, które istnieją już w bazie
+npm run export:levels:force    # nadpisuje istniejące poziomy
+```
+
+Tworzy nowe zasoby w bazie bazując na slugu
+`default.json` - jest używany offline, gdy baza nie jest podłączona
+
 ## Stack
 
 - [Colyseus.io](https://docs.colyseus.io/) - biblioteka po stronie serwera
