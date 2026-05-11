@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import type { MouseEvent } from "react";
 
 import { ASSETS } from "../../../constants/blocks";
 import { layerNameToIndex } from "../../../constants/global";
@@ -25,6 +24,10 @@ export function CreatorBoard({
 
   const [boardHeight, setBoardHeight] = useState<number>(0);
   const [boardWidth, setBoardWidth] = useState<number>(0);
+  const [isMouseOver, setMouseOver] = useState<{ row: number; col: number }>({
+    row: -1,
+    col: -1,
+  });
 
   const [tileSize, setTileSize] = useState<number>(0);
 
@@ -53,14 +56,47 @@ export function CreatorBoard({
     if (!boardHeight || !boardWidth) return;
     const innerW = Math.max(0, boardWidth - 32);
     const innerH = Math.max(0, boardHeight - 32);
-    const next = Math.min(innerH / rows - 6, innerW / cols - 4);
+    const next = Math.min(innerH / (rows + 1) - 6, innerW / cols - 4);
     setTileSize(Math.max(1, next));
   }, [boardHeight, boardWidth, rows, cols]);
 
   const boardRows = Array.from({ length: rows }, (_, rowIndex) => rowIndex);
   const boardCols = Array.from({ length: cols }, (_, colIndex) => colIndex);
 
-  const handleTileClick = (tileIdx: number) => {
+  const handleBoardMouse = (
+    e: React.MouseEvent<HTMLDivElement>,
+  ): { row: number; col: number } => {
+    if (!boardRef.current) return { row: -1, col: -1 };
+
+    const position = boardRef.current.getBoundingClientRect();
+
+    const left = (boardWidth - tileSize * cols) / 2;
+    const top = (boardHeight - tileSize * rows) / 2;
+
+    const x = e.clientX - position.left - left;
+    const y = e.clientY - position.y - top;
+
+    const col = Math.floor(x / tileSize);
+    const row = Math.floor(y / tileSize) == -1 ? 0 : Math.floor(y / tileSize);
+
+    return { row: row, col: col };
+  };
+
+  const handleMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { row, col } = handleBoardMouse(e);
+    setMouseOver({ row: row, col: col });
+  };
+
+  const handleMouseLeave = () => {
+    setMouseOver({ row: -1, col: -1 });
+  };
+
+  const handleTileClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { row, col } = handleBoardMouse(e);
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
+      return;
+    }
+    const tileIdx = row * cols + col;
     if (activeBlock) {
       const layerIdx = layerNameToIndex[activeBlock.layer];
 
@@ -82,8 +118,10 @@ export function CreatorBoard({
     }
   };
 
-  const handleRightClick = (e: MouseEvent, tileIdx: number) => {
+  const handleRightClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    const { row, col } = handleBoardMouse(e);
+    const tileIdx = row * cols + col;
 
     if (e.shiftKey) {
       setTileIndices((prev) => {
@@ -114,6 +152,7 @@ export function CreatorBoard({
           style={{
             gridTemplateColumns: `repeat(${cols}, ${tileSize}px)`,
             gap: 0,
+            boxSizing: "border-box",
           }}
         >
           {boardRows.map((row) =>
@@ -122,9 +161,18 @@ export function CreatorBoard({
               return (
                 <div
                   key={`${row}-${col}`}
-                  onClick={() => handleTileClick(tileIdx)}
-                  onContextMenu={(e) => handleRightClick(e, tileIdx)}
-                  style={{ cursor: activeBlock ? "pointer" : undefined }}
+                  onClick={handleTileClick}
+                  onMouseMove={handleMouseOver}
+                  onMouseLeave={handleMouseLeave}
+                  onContextMenu={handleRightClick}
+                  style={{
+                    cursor: activeBlock ? "pointer" : undefined,
+                    boxSizing: "border-box",
+                    filter:
+                      isMouseOver.col == col && isMouseOver.row == row
+                        ? "brightness(1.3)"
+                        : "",
+                  }}
                 >
                   <CreatorTile
                     sizePx={tileSize}

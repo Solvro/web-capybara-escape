@@ -1,3 +1,8 @@
+import { TILE_MAPPING } from "../../../constants/blocks";
+import {
+  EXTRA_HEIGHT,
+  TALL_WALL_HEIGHT_MULTIPLIER,
+} from "../../../constants/global";
 import { getTilesetBackgroundPosition } from "../../../utils/tileset-utils";
 
 interface CreatorTileProps {
@@ -29,13 +34,13 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
   // Render in stacking order: first index at the bottom
   return (
     <div
-      className="overflow-hidden border-4 border-emerald-950 bg-blue-400"
+      className="overflow-hidden bg-blue-400"
       style={{
         position: "relative",
         width: `${sizePx}px`,
-        height: `${sizePx}px`,
+        height: `${sizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
+        marginTop: `${-sizePx * EXTRA_HEIGHT}px`,
         overflow: "hidden",
-        border: "2px solid #333",
         background: "transparent",
       }}
     >
@@ -45,16 +50,21 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
           tileIndex,
           6,
           sourceTileSizePx,
+          true,
         );
         return (
           <div
             key={layerId}
             style={{
               position: "absolute",
-              top: 0,
+              top:
+                tileIndices[0] === TILE_MAPPING.w1t.frame ||
+                tileIndices[0] === TILE_MAPPING.w2t.frame
+                  ? 0
+                  : `${sizePx * EXTRA_HEIGHT}px`, // AAAAAAAAAA SINGLE SOURCE OF TRUTH
               left: 0,
               width: `${sourceTileSizePx}px`,
-              height: `${sourceTileSizePx}px`,
+              height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
               backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
               backgroundPosition: `${x}px ${y}px`,
               backgroundRepeat: "no-repeat",
