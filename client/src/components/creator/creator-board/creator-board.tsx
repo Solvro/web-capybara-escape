@@ -119,8 +119,10 @@ export function CreatorBoard({
     }
   };
 
-  const handleRightClick = (e: MouseEvent, tileIdx: number) => {
+  const handleRightClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    const { row, col } = handleBoardMouse(e);
+    const tileIdx = row * cols + col;
 
     if (e.shiftKey) {
       setTileIndices((prev) => {
@@ -163,6 +165,7 @@ export function CreatorBoard({
                   onClick={handleTileClick}
                   onMouseMove={handleMouseOver}
                   onMouseLeave={handleMouseLeave}
+                  onContextMenu={handleRightClick}
                   style={{
                     cursor: activeBlock ? "pointer" : undefined,
                     boxSizing: "border-box",
