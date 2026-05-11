@@ -26,7 +26,7 @@
     "@colyseus/ws-transport": "^0.17.13",
     "colyseus": "^0.17.10",
     "express": "^5.2.1",
-    "mongodb": "^6.16.0"
+    "mongodb": "^7.2.0"
   },
   "devDependencies": {
     "@colyseus/testing": "^0.17.11",
