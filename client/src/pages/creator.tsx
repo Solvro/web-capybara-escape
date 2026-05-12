@@ -29,7 +29,13 @@ export function Creator() {
     ASSETS.WIRE,
     ASSETS.BUTTON_RELEASED,
   ];
-  const entities = [ASSETS.CRATE, ASSETS.LASER_GUN];
+  const entities = [
+    ASSETS.CRATE, 
+    ASSETS.LASER_GUN, 
+    ASSETS.CAPYBARA,
+    ASSETS.SOL,
+    ASSETS.VRON
+  ];
   const wallDecoys = [ASSETS.DOOR_CLOSED];
 
   const [tileIndices, setTileIndices] = useState<(number | null)[][]>(() =>
