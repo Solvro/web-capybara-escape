@@ -33,6 +33,10 @@ export const ASSETS = {
   SOCKET: 26,
   WIRE_CURVE: 27,
   CABLE_END_INACTIVE: 36,
+  //Entities
+  CAPYBARA: 43,
+  SOL: 44,
+  VRON: 45,
 };
 
 // Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)
