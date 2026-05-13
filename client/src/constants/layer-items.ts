@@ -18,62 +18,14 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
     },
     {
       key: "w1t",
-      label: "Wall 1 Top",
+      label: "Brick wall",
       frame: TILE_MAPPING.w1t.frame,
       layer: LAYER_NAMES.BACKGROUND,
     },
     {
-      key: "w1t-upper",
-      label: "Wall 1 Upper",
-      frame: 10,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
-      key: "w1",
-      label: "Wall 1",
-      frame: TILE_MAPPING.w1.frame,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
-      key: "w13",
-      label: "Wall 1-3",
-      frame: TILE_MAPPING.w13.frame,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
       key: "w2t",
-      label: "Wall 2 Top",
+      label: "Server wall",
       frame: TILE_MAPPING.w2t.frame,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
-      key: "w2t-upper",
-      label: "Wall 2/3 Upper",
-      frame: 4,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
-      key: "w2",
-      label: "Wall 2",
-      frame: TILE_MAPPING.w2.frame,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
-      key: "w3t",
-      label: "Wall 3 Top",
-      frame: TILE_MAPPING.w3t.frame,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
-      key: "w3",
-      label: "Wall 3",
-      frame: TILE_MAPPING.w3.frame,
-      layer: LAYER_NAMES.BACKGROUND,
-    },
-    {
-      key: "w21",
-      label: "Wall 2-1",
-      frame: TILE_MAPPING.w21.frame,
       layer: LAYER_NAMES.BACKGROUND,
     },
     {
@@ -150,6 +102,12 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       frame: ASSETS.VENT_CLOSED,
       layer: LAYER_NAMES.FLOOR_DECOYS,
     },
+    {
+      key: "empty-floor",
+      label: "Empty",
+      frame: ASSETS.EMPTY,
+      layer: LAYER_NAMES.FLOOR_DECOYS,
+    },
   ],
   [LAYER_NAMES.ENTITIES]: [
     {
@@ -194,6 +152,12 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       frame: ASSETS.LASER_BEAM_VERTICAL_TIP,
       layer: LAYER_NAMES.ENTITIES,
     },
+    {
+      key: "empty-entities",
+      label: "Empty",
+      frame: ASSETS.EMPTY,
+      layer: LAYER_NAMES.ENTITIES,
+    },
   ],
   [LAYER_NAMES.WALL_DECOYS]: [
     {
@@ -206,6 +170,12 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       key: "doorBase",
       label: "Door Base",
       frame: ASSETS.DOOR_BASE,
+      layer: LAYER_NAMES.WALL_DECOYS,
+    },
+    {
+      key: "empty-walls",
+      label: "Empty",
+      frame: ASSETS.EMPTY,
       layer: LAYER_NAMES.WALL_DECOYS,
     },
   ],

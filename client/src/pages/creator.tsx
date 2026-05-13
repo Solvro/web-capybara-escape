@@ -5,14 +5,22 @@ import { CreatorControl } from "../components/creator/creator-control/creator-co
 import { CreatorItemsSelect } from "../components/creator/creator-items-select/creator-items-select";
 import { CreatorName } from "../components/creator/creator-name/creator-name";
 import { ASSETS, TILE_MAPPING } from "../constants/blocks";
+import { LAYER_NAMES } from "../constants/global";
 import type { LayerItem } from "../constants/layer-items";
+import { LAYER_ITEMS } from "../constants/layer-items";
 import { generateInitialTiles } from "../utils/tileset-utils";
 
 export function Creator() {
   const [levelName, setLevelName] = useState<string>();
   const [dims, setDims] = useState<[number, number]>([7, 8]);
 
-  const [activeBlock, setActiveBlock] = useState<LayerItem | null>(null);
+  const [activeBlock, setActiveBlock] = useState<LayerItem | null>(() => {
+    return (
+      LAYER_ITEMS[LAYER_NAMES.BACKGROUND]?.find(
+        (item) => item.label === "Empty",
+      ) || null
+    );
+  });
 
   const floorDecoys = [
     ASSETS.VENT_OPEN,
