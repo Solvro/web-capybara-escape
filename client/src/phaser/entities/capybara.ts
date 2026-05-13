@@ -1,7 +1,13 @@
+import type { EntityAnimator } from "../lib/EntityAnimator";
 import { Entity } from "./entity";
 
 export class Capybara extends Entity {
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "capybara");
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    animator: EntityAnimator | null = null,
+  ) {
+    super(scene, x, y, animator?.textureKey ?? "capybara", animator);
   }
 }

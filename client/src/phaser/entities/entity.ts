@@ -3,7 +3,7 @@ import {
   SCALE_FACTOR,
   SIZE_MULTIPLIER,
 } from "../../constants/global";
-import type { SpriteAnimator } from "../lib/sprite-animator";
+import type { EntityAnimator } from "../lib/EntityAnimator";
 
 export type Direction = "left" | "right" | "up" | "down";
 
@@ -11,14 +11,14 @@ export class Entity extends Phaser.GameObjects.Container {
   protected sprite: Phaser.GameObjects.Sprite;
   protected gridX: number;
   protected gridY: number;
-  protected animator: SpriteAnimator | null;
+  protected animator: EntityAnimator | null;
 
   constructor(
     scene: Phaser.Scene,
     gridX: number,
     gridY: number,
     textureKey = "player",
-    animator: SpriteAnimator | null = null,
+    animator: EntityAnimator | null = null,
   ) {
     super(scene);
 
@@ -42,21 +42,13 @@ export class Entity extends Phaser.GameObjects.Container {
     this.setDepth(this.y);
   }
 
-  playAnim(animName: string): void {
+  animate(): void {
     if (this.animator !== null) {
-      this.animator.play(this.sprite, animName);
-    }
-  }
-
-  stopAnim(animName: string, idleAnimName?: string): void {
-    if (this.animator !== null) {
-      this.animator.stop(this.sprite, animName, idleAnimName);
+      this.animator.animate(this.sprite);
     }
   }
 
   move(direction: Direction, ease = "Linear") {
-    const walkAnimName = `walk-${direction}`;
-
     switch (direction) {
       case "left": {
         this.gridX -= 1;
@@ -79,7 +71,7 @@ export class Entity extends Phaser.GameObjects.Container {
     const targetX = this.gridX * CELL_SIZE + CELL_SIZE / 2;
     const targetY = this.gridY * CELL_SIZE + CELL_SIZE / 2;
 
-    this.playAnim(walkAnimName);
+    this.animator?.notifyMove(direction);
 
     this.scene.tweens.add({
       targets: this,
@@ -92,7 +84,7 @@ export class Entity extends Phaser.GameObjects.Container {
       },
       onComplete: () => {
         this.setPosition(targetX, targetY);
-        this.stopAnim(walkAnimName, `idle-${direction}`);
+        this.animator?.notifyStop(direction);
       },
     });
   }
