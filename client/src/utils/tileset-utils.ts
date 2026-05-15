@@ -1,8 +1,6 @@
 import { TILE_MAPPING } from "../constants/blocks";
-import { Direction, type DirectionType } from "../types/direction";
-
-import { TILE_MAPPING } from "../constants/blocks";
 import { EXTRA_HEIGHT } from "../constants/global";
+import { Direction, type DirectionType } from "../types/direction";
 
 export function getTilesetBackgroundPosition(
   frame: number,
