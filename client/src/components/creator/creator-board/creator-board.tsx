@@ -12,8 +12,8 @@ import { CreatorTile } from "./creator-tile";
 interface CreatorBoardProps {
   dims: [number, number];
   activeBlock: LayerItem | null;
-  tileIndices: (number | null)[][];
-  setTileIndices: React.Dispatch<React.SetStateAction<(number | null)[][]>>;
+  tileIndices: (LayerItem | null)[][];
+  setTileIndices: React.Dispatch<React.SetStateAction<(LayerItem | null)[][]>>;
   setDims: (dims: [number, number]) => void;
   setDirection: (direction: DirectionType) => void;
 }
@@ -109,7 +109,7 @@ export function CreatorBoard({
       const layerIdx = layerNameToIndex[activeBlock.layer];
 
       const valueToSet =
-        activeBlock.frame === ASSETS.EMPTY ? null : activeBlock.frame;
+        activeBlock.frame === ASSETS.EMPTY ? null : activeBlock;
 
       if (layerIdx === undefined) return;
       setTileIndices((prev) => {

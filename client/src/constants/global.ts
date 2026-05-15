@@ -10,6 +10,14 @@ export const TALL_WALL_HEIGHT = 34;
 export const TALL_WALL_HEIGHT_MULTIPLIER = TALL_WALL_HEIGHT / TILE_SIZE;
 export const EXTRA_HEIGHT = TALL_WALL_HEIGHT_MULTIPLIER - 1;
 
+export const COLOR_LIST = [
+  "#800080",
+  "#FFA500",
+  "#0000FF",
+  "#33cc33",
+  "#FF3B30",
+];
+
 export const LAYER_NAMES = {
   FLOOR: "floor", //Floor tiles
   BACKGROUND: "background", //Wall tiles

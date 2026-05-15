@@ -1,12 +1,55 @@
 import { ASSETS, TILE_MAPPING } from "./blocks";
-import { LAYER_NAMES } from "./global";
+import { COLOR_LIST, LAYER_NAMES } from "./global";
 
 export interface LayerItem {
   key: string;
   label: string;
   frame: number;
   layer: string;
+  color?: string;
+  baseFrame?: number;
+  direction?: "up" | "down" | "left" | "right";
 }
+
+const coloredButtons: LayerItem[] = COLOR_LIST.map((color, index) => ({
+  key: `button-${index}`,
+  label: `Button`,
+  frame: ASSETS.BUTTON_RELEASED,
+  layer: LAYER_NAMES.FLOOR_DECOYS,
+  color,
+  baseFrame: ASSETS.BUTTON_BASE,
+}));
+
+const coloredDoors: LayerItem[] = COLOR_LIST.map((color, index) => ({
+  key: `door-${index}`,
+  label: `Door`,
+  frame: ASSETS.DOOR_CLOSED,
+  layer: LAYER_NAMES.WALL_DECOYS,
+  color,
+  baseFrame: ASSETS.DOOR_BASE,
+}));
+
+const coloredLasers: LayerItem[] = COLOR_LIST.flatMap((color, colorIdx) =>
+  (["up", "down", "left", "right"] as const).map((direction) => {
+    let frame = ASSETS.GHOST_ACTIVE_RIGHT;
+    if (direction === "down") frame = ASSETS.GHOST_ACTIVE_DOWN;
+    else if (direction === "up") frame = ASSETS.GHOST_ACTIVE_UP;
+
+    let colorFrame = ASSETS.GHOST_COLOR_RIGHT;
+    if (direction === "down") colorFrame = ASSETS.GHOST_COLOR_DOWN;
+    else if (direction === "up") colorFrame = ASSETS.GHOST_COLOR_UP;
+
+    return {
+      key: `laser-${colorIdx}-${direction}`,
+      label: `Laser ${direction}`,
+      frame: colorFrame, // Colorized part
+      baseFrame: frame, // Base sprite
+      layer: LAYER_NAMES.ENTITIES,
+      color,
+      direction,
+    };
+  }),
+);
 
 export const LAYER_ITEMS: Record<string, LayerItem[]> = {
   [LAYER_NAMES.FLOOR]: [
@@ -44,30 +87,7 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
     },
   ],
   [LAYER_NAMES.FLOOR_DECOYS]: [
-    {
-      key: "button",
-      label: "Button",
-      frame: ASSETS.BUTTON_RELEASED,
-      layer: LAYER_NAMES.FLOOR_DECOYS,
-    },
-    {
-      key: "buttonPressed",
-      label: "Button Pressed",
-      frame: ASSETS.BUTTON_PRESSED,
-      layer: LAYER_NAMES.FLOOR_DECOYS,
-    },
-    {
-      key: "buttonBase",
-      label: "Button Base",
-      frame: ASSETS.BUTTON_BASE,
-      layer: LAYER_NAMES.FLOOR_DECOYS,
-    },
-    {
-      key: "pointButton",
-      label: "Point Button",
-      frame: ASSETS.POINT_BUTTON,
-      layer: LAYER_NAMES.FLOOR_DECOYS,
-    },
+    ...coloredButtons,
     {
       key: "cable",
       label: "Cable Active",
@@ -118,22 +138,11 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
     },
   ],
   [LAYER_NAMES.ENTITIES]: [
+    ...coloredLasers,
     {
       key: "crate",
       label: "Crate",
       frame: ASSETS.CRATE,
-      layer: LAYER_NAMES.ENTITIES,
-    },
-    {
-      key: "laserGun",
-      label: "Laser Gun",
-      frame: ASSETS.LASER_GUN,
-      layer: LAYER_NAMES.ENTITIES,
-    },
-    {
-      key: "laserGunFired",
-      label: "Laser Fired",
-      frame: ASSETS.LASER_GUN_FIRED,
       layer: LAYER_NAMES.ENTITIES,
     },
     {
@@ -186,18 +195,7 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
     },
   ],
   [LAYER_NAMES.WALL_DECOYS]: [
-    {
-      key: "door",
-      label: "Door Closed",
-      frame: ASSETS.DOOR_CLOSED,
-      layer: LAYER_NAMES.WALL_DECOYS,
-    },
-    {
-      key: "doorBase",
-      label: "Door Base",
-      frame: ASSETS.DOOR_BASE,
-      layer: LAYER_NAMES.WALL_DECOYS,
-    },
+    ...coloredDoors,
     {
       key: "empty-walls",
       label: "Empty",
@@ -206,3 +204,10 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
     },
   ],
 };
+
+export const ALL_ITEMS_MAP: Record<string, LayerItem> = {};
+Object.values(LAYER_ITEMS)
+  .flat()
+  .forEach((item) => {
+    ALL_ITEMS_MAP[item.key] = item;
+  });

@@ -4,7 +4,6 @@ import { CreatorBoard } from "../components/creator/creator-board/creator-board"
 import { CreatorControl } from "../components/creator/creator-control/creator-control";
 import { CreatorItemsSelect } from "../components/creator/creator-items-select/creator-items-select";
 import { CreatorName } from "../components/creator/creator-name/creator-name";
-import { ASSETS, TILE_MAPPING } from "../constants/blocks";
 import { LAYER_NAMES } from "../constants/global";
 import type { LayerItem } from "../constants/layer-items";
 import { LAYER_ITEMS } from "../constants/layer-items";
@@ -24,22 +23,22 @@ export function Creator() {
   });
 
   const floorDecoys = [
-    ASSETS.VENT_OPEN,
-    ASSETS.VENT_CLOSED,
-    ASSETS.WIRE,
-    ASSETS.BUTTON_RELEASED,
+    "ventOpen",
+    "ventClosed",
+    "wire",
+    "button-0",
   ];
   const entities = [
-    ASSETS.CRATE,
-    ASSETS.LASER_GUN,
-    ASSETS.CAPYBARA_START,
-    ASSETS.SOL_START,
-    ASSETS.VRON_START,
+    "crate",
+    "laser-0-right",
+    "capy-start",
+    "sol-start",
+    "vron-start",
   ];
-  const wallDecoys = [ASSETS.DOOR_CLOSED];
+  const wallDecoys = ["door-0"];
 
-  const [tileIndices, setTileIndices] = useState<(number | null)[][]>(() =>
-    generateInitialTiles(dims, floorDecoys, entities, wallDecoys, TILE_MAPPING),
+  const [tileIndices, setTileIndices] = useState<(LayerItem | null)[][]>(() =>
+    generateInitialTiles(dims, floorDecoys, entities, wallDecoys),
   );
 
   const [rows, cols] = dims;
@@ -54,7 +53,6 @@ export function Creator() {
         floorDecoys,
         entities,
         wallDecoys,
-        TILE_MAPPING,
       ),
     );
   };
