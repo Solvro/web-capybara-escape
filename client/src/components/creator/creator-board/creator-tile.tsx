@@ -1,4 +1,4 @@
-import { TILE_MAPPING } from "../../../constants/blocks";
+import { TILE_MAPPING, ENTITY_MAPPING } from "../../../constants/blocks";
 import {
   EXTRA_HEIGHT,
   TALL_WALL_HEIGHT_MULTIPLIER,
@@ -40,18 +40,20 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
         width: `${sizePx}px`,
         height: `${sizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
         marginTop: `${-sizePx * EXTRA_HEIGHT}px`,
-        overflow: "hidden",
+        overflow: "visible",
         background: "transparent",
       }}
     >
       {safeTileIndices.map((tileIndex, layerId) => {
         if (tileIndex === null) return null;
-        const { x, y } = getTilesetBackgroundPosition(
-          tileIndex,
-          6,
-          sourceTileSizePx,
-          true,
-        );
+        const isEntity = ENTITY_MAPPING[tileIndex] !== undefined;
+        const bgUrl = isEntity 
+          ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[tileIndex].substring(1)})` 
+          : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
+
+        const { x, y } = isEntity
+          ? { x: 0, y: 0 } 
+          : getTilesetBackgroundPosition(tileIndex, 6, sourceTileSizePx, true); 
         return (
           <div
             key={layerId}
@@ -65,8 +67,8 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
               left: 0,
               width: `${sourceTileSizePx}px`,
               height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
-              backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-              backgroundPosition: `${x}px ${y}px`,
+              backgroundImage: bgUrl,
+              backgroundPosition: isEntity ? "bottom left" : `${x}px ${y}px`,
               backgroundRepeat: "no-repeat",
               imageRendering: "pixelated",
               transform: `scale(${scale})`,
