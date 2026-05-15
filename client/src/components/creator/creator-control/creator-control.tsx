@@ -1,3 +1,5 @@
+import { MAX_DIM_CREATOR, MIN_DIM_CREATOR } from "../../../constants/global";
+import { Direction, type DirectionType } from "../../../types/direction";
 import { CreatorActionButtons } from "./parts/creator-action-buttons";
 import { CreatorColumnsControl } from "./parts/creator-columns-control";
 import { CreatorRowsControl } from "./parts/creator-rows-control";
@@ -6,34 +8,37 @@ interface CreatorControlProps {
   dims: [number, number];
   setDims: (dims: [number, number]) => void;
   onReset?: () => void;
+  setDirection: (direction: DirectionType) => void;
 }
+
+export const clampDim = (value: number) => {
+  return Math.min(MAX_DIM_CREATOR, Math.max(MIN_DIM_CREATOR, value));
+};
 
 export function CreatorControl({
   dims,
   setDims,
+  setDirection,
   onReset,
 }: CreatorControlProps) {
   const [rows, cols] = dims;
-  const MIN_DIM = 3;
-  const MAX_DIM = 12;
-
-  const clampDim = (value: number) =>
-    Math.min(MAX_DIM, Math.max(MIN_DIM, value));
 
   const handleRowsChange = (delta: number) => {
     const newRows = clampDim(rows + delta);
+    setDirection(Direction.BOTTOM);
     setDims([newRows, cols]);
   };
 
   const handleColsChange = (delta: number) => {
     const newCols = clampDim(cols + delta);
+    setDirection(Direction.RIGHT);
     setDims([rows, newCols]);
   };
 
-  const isRowsMin = rows <= MIN_DIM;
-  const isRowsMax = rows >= MAX_DIM;
-  const isColsMin = cols <= MIN_DIM;
-  const isColsMax = cols >= MAX_DIM;
+  const isRowsMin = rows <= MIN_DIM_CREATOR;
+  const isRowsMax = rows >= MAX_DIM_CREATOR;
+  const isColsMin = cols <= MIN_DIM_CREATOR;
+  const isColsMax = cols >= MAX_DIM_CREATOR;
 
   return (
     <div className="relative flex h-full w-full items-center gap-6 rounded-lg bg-[#4b2a86] p-4 shadow-lg">
