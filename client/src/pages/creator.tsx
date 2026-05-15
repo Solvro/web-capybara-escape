@@ -22,12 +22,7 @@ export function Creator() {
     );
   });
 
-  const floorDecoys = [
-    "ventOpen",
-    "ventClosed",
-    "wire",
-    "button-0",
-  ];
+  const floorDecoys = ["ventOpen", "ventClosed", "wire", "button-0"];
   const entities = [
     "crate",
     "laser-0-right",
@@ -48,12 +43,7 @@ export function Creator() {
 
   const handleReset = () => {
     setTileIndices(
-      generateInitialTiles(
-        [rows, cols],
-        floorDecoys,
-        entities,
-        wallDecoys,
-      ),
+      generateInitialTiles([rows, cols], floorDecoys, entities, wallDecoys),
     );
   };
 

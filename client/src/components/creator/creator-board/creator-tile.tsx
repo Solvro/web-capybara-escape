@@ -35,8 +35,7 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
   }
 
   const wallBg = safeTileIndices[1];
-  const isWallCell =
-    wallBg?.key === "w1t" || wallBg?.key === "w2t";
+  const isWallCell = wallBg?.key === "w1t" || wallBg?.key === "w2t";
 
   const renderPart = (
     frameId: number,

@@ -23,11 +23,7 @@ export function CreatorLayerOptionsGrid({
           color?: string,
           direction?: string,
         ) => {
-          const { x: px, y: py } = getTilesetBackgroundPosition(
-            frameId,
-            6,
-            24,
-          );
+          const { x: px, y: py } = getTilesetBackgroundPosition(frameId, 6, 24);
           const innerTransform =
             direction === "left" ? "rotate(180deg)" : "none";
 
@@ -98,6 +94,7 @@ export function CreatorLayerOptionsGrid({
             {!useCompositeBlend ? (
               <div className="h-20 w-20 overflow-hidden border-4 border-emerald-950 bg-blue-400">
                 <div
+                  className="h-6 w-6"
                   style={{
                     width: "24px",
                     height: "24px",
@@ -108,7 +105,6 @@ export function CreatorLayerOptionsGrid({
                     transform: "scale(3)",
                     transformOrigin: "top left",
                   }}
-                  className="h-6 w-6"
                 />
               </div>
             ) : (
