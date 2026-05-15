@@ -1,4 +1,4 @@
-import { ASSETS, TILE_MAPPING } from "./blocks";
+import { ASSETS, TILE_MAPPING, } from "./blocks";
 import { LAYER_NAMES } from "./global";
 
 export interface LayerItem {
@@ -155,19 +155,19 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
     {
       key: "capy-start",
       label: "Capybara",
-      frame: ASSETS.CAPYBARA,
+      frame: ASSETS.CAPYBARA_START,
       layer: LAYER_NAMES.ENTITIES,
     },
     {
       key: "sol-start",
       label: "Sol",
-      frame: ASSETS.SOL,
+      frame: ASSETS.SOL_START,
       layer: LAYER_NAMES.ENTITIES,
     },
     {
       key: "vron-start",
       label: "Vron",
-      frame: ASSETS.VRON,
+      frame: ASSETS.VRON_START,
       layer: LAYER_NAMES.ENTITIES,
     },
     {

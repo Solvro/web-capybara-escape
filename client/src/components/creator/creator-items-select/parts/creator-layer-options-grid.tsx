@@ -1,4 +1,5 @@
 import type { LayerItem } from "../../../../constants/layer-items";
+import { ENTITY_MAPPING } from "../../../../constants/blocks";
 import { getTilesetBackgroundPosition } from "../../../../utils/tileset-utils";
 
 interface CreatorLayerOptionsGridProps {
@@ -15,11 +16,15 @@ export function CreatorLayerOptionsGrid({
   return (
     <div className="custom-scrollbar flex min-h-0 flex-1 flex-wrap content-start items-start justify-center gap-4 overflow-y-auto rounded-lg bg-violet-900/40 p-4">
       {items.map((item) => {
-        const { x: posX, y: posY } = getTilesetBackgroundPosition(
-          item.frame,
-          6,
-          24,
-        );
+      const isEntity = ENTITY_MAPPING[item.frame] !== undefined;
+        
+        const { x: posX, y: posY } = isEntity
+          ? { x: 0, y: 0 }
+          : getTilesetBackgroundPosition(item.frame, 6, 24);
+
+        const bgUrl = isEntity
+          ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[item.frame].substring(1)})`
+          : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
         return (
           <button
             key={item.key}
@@ -38,8 +43,8 @@ export function CreatorLayerOptionsGrid({
                 style={{
                   width: "24px",
                   height: "24px",
-                  backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-                  backgroundPosition: `${String(posX)}px ${String(posY)}px`,
+                  backgroundImage: bgUrl,
+                  backgroundPosition: isEntity ? "bottom left" : `${String(posX)}px ${String(posY)}px`,
                   backgroundRepeat: "no-repeat",
                   imageRendering: "pixelated",
                   transform: "scale(3)",

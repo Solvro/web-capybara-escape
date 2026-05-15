@@ -34,9 +34,21 @@ export const ASSETS = {
   WIRE_CURVE: 27,
   CABLE_END_INACTIVE: 36,
   //Entities
-  CAPYBARA: 43,
-  SOL: 44,
-  VRON: 45,
+  CAPYBARA_START: 100,
+  SOL_START: 101,
+  VRON_START: 102,
+};
+
+export const ENTITY_SOURCES = {
+  CAPYBARA: "/images/capybara/capybara.png",
+  SOL: "/images/players/Sol.png",
+  VRON: "/images/players/Vron.png",
+};
+
+export const ENTITY_MAPPING: Record<number, string> = {
+  [ASSETS.CAPYBARA_START]: ENTITY_SOURCES.CAPYBARA,
+  [ASSETS.SOL_START]: ENTITY_SOURCES.SOL,
+  [ASSETS.VRON_START]: ENTITY_SOURCES.VRON,
 };
 
 // Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)
