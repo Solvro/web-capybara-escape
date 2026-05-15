@@ -1,4 +1,8 @@
-import { TILE_MAPPING, ENTITY_MAPPING } from "../../../constants/blocks";
+import {
+  ASSETS,
+  ENTITY_MAPPING,
+  TILE_MAPPING,
+} from "../../../constants/blocks";
 import {
   EXTRA_HEIGHT,
   TALL_WALL_HEIGHT_MULTIPLIER,
@@ -40,20 +44,32 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
         width: `${sizePx}px`,
         height: `${sizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
         marginTop: `${-sizePx * EXTRA_HEIGHT}px`,
-        overflow: "visible",
+        overflow: "hidden",
         background: "transparent",
       }}
     >
       {safeTileIndices.map((tileIndex, layerId) => {
         if (tileIndex === null) return null;
         const isEntity = ENTITY_MAPPING[tileIndex] !== undefined;
-        const bgUrl = isEntity 
-          ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[tileIndex].substring(1)})` 
-          : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
+        let bgPosX = 0;
+        let bgPosY = 0;
 
-        const { x, y } = isEntity
-          ? { x: 0, y: 0 } 
-          : getTilesetBackgroundPosition(tileIndex, 6, sourceTileSizePx, true); 
+        if (isEntity) {
+          bgPosY = tileIndex === ASSETS.CAPYBARA_START ? 12 : 6;
+        } else {
+          const pos = getTilesetBackgroundPosition(
+            tileIndex,
+            6,
+            sourceTileSizePx,
+            true,
+          );
+          bgPosX = pos.x;
+          bgPosY = pos.y;
+        }
+
+        const bgUrl = isEntity
+          ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[tileIndex].substring(1)})`
+          : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
         return (
           <div
             key={layerId}
@@ -61,14 +77,15 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
               position: "absolute",
               top:
                 tileIndices[0] === TILE_MAPPING.w1t.frame ||
-                tileIndices[0] === TILE_MAPPING.w2t.frame
+                tileIndices[0] === TILE_MAPPING.w2t.frame ||
+                isEntity
                   ? 0
                   : `${sizePx * EXTRA_HEIGHT}px`, // AAAAAAAAAA SINGLE SOURCE OF TRUTH
               left: 0,
               width: `${sourceTileSizePx}px`,
               height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
               backgroundImage: bgUrl,
-              backgroundPosition: isEntity ? "bottom left" : `${x}px ${y}px`,
+              backgroundPosition: `${bgPosX}px ${bgPosY}px`,
               backgroundRepeat: "no-repeat",
               imageRendering: "pixelated",
               transform: `scale(${scale})`,

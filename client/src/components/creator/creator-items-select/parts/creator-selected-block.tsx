@@ -1,3 +1,4 @@
+import { ENTITY_MAPPING } from "../../../../constants/blocks";
 import type { LayerItem } from "../../../../constants/layer-items";
 
 interface CreatorSelectedBlockProps {
@@ -26,19 +27,34 @@ export function CreatorSelectedBlock({
       ) : (
         <>
           <div className="h-13 w-13 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
-            <div
-              style={{
-                width: "24px",
-                height: "24px",
-                backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-                backgroundPosition: `${String(-(activeBlock.frame % 6) * 24)}px ${String(-Math.floor(activeBlock.frame / 6) * 24)}px`,
-                backgroundRepeat: "no-repeat",
-                imageRendering: "pixelated",
-                transform: "scale(2)",
-                transformOrigin: "top left",
-              }}
-              className="h-6 w-6"
-            />
+            {(() => {
+              const isEntity = ENTITY_MAPPING[activeBlock.frame] !== undefined;
+
+              const bgUrl = isEntity
+                ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[activeBlock.frame].substring(1)})`
+                : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
+
+              const bgPosX = isEntity ? 0 : -(activeBlock.frame % 6) * 24;
+              const bgPosY = isEntity
+                ? 0
+                : -Math.floor(activeBlock.frame / 6) * 24;
+
+              return (
+                <div
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    backgroundImage: bgUrl,
+                    backgroundPosition: `${bgPosX}px ${bgPosY}px`,
+                    backgroundRepeat: "no-repeat",
+                    imageRendering: "pixelated",
+                    transform: "scale(2)",
+                    transformOrigin: "top left",
+                  }}
+                  className="h-6 w-6"
+                />
+              );
+            })()}
           </div>
           <span className="text-sm font-bold text-violet-50">
             {activeBlock.label}
