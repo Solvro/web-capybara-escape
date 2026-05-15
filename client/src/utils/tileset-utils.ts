@@ -1,5 +1,6 @@
-import { ENTITY_MAPPING, TILE_MAPPING } from "../constants/blocks";
+import { ENTITY_MAPPING } from "../constants/blocks";
 import { EXTRA_HEIGHT } from "../constants/global";
+import { ALL_ITEMS_MAP, type LayerItem } from "../constants/layer-items";
 import { Direction, type DirectionType } from "../types/direction";
 
 export function getTilesetBackgroundPosition(
@@ -10,7 +11,8 @@ export function getTilesetBackgroundPosition(
 ) {
   const x = -(frame % tilesetCols) * tileSize;
   const y =
-    (frame == TILE_MAPPING.w1t.frame || frame == TILE_MAPPING.w2t.frame) &&
+    (frame == ALL_ITEMS_MAP["w1t"].frame ||
+      frame == ALL_ITEMS_MAP["w2t"].frame) &&
     withOffset
       ? -Math.floor(frame / tilesetCols) * tileSize + EXTRA_HEIGHT * tileSize
       : -Math.floor(frame / tilesetCols) * tileSize;
@@ -19,35 +21,42 @@ export function getTilesetBackgroundPosition(
 
 export function generateInitialTiles(
   dims: [number, number],
-  floorDecoys: number[],
-  entities: number[],
-  wallDecoys: number[],
-  TILE_MAPPING: Record<string, { frame: number }>,
-): (number | null)[][] {
+  floorDecoys: string[],
+  entities: string[],
+  wallDecoys: string[],
+): (LayerItem | null)[][] {
   const [rows, cols] = dims;
+  const f1 = ALL_ITEMS_MAP["f1"]!;
+  const w1 = ALL_ITEMS_MAP["w1t"]!;
+  const w2 = ALL_ITEMS_MAP["w2t"]!;
+
   return Array.from({ length: rows * cols }, (_, idx) => {
     const row = Math.floor(idx / cols);
     const col = idx % cols;
     if (row === 0 || row === rows - 1 || col === 0 || col === cols - 1) {
-      return [TILE_MAPPING.f1.frame, TILE_MAPPING.w1t.frame, null, null, null];
+      return [f1, w1, null, null, null];
     }
-    const frame = Math.random() < 0.8 ? null : TILE_MAPPING.w2t.frame;
-    if (frame === TILE_MAPPING.w2t.frame) {
-      return [TILE_MAPPING.f1.frame, frame, null, null, null];
+    const secondary =
+      Math.random() < 0.8 ? null : w2;
+    if (secondary !== null) {
+      return [f1, secondary, null, null, null];
     }
 
     const layerTypes = [
       () =>
         Math.random() < 0.2
-          ? floorDecoys[Math.floor(Math.random() * floorDecoys.length)]
+          ? ALL_ITEMS_MAP[floorDecoys[Math.floor(Math.random() * floorDecoys.length)]] ||
+            null
           : null,
       () =>
         Math.random() < 0.15
-          ? entities[Math.floor(Math.random() * entities.length)]
+          ? ALL_ITEMS_MAP[entities[Math.floor(Math.random() * entities.length)]] ||
+            null
           : null,
       () =>
         Math.random() < 0.1
-          ? wallDecoys[Math.floor(Math.random() * wallDecoys.length)]
+          ? ALL_ITEMS_MAP[wallDecoys[Math.floor(Math.random() * wallDecoys.length)]] ||
+            null
           : null,
     ];
 
@@ -59,14 +68,14 @@ export function generateInitialTiles(
     else if (which === 1) entity = layerTypes[1]();
     else if (which === 2) wallDecoy = layerTypes[2]();
 
-    return [TILE_MAPPING.f1.frame, frame, floorDecoy, entity, wallDecoy];
+    return [f1, null, floorDecoy, entity, wallDecoy];
   });
 }
 
-type Tile = (number | null)[];
+type Tile = (LayerItem | null)[];
 
-const WALL: Tile = [null, TILE_MAPPING.w1t.frame, null, null, null];
-const FLOOR: Tile = [TILE_MAPPING.f1.frame, null, null, null, null];
+const WALL: Tile = [null, ALL_ITEMS_MAP["w1t"]!, null, null, null];
+const FLOOR: Tile = [ALL_ITEMS_MAP["f1"]!, null, null, null, null];
 
 const createWallRow = (cols: number): Tile[] => {
   return Array.from({ length: cols }, () => [...WALL]);
