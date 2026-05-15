@@ -66,7 +66,7 @@ export function generateInitialTiles(
 
 type Tile = (number | null)[];
 
-const WALL: Tile = [TILE_MAPPING.w1.frame, null, null, null];
+const WALL: Tile = [TILE_MAPPING.w1t.frame, null, null, null];
 const FLOOR: Tile = [TILE_MAPPING.f1.frame, null, null, null];
 
 const createWallRow = (cols: number): Tile[] => {
