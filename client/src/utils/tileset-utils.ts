@@ -45,18 +45,20 @@ export function generateInitialTiles(
     const layerTypes = [
       () =>
         Math.random() < 0.2
-          ? ALL_ITEMS_MAP[floorDecoys[Math.floor(Math.random() * floorDecoys.length)]] ||
-            null
+          ? ALL_ITEMS_MAP[
+              floorDecoys[Math.floor(Math.random() * floorDecoys.length)]
+            ] ?? null
           : null,
       () =>
         Math.random() < 0.15
-          ? ALL_ITEMS_MAP[entities[Math.floor(Math.random() * entities.length)]] ||
+          ? ALL_ITEMS_MAP[entities[Math.floor(Math.random() * entities.length)]] ??
             null
           : null,
       () =>
         Math.random() < 0.1
-          ? ALL_ITEMS_MAP[wallDecoys[Math.floor(Math.random() * wallDecoys.length)]] ||
-            null
+          ? ALL_ITEMS_MAP[
+              wallDecoys[Math.floor(Math.random() * wallDecoys.length)]
+            ] ?? null
           : null,
     ];
 
