@@ -29,7 +29,7 @@ export function generateInitialTiles(
     const row = Math.floor(idx / cols);
     const col = idx % cols;
     if (row === 0 || row === rows - 1 || col === 0 || col === cols - 1) {
-      return [TILE_MAPPING.w1t.frame, null, null, null];
+      return [null, TILE_MAPPING.w1t.frame, null, null, null];
     }
     const frame = Math.random() < 0.8 ? null : TILE_MAPPING.w2t.frame;
     if (frame === TILE_MAPPING.w2t.frame) {

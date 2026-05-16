@@ -9,7 +9,8 @@ export const SCALE_FACTOR = TILE_SIZE / TILE_SIZE_OLD;
 export const MIN_DIM_CREATOR = 3;
 export const MAX_DIM_CREATOR = 12;
 
-export const TALL_WALL_HEIGHT_MULTIPLIER = 1.5;
+export const TALL_WALL_HEIGHT = 34;
+export const TALL_WALL_HEIGHT_MULTIPLIER = TALL_WALL_HEIGHT / TILE_SIZE;
 export const EXTRA_HEIGHT = TALL_WALL_HEIGHT_MULTIPLIER - 1;
 
 export const LAYER_NAMES = {

@@ -58,8 +58,8 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
             style={{
               position: "absolute",
               top:
-                tileIndices[0] === TILE_MAPPING.w1t.frame ||
-                tileIndices[0] === TILE_MAPPING.w2t.frame
+                tileIndices[1] === TILE_MAPPING.w1t.frame ||
+                tileIndices[1] === TILE_MAPPING.w2t.frame
                   ? 0
                   : `${sizePx * EXTRA_HEIGHT}px`, // AAAAAAAAAA SINGLE SOURCE OF TRUTH
               left: 0,
