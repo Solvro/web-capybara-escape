@@ -1,5 +1,5 @@
-import { ENTITY_MAPPING } from "../../../../constants/blocks";
 import type { LayerItem } from "../../../../constants/layer-items";
+import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
 
 interface CreatorSelectedBlockProps {
   activeBlock: LayerItem | null;
@@ -28,17 +28,11 @@ export function CreatorSelectedBlock({
         <>
           <div className="h-13 w-13 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
             {(() => {
-              const isEntity = ENTITY_MAPPING[activeBlock.frame] !== undefined;
-
-              const bgUrl = isEntity
-                ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[activeBlock.frame]?.src.substring(1)})`
-                : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
-
-              const bgPosX = isEntity ? 0 : -(activeBlock.frame % 6) * 24;
-              const bgPosY = isEntity
-                ? 0
-                : -Math.floor(activeBlock.frame / 6) * 24;
-
+              const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(
+                activeBlock.frame,
+                24,
+                import.meta.env.BASE_URL,
+              );
               return (
                 <div
                   style={{

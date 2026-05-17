@@ -1,52 +1,14 @@
-import {
-  ASSETS,
-  ENTITY_MAPPING,
-  TILE_MAPPING,
-} from "../../../constants/blocks";
+import { TILE_MAPPING } from "../../../constants/blocks";
 import {
   EXTRA_HEIGHT,
   TALL_WALL_HEIGHT_MULTIPLIER,
 } from "../../../constants/global";
-import { getTilesetBackgroundPosition } from "../../../utils/tileset-utils";
+import { getTileBackgroundData } from "../../../utils/tileset-utils";
 
 interface CreatorTileProps {
   sizePx: number;
   tileIndices: (number | null)[];
 }
-
-const TILESET_COLUMNS = 6;
-
-const getTileBackgroundData = (
-  tileIndex: number,
-  sourceTileSizePx: number,
-  baseUrl: string,
-) => {
-  const entity = ENTITY_MAPPING[tileIndex];
-
-  if (entity) {
-    return {
-      isEntity: true,
-      isTall: entity.isTall,
-      bgUrl: `url(${baseUrl}${entity.src.substring(1)})`,
-      bgPosX: 0,
-      bgPosY: entity.offset,
-    };
-  }
-
-  const pos = getTilesetBackgroundPosition(
-    tileIndex,
-    TILESET_COLUMNS,
-    sourceTileSizePx,
-    true,
-  );
-  return {
-    isEntity: false,
-    isTall: false,
-    bgUrl: `url(${baseUrl}images/capybara-tileset.png)`,
-    bgPosX: pos.x,
-    bgPosY: pos.y,
-  };
-};
 
 export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
   const sourceTileSizePx = 24;

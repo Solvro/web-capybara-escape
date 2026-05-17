@@ -1,6 +1,5 @@
-import { ENTITY_MAPPING } from "../../../../constants/blocks";
 import type { LayerItem } from "../../../../constants/layer-items";
-import { getTilesetBackgroundPosition } from "../../../../utils/tileset-utils";
+import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
 
 interface CreatorLayerOptionsGridProps {
   items: LayerItem[];
@@ -16,19 +15,11 @@ export function CreatorLayerOptionsGrid({
   return (
     <div className="custom-scrollbar flex min-h-0 flex-1 flex-wrap content-start items-start justify-center gap-4 overflow-y-auto rounded-lg bg-violet-900/40 p-4">
       {items.map((item) => {
-        const isEntity = ENTITY_MAPPING[item.frame] !== undefined;
-        let bgPosX = 0;
-        let bgPosY = 0;
-
-        if (!isEntity) {
-          const pos = getTilesetBackgroundPosition(item.frame, 6, 24);
-          bgPosX = pos.x;
-          bgPosY = pos.y;
-        }
-
-        const bgUrl = isEntity
-          ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[item.frame]?.src.substring(1)})`
-          : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
+        const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(
+          item.frame,
+          24,
+          import.meta.env.BASE_URL,
+        );
         return (
           <button
             key={item.key}
