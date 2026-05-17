@@ -25,8 +25,6 @@ export function CreatorItemsSelect({
 }: CreatorItemsSelectProps) {
   const [selectedLayer, setSelectedLayer] = useState<string>(LAYER_TABS[0].key);
 
-  const items = LAYER_ITEMS[selectedLayer] ?? [];
-
   const handleLayerChange = (layer: string) => {
     setSelectedLayer(layer);
     const emptyBlockForLayer = LAYER_ITEMS[layer]?.find(
@@ -73,7 +71,7 @@ export function CreatorItemsSelect({
         />
 
         <CreatorLayerOptionsGrid
-          items={items}
+          layerKey={selectedLayer}
           activeBlock={activeBlock}
           setActiveBlock={setActiveBlock}
         />

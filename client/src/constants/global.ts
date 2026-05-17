@@ -11,11 +11,15 @@ export const TALL_WALL_HEIGHT_MULTIPLIER = TALL_WALL_HEIGHT / TILE_SIZE;
 export const EXTRA_HEIGHT = TALL_WALL_HEIGHT_MULTIPLIER - 1;
 
 export const COLOR_LIST = [
-  "#800080",
-  "#FFA500",
-  "#0000FF",
-  "#33cc33",
   "#FF3B30",
+  "#33cc33",
+  "#007AFF",
+  "#ffaa00",
+  "#aa44ff",
+  "#FF00FF",
+  "#33CC66",
+  "#3399FF",
+  "#FF3344",
 ];
 
 export const LAYER_NAMES = {

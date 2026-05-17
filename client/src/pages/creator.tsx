@@ -6,7 +6,7 @@ import { CreatorItemsSelect } from "../components/creator/creator-items-select/c
 import { CreatorName } from "../components/creator/creator-name/creator-name";
 import { LAYER_NAMES } from "../constants/global";
 import type { LayerItem } from "../constants/layer-items";
-import { LAYER_ITEMS } from "../constants/layer-items";
+import { LAYER_ITEMS, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { type DirectionType } from "../types/direction";
 import { changeBoardSize, generateInitialTiles } from "../utils/tileset-utils";
 
@@ -22,27 +22,32 @@ export function Creator() {
     );
   });
 
-  const floorDecoys = ["ventOpen", "ventClosed", "wire", "button-0"];
-  const entities = [
-    "crate",
-    "laser-0-right",
-    "capy-start",
-    "sol-start",
-    "vron-start",
+  const floorDecoys = [
+    LAYER_ITEM_KEYS.VENT_OPEN,
+    LAYER_ITEM_KEYS.VENT_CLOSED,
+    LAYER_ITEM_KEYS.WIRE,
+    `${LAYER_ITEM_KEYS.BUTTON}-0`,
   ];
-  const wallDecoys = ["door-0"];
+  const entities = [
+    LAYER_ITEM_KEYS.CRATE,
+    `${LAYER_ITEM_KEYS.LASER}-0-right`,
+    LAYER_ITEM_KEYS.CAPYBARA_START,
+    LAYER_ITEM_KEYS.SOL_START,
+    LAYER_ITEM_KEYS.VRON_START,
+  ];
+  const wallDecoys = [`${LAYER_ITEM_KEYS.DOOR}-0`];
 
-  const [tileIndices, setTileIndices] = useState<(LayerItem | null)[][]>(() =>
+  const [tileData, setTileData] = useState<(string | null)[][]>(() =>
     generateInitialTiles(dims, floorDecoys, entities, wallDecoys),
   );
 
   const [rows, cols] = dims;
   useEffect(() => {
-    setTileIndices((prev) => changeBoardSize([rows, cols], direction, prev));
+    setTileData((prev) => changeBoardSize([rows, cols], direction, prev));
   }, [rows, cols]);
 
   const handleReset = () => {
-    setTileIndices(
+    setTileData(
       generateInitialTiles([rows, cols], floorDecoys, entities, wallDecoys),
     );
   };
@@ -75,8 +80,8 @@ export function Creator() {
             setDirection={setDirection}
             setDims={setDims}
             activeBlock={activeBlock}
-            tileIndices={tileIndices}
-            setTileIndices={setTileIndices}
+            tileData={tileData}
+            setTileData={setTileData}
           />
         </div>
       </div>

@@ -2,7 +2,10 @@ import {
   EXTRA_HEIGHT,
   TALL_WALL_HEIGHT_MULTIPLIER,
 } from "../../../constants/global";
-import type { LayerItem } from "../../../constants/layer-items";
+import {
+  ALL_ITEMS_MAP,
+  type LayerItem,
+} from "../../../constants/layer-items";
 import {
   getTileBackgroundData,
   getTilesetBackgroundPosition,
@@ -10,19 +13,23 @@ import {
 
 interface CreatorTileProps {
   sizePx: number;
-  tileIndices: (LayerItem | null)[];
+  tileKeys: (string | null)[];
 }
 
-export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
+export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
   const sourceTileSizePx = 24;
   const scale = sizePx / sourceTileSizePx;
 
-  const safeTileIndices =
-    Array.isArray(tileIndices) && tileIndices.length === 5
-      ? tileIndices
+  const safeKeys =
+    Array.isArray(tileKeys) && tileKeys.length === 5
+      ? tileKeys
       : [null, null, null, null, null];
 
-  if (!safeTileIndices.some((idx) => idx !== null)) {
+  const resolvedItems: (LayerItem | null)[] = safeKeys.map((key) =>
+    key ? (ALL_ITEMS_MAP[key] ?? null) : null,
+  );
+
+  if (!resolvedItems.some((item) => item !== null)) {
     return (
       <div
         className="overflow-hidden border-4 border-emerald-950 bg-transparent"
@@ -34,8 +41,10 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
     );
   }
 
-  const wallBg = safeTileIndices[1];
-  const isWallCell = wallBg?.key === "w1t" || wallBg?.key === "w2t";
+  /** Background layer decides wall tiling / vertical placement. */
+  const wallBg = resolvedItems[1];
+  const isWallCell =
+    wallBg?.key === "w1t" || wallBg?.key === "w2t";
 
   const renderPart = (
     frameId: number,
@@ -49,7 +58,7 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
       true,
     );
 
-    const innerTransform = direction === "left" ? "rotate(180deg)" : "none";
+    const innerTransform = direction === "left" ? "scaleX(-1)" : "none";
 
     if (color) {
       return (
@@ -105,7 +114,7 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
         background: "transparent",
       }}
     >
-      {safeTileIndices.map((item, layerId) => {
+      {resolvedItems.map((item, layerId) => {
         if (item === null) return null;
 
         const { isEntity, isTall, bgUrl, bgPosX, bgPosY } =
