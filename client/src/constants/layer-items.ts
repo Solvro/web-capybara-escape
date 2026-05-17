@@ -1,4 +1,4 @@
-import { ASSETS, TILE_MAPPING, } from "./blocks";
+import { ASSETS, TILE_MAPPING } from "./blocks";
 import { LAYER_NAMES } from "./global";
 
 export interface LayerItem {
