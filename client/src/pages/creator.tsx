@@ -30,11 +30,11 @@ export function Creator() {
     ASSETS.BUTTON_RELEASED,
   ];
   const entities = [
-    ASSETS.CRATE, 
-    ASSETS.LASER_GUN, 
-    ASSETS.CAPYBARA,
-    ASSETS.SOL,
-    ASSETS.VRON
+    ASSETS.CRATE,
+    ASSETS.LASER_GUN,
+    ASSETS.CAPYBARA_START,
+    ASSETS.SOL_START,
+    ASSETS.VRON_START,
   ];
   const wallDecoys = [ASSETS.DOOR_CLOSED];
 

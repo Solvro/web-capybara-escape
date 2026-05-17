@@ -45,10 +45,33 @@ export const ENTITY_SOURCES = {
   VRON: "/images/players/Vron.png",
 };
 
-export const ENTITY_MAPPING: Record<number, string> = {
-  [ASSETS.CAPYBARA_START]: ENTITY_SOURCES.CAPYBARA,
-  [ASSETS.SOL_START]: ENTITY_SOURCES.SOL,
-  [ASSETS.VRON_START]: ENTITY_SOURCES.VRON,
+export const ENTITY_OFFSET = {
+  CAPYBARA: 12,
+  PLAYER: 6,
+};
+
+export interface EntityConfig {
+  src: string;
+  isTall: boolean;
+  offset: number;
+}
+
+export const ENTITY_MAPPING: Record<number, EntityConfig> = {
+  [ASSETS.CAPYBARA_START]: {
+    src: ENTITY_SOURCES.CAPYBARA,
+    isTall: true,
+    offset: ENTITY_OFFSET.CAPYBARA,
+  },
+  [ASSETS.SOL_START]: {
+    src: ENTITY_SOURCES.SOL,
+    isTall: true,
+    offset: ENTITY_OFFSET.PLAYER,
+  },
+  [ASSETS.VRON_START]: {
+    src: ENTITY_SOURCES.VRON,
+    isTall: true,
+    offset: ENTITY_OFFSET.PLAYER,
+  },
 };
 
 // Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)

@@ -27,7 +27,7 @@ export function CreatorLayerOptionsGrid({
         }
 
         const bgUrl = isEntity
-          ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[item.frame].substring(1)})`
+          ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[item.frame]?.src.substring(1)})`
           : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
         return (
           <button
