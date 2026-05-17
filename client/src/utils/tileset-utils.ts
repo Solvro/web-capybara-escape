@@ -80,7 +80,6 @@ export function changeBoardSize(
   const [rows, cols] = dims;
   const bigger = rows * cols > tileIndices.length;
   let nextBoard: Tile[] = [];
-  console.log(tileIndices);
   if (direction == Direction.TOP) {
     const walls = createWallRow(cols);
     if (bigger) {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { LAYER_NAMES } from "../../../constants/global";
+
 import { ASSETS } from "../../../constants/blocks";
 import { layerNameToIndex } from "../../../constants/global";
 import { MAX_DIM_CREATOR, MIN_DIM_CREATOR } from "../../../constants/global";
@@ -106,13 +106,6 @@ export function CreatorBoard({
     }
     const tileIdx = row * cols + col;
     if (activeBlock) {
-      const layerNameToIndex: Record<string, number> = {
-        [LAYER_NAMES.FLOOR]: 0,
-        [LAYER_NAMES.BACKGROUND]: 1,
-        [LAYER_NAMES.FLOOR_DECOYS]: 2,
-        [LAYER_NAMES.ENTITIES]: 3,
-        [LAYER_NAMES.WALL_DECOYS]: 4,
-      };
       const layerIdx = layerNameToIndex[activeBlock.layer];
 
       const valueToSet =
@@ -156,7 +149,7 @@ export function CreatorBoard({
     if (e.shiftKey) {
       setTileIndices((prev) => {
         const next = prev.map((arr) => [...arr]);
-        next[tileIdx] = [null, null, null, null];
+        next[tileIdx] = [null, null, null, null, null];
         return next;
       });
     } else if (activeBlock) {
