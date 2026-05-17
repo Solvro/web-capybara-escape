@@ -31,7 +31,7 @@ export function CreatorSelectedBlock({
               const isEntity = ENTITY_MAPPING[activeBlock.frame] !== undefined;
 
               const bgUrl = isEntity
-                ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[activeBlock.frame].substring(1)})`
+                ? `url(${import.meta.env.BASE_URL}${ENTITY_MAPPING[activeBlock.frame]?.src.substring(1)})`
                 : `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`;
 
               const bgPosX = isEntity ? 0 : -(activeBlock.frame % 6) * 24;
