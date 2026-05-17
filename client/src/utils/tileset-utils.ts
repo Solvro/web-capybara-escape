@@ -168,7 +168,7 @@ export function changeBoardSize(
 
 const TILESET_COLUMNS = 6;
 
-const getTileBackgroundData = (
+export const getTileBackgroundData = (
   tileIndex: number,
   sourceTileSizePx: number,
   baseUrl: string,
