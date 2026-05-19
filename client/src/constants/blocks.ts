@@ -33,6 +33,45 @@ export const ASSETS = {
   SOCKET: 26,
   WIRE_CURVE: 27,
   CABLE_END_INACTIVE: 36,
+  //Entities
+  CAPYBARA_START: 100,
+  SOL_START: 101,
+  VRON_START: 102,
+};
+
+export const ENTITY_SOURCES = {
+  CAPYBARA: "/images/capybara/capybara.png",
+  SOL: "/images/players/Sol.png",
+  VRON: "/images/players/Vron.png",
+};
+
+export const ENTITY_OFFSET = {
+  CAPYBARA: 12,
+  PLAYER: 6,
+};
+
+export interface EntityConfig {
+  src: string;
+  isTall: boolean;
+  offset: number;
+}
+
+export const ENTITY_MAPPING: Record<number, EntityConfig> = {
+  [ASSETS.CAPYBARA_START]: {
+    src: ENTITY_SOURCES.CAPYBARA,
+    isTall: true,
+    offset: ENTITY_OFFSET.CAPYBARA,
+  },
+  [ASSETS.SOL_START]: {
+    src: ENTITY_SOURCES.SOL,
+    isTall: true,
+    offset: ENTITY_OFFSET.PLAYER,
+  },
+  [ASSETS.VRON_START]: {
+    src: ENTITY_SOURCES.VRON,
+    isTall: true,
+    offset: ENTITY_OFFSET.PLAYER,
+  },
 };
 
 // Mapping of tile types to their corresponding frame in the tileset and whether they are tall (require a second tile on top)

@@ -161,6 +161,24 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       layer: LAYER_NAMES.ENTITIES,
     },
     {
+      key: "capy-start",
+      label: "Capybara",
+      frame: ASSETS.CAPYBARA_START,
+      layer: LAYER_NAMES.ENTITIES,
+    },
+    {
+      key: "sol-start",
+      label: "Sol",
+      frame: ASSETS.SOL_START,
+      layer: LAYER_NAMES.ENTITIES,
+    },
+    {
+      key: "vron-start",
+      label: "Vron",
+      frame: ASSETS.VRON_START,
+      layer: LAYER_NAMES.ENTITIES,
+    },
+    {
       key: "empty-entities",
       label: "Empty",
       frame: ASSETS.EMPTY,
