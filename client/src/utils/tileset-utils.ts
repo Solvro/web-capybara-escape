@@ -1,4 +1,4 @@
-import { TILE_MAPPING } from "../constants/blocks";
+import { ENTITY_MAPPING, TILE_MAPPING } from "../constants/blocks";
 import { EXTRA_HEIGHT } from "../constants/global";
 import { Direction, type DirectionType } from "../types/direction";
 
@@ -163,3 +163,65 @@ export function changeBoardSize(
 
   return tileIndices;
 }
+
+const TILESET_COLUMNS = 6;
+
+export const getTileBackgroundData = (
+  tileIndex: number,
+  sourceTileSizePx: number,
+  baseUrl: string,
+) => {
+  const entity = ENTITY_MAPPING[tileIndex];
+
+  if (entity) {
+    return {
+      isEntity: true,
+      isTall: entity.isTall,
+      bgUrl: `url(${baseUrl}${entity.src.substring(1)})`,
+      bgPosX: 0,
+      bgPosY: entity.offset,
+    };
+  }
+
+  const pos = getTilesetBackgroundPosition(
+    tileIndex,
+    TILESET_COLUMNS,
+    sourceTileSizePx,
+    true,
+  );
+  return {
+    isEntity: false,
+    isTall: false,
+    bgUrl: `url(${baseUrl}images/capybara-tileset.png)`,
+    bgPosX: pos.x,
+    bgPosY: pos.y,
+  };
+};
+
+export const getUIBlockBackgroundData = (
+  frame: number,
+  sourceTileSizePx: number,
+  baseUrl: string,
+) => {
+  const isEntity = ENTITY_MAPPING[frame] !== undefined;
+
+  if (isEntity) {
+    return {
+      bgUrl: `url(${baseUrl}${ENTITY_MAPPING[frame]?.src.substring(1)})`,
+      bgPosX: 0,
+      bgPosY: 0,
+    };
+  }
+
+  const pos = getTilesetBackgroundPosition(
+    frame,
+    TILESET_COLUMNS,
+    sourceTileSizePx,
+  );
+
+  return {
+    bgUrl: `url(${baseUrl}images/capybara-tileset.png)`,
+    bgPosX: pos.x,
+    bgPosY: pos.y,
+  };
+};
