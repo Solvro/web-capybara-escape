@@ -117,7 +117,7 @@ export function CreatorBoard({
         if (layerIdx === 0) {
           next[tileIdx][0] = valueToSet;
         } else {
-          for (let i = 1; i <= 3; i++) {
+          for (let i = 1; i <= 4; i++) {
             next[tileIdx][i] = i === layerIdx ? valueToSet : null;
           }
         }
@@ -149,7 +149,7 @@ export function CreatorBoard({
     if (e.shiftKey) {
       setTileIndices((prev) => {
         const next = prev.map((arr) => [...arr]);
-        next[tileIdx] = [null, null, null, null];
+        next[tileIdx] = [null, null, null, null, null];
         return next;
       });
     } else if (activeBlock) {

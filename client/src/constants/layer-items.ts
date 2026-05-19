@@ -9,13 +9,21 @@ export interface LayerItem {
 }
 
 export const LAYER_ITEMS: Record<string, LayerItem[]> = {
-  [LAYER_NAMES.BACKGROUND]: [
+  [LAYER_NAMES.FLOOR]: [
     {
       key: "f1",
       label: "Floor",
       frame: TILE_MAPPING.f1.frame,
-      layer: LAYER_NAMES.BACKGROUND,
+      layer: LAYER_NAMES.FLOOR,
     },
+    {
+      key: "empty-floor",
+      label: "Empty",
+      frame: ASSETS.EMPTY,
+      layer: LAYER_NAMES.FLOOR,
+    },
+  ],
+  [LAYER_NAMES.BACKGROUND]: [
     {
       key: "w1t",
       label: "Brick wall",
