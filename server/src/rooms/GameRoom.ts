@@ -21,6 +21,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.maxClients = this.roomData.maxClients ?? this.maxClients;
     this.state.loadRoomFromJson(this.roomData);
     this.onMessage("move", (client, message) => {
+      if (this.state.isPaused) return;
+
       const player = this.state.playerState.players.get(client.sessionId);
       if (!player) return;
 
@@ -70,6 +72,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.setSimulationInterval((deltaTime) => {
+      if (this.state.isPaused) return;
+
       const result = this.state.updateLasers(deltaTime);
       if (result.length > 0) {
         this.broadcast("lasersUpdated", { lasers: result });
@@ -119,6 +123,14 @@ export class GameRoom extends Room<{ state: RoomState }> {
         mapInfo: this.state.getMapInfo(),
       });
     });
+
+    this.onMessage("togglePause", (client) => {
+      this.state.isPaused = !this.state.isPaused;
+
+      this.broadcast("pauseToggled", {
+        isPaused: this.state.isPaused,
+      });
+    });
   }
 
   onJoin(client: Client, options: any) {
@@ -131,6 +143,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
       position: player.position,
       index: player.index,
     });
+
     console.log(client.sessionId, "joined!");
   }
 

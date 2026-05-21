@@ -12,6 +12,7 @@ export interface MessageMapInfo {
   grid: string[][];
   width: number;
   height: number;
+  isPaused: boolean;
   players: Player[];
   crates: Crate[];
   doors: Door[];
@@ -68,4 +69,8 @@ export interface MessageGenerateLines {
 export interface MessageRoomReset {
   message: string;
   timestamp: number;
+}
+
+export interface MessagePauseToggled {
+  isPaused: boolean;
 }

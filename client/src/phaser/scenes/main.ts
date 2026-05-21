@@ -11,6 +11,7 @@ import type {
   MessageMapInfo,
   MessageOnAddPlayer,
   MessageOnRemovePlayer,
+  MessagePauseToggled,
   MessagePositionUpdate,
 } from "../../types/messages";
 import type { INetworkInterface } from "../../types/network-interface";
@@ -55,8 +56,10 @@ export class Main extends Phaser.Scene {
   };
   private speakInput!: Phaser.Input.Keyboard.Key;
   private resetInput!: Phaser.Input.Keyboard.Key;
+  private pauseInput!: Phaser.Input.Keyboard.Key;
   private playerMoveDebounce = 0;
   private playerEntityAnimators!: PlayerEntityAnimator[];
+  private isPaused = false;
   private capybaraAnimator!: CapybaraEntityAnimator;
 
   constructor() {
@@ -162,6 +165,7 @@ export class Main extends Phaser.Scene {
       };
       this.speakInput = this.input.keyboard.addKey("L");
       this.resetInput = this.input.keyboard.addKey("R");
+      this.pauseInput = this.input.keyboard.addKey("P");
     }
 
     // Colyseus message handlers
@@ -169,6 +173,8 @@ export class Main extends Phaser.Scene {
       const room = this.registry.get("room") as Room;
 
       room.onMessage("mapInfo", (message: MessageMapInfo) => {
+        this.syncPauseState(message.isPaused);
+
         this.displayHandler.createMap(
           message.grid,
           message.width,
@@ -309,10 +315,23 @@ export class Main extends Phaser.Scene {
         }
       });
 
+      room.onMessage("pauseToggled", (message: MessagePauseToggled) => {
+        this.syncPauseState(message.isPaused);
+      });
+
       this.room.send("getMapInfo");
     } catch (error) {
       console.error("Error setting up Colyseus message handlers:", error);
     }
+  }
+
+  private syncPauseState(isPaused: boolean) {
+    this.isPaused = isPaused;
+    window.dispatchEvent(
+      new CustomEvent("game:pauseToggled", {
+        detail: { isPaused: this.isPaused },
+      }),
+    );
   }
 
   displayBubble(text: string, target: Player, sessionId: string) {
@@ -337,9 +356,18 @@ export class Main extends Phaser.Scene {
   }
 
   update(time: number) {
+    if (Phaser.Input.Keyboard.JustDown(this.pauseInput)) {
+      this.room.send("togglePause");
+    }
+
     if (Phaser.Input.Keyboard.JustDown(this.resetInput)) {
       this.room.send("reset");
     }
+
+    if (this.isPaused) {
+      return;
+    }
+
     if (Phaser.Input.Keyboard.JustDown(this.speakInput)) {
       this.room.send("generateLine");
     }
