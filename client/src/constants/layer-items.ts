@@ -9,13 +9,21 @@ export interface LayerItem {
 }
 
 export const LAYER_ITEMS: Record<string, LayerItem[]> = {
-  [LAYER_NAMES.BACKGROUND]: [
+  [LAYER_NAMES.FLOOR]: [
     {
       key: "f1",
       label: "Floor",
       frame: TILE_MAPPING.f1.frame,
-      layer: LAYER_NAMES.BACKGROUND,
+      layer: LAYER_NAMES.FLOOR,
     },
+    {
+      key: "empty-floor",
+      label: "Empty",
+      frame: ASSETS.EMPTY,
+      layer: LAYER_NAMES.FLOOR,
+    },
+  ],
+  [LAYER_NAMES.BACKGROUND]: [
     {
       key: "w1t",
       label: "Brick wall",
@@ -150,6 +158,24 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       key: "laserBeamVTip",
       label: "Beam V Tip",
       frame: ASSETS.LASER_BEAM_VERTICAL_TIP,
+      layer: LAYER_NAMES.ENTITIES,
+    },
+    {
+      key: "capy-start",
+      label: "Capybara",
+      frame: ASSETS.CAPYBARA_START,
+      layer: LAYER_NAMES.ENTITIES,
+    },
+    {
+      key: "sol-start",
+      label: "Sol",
+      frame: ASSETS.SOL_START,
+      layer: LAYER_NAMES.ENTITIES,
+    },
+    {
+      key: "vron-start",
+      label: "Vron",
+      frame: ASSETS.VRON_START,
       layer: LAYER_NAMES.ENTITIES,
     },
     {

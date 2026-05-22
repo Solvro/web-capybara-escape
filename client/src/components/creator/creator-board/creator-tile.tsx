@@ -2,9 +2,8 @@ import { TILE_MAPPING } from "../../../constants/blocks";
 import {
   EXTRA_HEIGHT,
   TALL_WALL_HEIGHT_MULTIPLIER,
-  TEXTURE_PATH,
 } from "../../../constants/global";
-import { getTilesetBackgroundPosition } from "../../../utils/tileset-utils";
+import { getTileBackgroundData } from "../../../utils/tileset-utils";
 
 interface CreatorTileProps {
   sizePx: number;
@@ -16,9 +15,9 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
   const scale = sizePx / sourceTileSizePx;
 
   const safeTileIndices =
-    Array.isArray(tileIndices) && tileIndices.length === 4
+    Array.isArray(tileIndices) && tileIndices.length === 5
       ? tileIndices
-      : [null, null, null, null];
+      : [null, null, null, null, null];
 
   if (!safeTileIndices.some((idx) => idx !== null)) {
     return (
@@ -47,27 +46,28 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
     >
       {safeTileIndices.map((tileIndex, layerId) => {
         if (tileIndex === null) return null;
-        const { x, y } = getTilesetBackgroundPosition(
+        const { isTall, bgUrl, bgPosX, bgPosY } = getTileBackgroundData(
           tileIndex,
-          6,
           sourceTileSizePx,
-          true,
+          import.meta.env.BASE_URL,
         );
+
         return (
           <div
             key={layerId}
             style={{
               position: "absolute",
               top:
-                tileIndices[0] === TILE_MAPPING.w1t.frame ||
-                tileIndices[0] === TILE_MAPPING.w2t.frame
+                tileIndices[1] === TILE_MAPPING.w1t.frame ||
+                tileIndices[1] === TILE_MAPPING.w2t.frame ||
+                isTall
                   ? 0
                   : `${sizePx * EXTRA_HEIGHT}px`, // AAAAAAAAAA SINGLE SOURCE OF TRUTH
               left: 0,
               width: `${sourceTileSizePx}px`,
               height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
-              backgroundImage: TEXTURE_PATH,
-              backgroundPosition: `${x}px ${y}px`,
+              backgroundImage: bgUrl,
+              backgroundPosition: `${bgPosX}px ${bgPosY}px`,
               backgroundRepeat: "no-repeat",
               imageRendering: "pixelated",
               transform: `scale(${scale})`,

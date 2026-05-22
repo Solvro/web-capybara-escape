@@ -1,5 +1,5 @@
-import { TEXTURE_PATH } from "../../../../constants/global";
 import type { LayerItem } from "../../../../constants/layer-items";
+import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
 
 interface CreatorSelectedBlockProps {
   activeBlock: LayerItem | null;
@@ -27,19 +27,28 @@ export function CreatorSelectedBlock({
       ) : (
         <>
           <div className="h-13 w-13 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
-            <div
-              style={{
-                width: "24px",
-                height: "24px",
-                backgroundImage: TEXTURE_PATH,
-                backgroundPosition: `${String(-(activeBlock.frame % 6) * 24)}px ${String(-Math.floor(activeBlock.frame / 6) * 24)}px`,
-                backgroundRepeat: "no-repeat",
-                imageRendering: "pixelated",
-                transform: "scale(2)",
-                transformOrigin: "top left",
-              }}
-              className="h-6 w-6"
-            />
+            {(() => {
+              const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(
+                activeBlock.frame,
+                24,
+                import.meta.env.BASE_URL,
+              );
+              return (
+                <div
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    backgroundImage: bgUrl,
+                    backgroundPosition: `${bgPosX}px ${bgPosY}px`,
+                    backgroundRepeat: "no-repeat",
+                    imageRendering: "pixelated",
+                    transform: "scale(2)",
+                    transformOrigin: "top left",
+                  }}
+                  className="h-6 w-6"
+                />
+              );
+            })()}
           </div>
           <span className="text-sm font-bold text-violet-50">
             {activeBlock.label}

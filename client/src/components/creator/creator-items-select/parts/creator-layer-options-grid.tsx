@@ -1,6 +1,5 @@
-import { TEXTURE_PATH } from "../../../../constants/global";
 import type { LayerItem } from "../../../../constants/layer-items";
-import { getTilesetBackgroundPosition } from "../../../../utils/tileset-utils";
+import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
 
 interface CreatorLayerOptionsGridProps {
   items: LayerItem[];
@@ -16,10 +15,10 @@ export function CreatorLayerOptionsGrid({
   return (
     <div className="custom-scrollbar flex min-h-0 flex-1 flex-wrap content-start items-start justify-center gap-4 overflow-y-auto rounded-lg bg-violet-900/40 p-4">
       {items.map((item) => {
-        const { x: posX, y: posY } = getTilesetBackgroundPosition(
+        const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(
           item.frame,
-          6,
           24,
+          import.meta.env.BASE_URL,
         );
         return (
           <button
@@ -39,8 +38,8 @@ export function CreatorLayerOptionsGrid({
                 style={{
                   width: "24px",
                   height: "24px",
-                  backgroundImage: TEXTURE_PATH,
-                  backgroundPosition: `${String(posX)}px ${String(posY)}px`,
+                  backgroundImage: bgUrl,
+                  backgroundPosition: `${bgPosX}px ${bgPosY}px`,
                   backgroundRepeat: "no-repeat",
                   imageRendering: "pixelated",
                   transform: "scale(3)",
