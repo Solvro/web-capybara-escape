@@ -5,6 +5,7 @@
     "module": "CommonJS",
     "resolveJsonModule": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "strict": true,
     "allowJs": true,
     "strictNullChecks": false,
