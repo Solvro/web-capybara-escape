@@ -46,5 +46,12 @@ export const CAPYBARA_ANIM_CONFIG: SpriteAnimatorConfig = {
       frameRate: 1,
       loop: false,
     },
+    {
+      name: "jump",
+      startFrame: 0,
+      endFrame: 3,
+      frameRate: 2,
+      loop: false,
+    },
   ],
 };

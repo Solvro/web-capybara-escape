@@ -56,4 +56,9 @@ export class CapybaraEntityAnimator extends EntityAnimator {
       );
     }
   }
+
+  playJump(sprite: Phaser.GameObjects.Sprite, onComplete?: () => void): void {
+    this.controller.onMoveEnd();
+    this.spriteAnimator.playOnce(sprite, "jump", onComplete);
+  }
 }

@@ -71,6 +71,18 @@ export class SpriteAnimator {
     sprite.play(key, true);
   }
 
+  playOnce(
+    sprite: Phaser.GameObjects.Sprite,
+    animName: string,
+    onComplete?: () => void,
+  ): void {
+    const key = this.getAnimKey(animName);
+    sprite.play(key, true);
+    if (onComplete !== undefined) {
+      sprite.once(`animationcomplete-${key}`, onComplete);
+    }
+  }
+
   stop(
     sprite: Phaser.GameObjects.Sprite,
     animName: string,

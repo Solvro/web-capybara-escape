@@ -45,7 +45,33 @@ export class Entity extends Phaser.GameObjects.Container {
     }
   }
 
-  move(direction: Direction, ease = "Linear") {
+  syncGridPosition(x: number, y: number, onArrived?: () => void): void {
+    if (x === this.gridX && y === this.gridY) {
+      onArrived?.();
+      return;
+    }
+
+    const dx = x - this.gridX;
+    const dy = y - this.gridY;
+
+    if (Math.abs(dx) + Math.abs(dy) === 1) {
+      this.move(this.directionFromDelta(dx, dy), "Linear", onArrived);
+      return;
+    }
+
+    this.scene.tweens.killTweensOf(this);
+    this.gridX = x;
+    this.gridY = y;
+    this.setPosition(
+      this.gridX * CELL_SIZE + CELL_SIZE / 2,
+      this.gridY * CELL_SIZE + CELL_SIZE / 2,
+    );
+    this.setDepth(this.y);
+    this.animator?.notifyStop(this.directionFromDelta(dx, dy));
+    onArrived?.();
+  }
+
+  move(direction: Direction, ease = "Linear", onComplete?: () => void) {
     switch (direction) {
       case "left": {
         this.gridX -= 1;
@@ -82,6 +108,7 @@ export class Entity extends Phaser.GameObjects.Container {
       onComplete: () => {
         this.setPosition(targetX, targetY);
         this.animator?.notifyStop(direction);
+        onComplete?.();
       },
     });
   }
@@ -89,5 +116,12 @@ export class Entity extends Phaser.GameObjects.Container {
   destroy(): void {
     this.sprite.destroy();
     super.destroy();
+  }
+
+  private directionFromDelta(dx: number, dy: number): Direction {
+    if (dx < 0) return "left";
+    if (dx > 0) return "right";
+    if (dy < 0) return "up";
+    return "down";
   }
 }

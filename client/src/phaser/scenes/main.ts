@@ -1,6 +1,6 @@
 import type { Room } from "@colyseus/sdk";
 
-import { CELL_SIZE, LAYER_NAMES, TILE_SIZE } from "../../constants/global";
+import { LAYER_NAMES, TILE_SIZE } from "../../constants/global";
 import type { LAYER_NAME } from "../../constants/global";
 import type {
   MessageCablesUpdate,
@@ -282,12 +282,7 @@ export class Main extends Phaser.Scene {
       room.onMessage(
         "capybaraUpdate",
         (message: { x: number; y: number; state: string }) => {
-          if (this.capybara !== null) {
-            this.capybara.setPosition(
-              message.x * CELL_SIZE + CELL_SIZE / 2,
-              message.y * CELL_SIZE + CELL_SIZE / 2,
-            );
-          }
+          this.capybara?.syncServerState(message);
         },
       );
 
