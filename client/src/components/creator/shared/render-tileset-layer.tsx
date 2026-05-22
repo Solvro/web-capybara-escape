@@ -3,9 +3,12 @@ import type { CSSProperties, ReactElement } from "react";
 import { TILESET_URL } from "../../../constants/global";
 import { getTilesetBackgroundPosition } from "../../../utils/tileset-utils";
 
+export type TilesetLayerColorMode = "multiply" | "mask-fill";
+
 export interface RenderTilesetLayerParams {
   frameId: number;
   color?: string;
+  colorMode?: TilesetLayerColorMode;
   direction?: string;
   tileSizePx?: number;
   heightMultiplier?: number;
@@ -16,6 +19,7 @@ export interface RenderTilesetLayerParams {
 export function renderTilesetLayer({
   frameId,
   color,
+  colorMode = "multiply",
   direction,
   tileSizePx = 24,
   heightMultiplier = 1,
@@ -30,6 +34,15 @@ export function renderTilesetLayer({
   );
   const innerTransform = direction === "left" ? "scaleX(-1)" : "none";
 
+  const frameMaskStyle: CSSProperties = {
+    maskImage: `url(${TILESET_URL})`,
+    maskPosition: `${px}px ${py}px`,
+    maskRepeat: "no-repeat",
+    WebkitMaskImage: `url(${TILESET_URL})`,
+    WebkitMaskPosition: `${px}px ${py}px`,
+    WebkitMaskRepeat: "no-repeat",
+  };
+
   const baseStyle: CSSProperties = {
     position: "absolute",
     top: 0,
@@ -42,17 +55,27 @@ export function renderTilesetLayer({
   };
 
   if (color) {
+    if (colorMode === "mask-fill") {
+      return (
+        <div
+          style={{
+            ...baseStyle,
+            ...frameMaskStyle,
+            backgroundColor: color,
+          }}
+        />
+      );
+    }
+
     return (
       <div
         style={{
           ...baseStyle,
-          backgroundColor: color,
-          maskImage: `url(${TILESET_URL})`,
-          maskPosition: `${px}px ${py}px`,
-          maskRepeat: "no-repeat",
-          WebkitMaskImage: `url(${TILESET_URL})`,
-          WebkitMaskPosition: `${px}px ${py}px`,
-          WebkitMaskRepeat: "no-repeat",
+          ...frameMaskStyle,
+          backgroundImage: `url(${TILESET_URL}), linear-gradient(${color}, ${color})`,
+          backgroundPosition: `${px}px ${py}px, 0 0`,
+          backgroundRepeat: "no-repeat, no-repeat",
+          backgroundBlendMode: "multiply",
         }}
       />
     );
