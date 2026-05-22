@@ -114,13 +114,7 @@ export function CreatorBoard({
       if (layerIdx === undefined) return;
       setTileData((prev) => {
         const next = prev.map((arr) => [...arr]);
-        if (layerIdx === 0) {
-          next[tileIdx][0] = valueToSet;
-        } else {
-          for (let i = 1; i <= 4; i++) {
-            next[tileIdx][i] = i === layerIdx ? valueToSet : null;
-          }
-        }
+        next[tileIdx][layerIdx] = valueToSet;
         return next;
       });
     }
