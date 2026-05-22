@@ -1,8 +1,6 @@
 import type { LayerItem } from "../../../../constants/layer-items";
-import {
-  getTilesetBackgroundPosition,
-  getUIBlockBackgroundData,
-} from "../../../../utils/tileset-utils";
+import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
+import { renderTilesetLayer } from "../../shared/render-tileset-layer";
 
 interface CreatorSelectedBlockProps {
   activeBlock: LayerItem | null;
@@ -13,52 +11,6 @@ export function CreatorSelectedBlock({
   activeBlock,
   onClick,
 }: CreatorSelectedBlockProps) {
-  const renderPart = (frameId: number, color?: string, direction?: string) => {
-    const { x: px, y: py } = getTilesetBackgroundPosition(frameId, 6, 24);
-    const innerTransform = direction === "left" ? "scaleX(-1)" : "none";
-
-    if (color) {
-      return (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "24px",
-            height: "24px",
-            backgroundColor: color,
-            maskImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-            maskPosition: `${String(px)}px ${String(py)}px`,
-            maskRepeat: "no-repeat",
-            WebkitMaskImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-            WebkitMaskPosition: `${String(px)}px ${String(py)}px`,
-            WebkitMaskRepeat: "no-repeat",
-            imageRendering: "pixelated",
-            transform: innerTransform,
-            transformOrigin: "center center",
-          }}
-        />
-      );
-    }
-    return (
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "24px",
-          height: "24px",
-          backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-          backgroundPosition: `${String(px)}px ${String(py)}px`,
-          backgroundRepeat: "no-repeat",
-          imageRendering: "pixelated",
-          transform: innerTransform,
-          transformOrigin: "center center",
-        }}
-      />
-    );
-  };
-
   return (
     <button
       type="button"
@@ -80,6 +32,7 @@ export function CreatorSelectedBlock({
               const composite =
                 activeBlock.baseFrame !== undefined ||
                 Boolean(activeBlock.color);
+
               if (!composite) {
                 const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(
                   activeBlock.frame,
@@ -102,6 +55,7 @@ export function CreatorSelectedBlock({
                   />
                 );
               }
+
               return (
                 <div
                   style={{
@@ -113,16 +67,15 @@ export function CreatorSelectedBlock({
                   }}
                 >
                   {activeBlock.baseFrame !== undefined &&
-                    renderPart(
-                      activeBlock.baseFrame,
-                      undefined,
-                      activeBlock.direction,
-                    )}
-                  {renderPart(
-                    activeBlock.frame,
-                    activeBlock.color,
-                    activeBlock.direction,
-                  )}
+                    renderTilesetLayer({
+                      frameId: activeBlock.baseFrame,
+                      direction: activeBlock.direction,
+                    })}
+                  {renderTilesetLayer({
+                    frameId: activeBlock.frame,
+                    color: activeBlock.color,
+                    direction: activeBlock.direction,
+                  })}
                 </div>
               );
             })()}

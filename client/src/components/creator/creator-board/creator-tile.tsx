@@ -6,10 +6,8 @@ import {
   ALL_ITEMS_MAP,
   type LayerItem,
 } from "../../../constants/layer-items";
-import {
-  getTileBackgroundData,
-  getTilesetBackgroundPosition,
-} from "../../../utils/tileset-utils";
+import { getTileBackgroundData } from "../../../utils/tileset-utils";
+import { renderTilesetLayer } from "../shared/render-tileset-layer";
 
 interface CreatorTileProps {
   sizePx: number;
@@ -41,66 +39,10 @@ export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
     );
   }
 
-  /** Background layer decides wall tiling / vertical placement. */
+  /** Background slot (index 1) drives wall stacking / tall layout. */
   const wallBg = resolvedItems[1];
   const isWallCell =
     wallBg?.key === "w1t" || wallBg?.key === "w2t";
-
-  const renderPart = (
-    frameId: number,
-    color?: string,
-    direction?: string,
-  ) => {
-    const { x: px, y: py } = getTilesetBackgroundPosition(
-      frameId,
-      6,
-      sourceTileSizePx,
-      true,
-    );
-
-    const innerTransform = direction === "left" ? "scaleX(-1)" : "none";
-
-    if (color) {
-      return (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: `${sourceTileSizePx}px`,
-            height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
-            backgroundColor: color,
-            maskImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-            maskPosition: `${px}px ${py}px`,
-            maskRepeat: "no-repeat",
-            WebkitMaskImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-            WebkitMaskPosition: `${px}px ${py}px`,
-            WebkitMaskRepeat: "no-repeat",
-            imageRendering: "pixelated",
-            transform: innerTransform,
-            transformOrigin: "center center",
-          }}
-        />
-      );
-    }
-    return (
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: `${sourceTileSizePx}px`,
-          height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
-          backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-          backgroundPosition: `${px}px ${py}px`,
-          backgroundRepeat: "no-repeat",
-          imageRendering: "pixelated",
-          transform: innerTransform,
-          transformOrigin: "center center",
-        }}
-      />
-    );
-  };
 
   return (
     <div
@@ -189,8 +131,21 @@ export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
             }}
           >
             {item.baseFrame !== undefined &&
-              renderPart(item.baseFrame, undefined, item.direction)}
-            {renderPart(item.frame, item.color, item.direction)}
+              renderTilesetLayer({
+                frameId: item.baseFrame,
+                direction: item.direction,
+                tileSizePx: sourceTileSizePx,
+                heightMultiplier: TALL_WALL_HEIGHT_MULTIPLIER,
+                withWallYOffset: true,
+              })}
+            {renderTilesetLayer({
+              frameId: item.frame,
+              color: item.color,
+              direction: item.direction,
+              tileSizePx: sourceTileSizePx,
+              heightMultiplier: TALL_WALL_HEIGHT_MULTIPLIER,
+              withWallYOffset: true,
+            })}
           </div>
         );
       })}

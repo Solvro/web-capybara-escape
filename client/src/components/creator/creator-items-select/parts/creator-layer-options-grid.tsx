@@ -6,10 +6,8 @@ import {
   getColoredVariant,
   getGridItems,
 } from "../../../../constants/layer-items";
-import {
-  getTilesetBackgroundPosition,
-  getUIBlockBackgroundData,
-} from "../../../../utils/tileset-utils";
+import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
+import { renderTilesetLayer } from "../../shared/render-tileset-layer";
 import { CreatorColorPicker } from "./creator-color-picker";
 
 interface CreatorLayerOptionsGridProps {
@@ -75,56 +73,6 @@ export function CreatorLayerOptionsGrid({
         const hasVariants =
           isColorable && (COLORABLE_BASE_ITEMS[item.baseKey!]?.length ?? 0) > 1;
 
-        const renderPart = (
-          frameId: number,
-          color?: string,
-          direction?: string,
-        ) => {
-          const { x: px, y: py } = getTilesetBackgroundPosition(frameId, 6, 24);
-          const innerTransform = direction === "left" ? "scaleX(-1)" : "none";
-
-          if (color) {
-            return (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "24px",
-                  height: "24px",
-                  backgroundColor: color,
-                  maskImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-                  maskPosition: `${String(px)}px ${String(py)}px`,
-                  maskRepeat: "no-repeat",
-                  WebkitMaskImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-                  WebkitMaskPosition: `${String(px)}px ${String(py)}px`,
-                  WebkitMaskRepeat: "no-repeat",
-                  imageRendering: "pixelated",
-                  transform: innerTransform,
-                  transformOrigin: "center center",
-                }}
-              />
-            );
-          }
-          return (
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "24px",
-                height: "24px",
-                backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
-                backgroundPosition: `${String(px)}px ${String(py)}px`,
-                backgroundRepeat: "no-repeat",
-                imageRendering: "pixelated",
-                transform: innerTransform,
-                transformOrigin: "center center",
-              }}
-            />
-          );
-        };
-
         const useCompositeBlend =
           displayItem.baseFrame !== undefined || Boolean(displayItem.color);
 
@@ -181,16 +129,15 @@ export function CreatorLayerOptionsGrid({
                     }}
                   >
                     {displayItem.baseFrame !== undefined &&
-                      renderPart(
-                        displayItem.baseFrame,
-                        undefined,
-                        displayItem.direction,
-                      )}
-                    {renderPart(
-                      displayItem.frame,
-                      displayItem.color,
-                      displayItem.direction,
-                    )}
+                      renderTilesetLayer({
+                        frameId: displayItem.baseFrame,
+                        direction: displayItem.direction,
+                      })}
+                    {renderTilesetLayer({
+                      frameId: displayItem.frame,
+                      color: displayItem.color,
+                      direction: displayItem.direction,
+                    })}
                   </div>
                 )}
 
