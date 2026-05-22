@@ -170,6 +170,7 @@ export function CreatorBoard({
       ref={boardRef}
     >
       <CreatorDimensionButtons
+        dimensionAxis="rows"
         dimension={rows}
         onChange={(e) => {
           handleRowsChange(e);
@@ -180,6 +181,7 @@ export function CreatorBoard({
       />
       <div className="flex w-full items-center flex-1">
         <CreatorDimensionButtons
+          dimensionAxis="cols"
           vertical
           dimension={cols}
           onChange={(e) => {
@@ -223,6 +225,7 @@ export function CreatorBoard({
           )}
         </div>
         <CreatorDimensionButtons
+          dimensionAxis="cols"
           vertical
           dimension={cols}
           onChange={(e) => {
@@ -234,6 +237,7 @@ export function CreatorBoard({
         />
       </div>
       <CreatorDimensionButtons
+        dimensionAxis="rows"
         dimension={rows}
         onChange={(e) => {
           handleRowsChange(e);
