@@ -254,7 +254,7 @@ Object.values(LAYER_ITEMS)
 
 /**
  * Groups all color variants by their baseKey.
- * e.g. "button" -> [button-0, button-1, ...], "laser-right" -> [laser-0-right, laser-1-right, ...]
+ * button -> [button-0, button-1, ...], laser-right -> [laser-0-right, laser-1-right, ...]
  */
 export const COLORABLE_BASE_ITEMS: Record<string, LayerItem[]> = {};
 Object.values(LAYER_ITEMS)
@@ -270,7 +270,7 @@ Object.values(LAYER_ITEMS)
 
 /**
  * Get a specific colored variant for a base item type.
- * @param baseKey - The base key (e.g. "button", "door", "laser-right")
+ * @param baseKey - The base key
  * @param colorIndex - Index into COLOR_LIST
  */
 export function getColoredVariant(
