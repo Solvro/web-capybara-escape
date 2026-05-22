@@ -1,4 +1,7 @@
-import type { LayerItem } from "../../../../constants/layer-items";
+import {
+  type LayerItem,
+  paletteDisplayLabel,
+} from "../../../../constants/layer-items";
 import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
 import { renderTilesetLayer } from "../../shared/render-tileset-layer";
 
@@ -31,7 +34,9 @@ export function CreatorSelectedBlock({
             {(() => {
               const composite =
                 activeBlock.baseFrame !== undefined ||
-                Boolean(activeBlock.color);
+                Boolean(activeBlock.color) ||
+                (activeBlock.rotationDeg != null &&
+                  activeBlock.rotationDeg % 360 !== 0);
 
               if (!composite) {
                 const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(
@@ -70,18 +75,20 @@ export function CreatorSelectedBlock({
                     renderTilesetLayer({
                       frameId: activeBlock.baseFrame,
                       direction: activeBlock.direction,
+                      rotationDeg: activeBlock.rotationDeg,
                     })}
                   {renderTilesetLayer({
                     frameId: activeBlock.frame,
                     color: activeBlock.color,
                     direction: activeBlock.direction,
+                    rotationDeg: activeBlock.rotationDeg,
                   })}
                 </div>
               );
             })()}
           </div>
-          <span className="text-sm font-bold text-violet-50">
-            {activeBlock.label}
+          <span className="min-w-0 shrink text-sm font-bold break-words text-violet-50">
+            {paletteDisplayLabel(activeBlock)}
           </span>
           {activeBlock.color && (
             <div

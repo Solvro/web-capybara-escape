@@ -2,10 +2,7 @@ import {
   EXTRA_HEIGHT,
   TALL_WALL_HEIGHT_MULTIPLIER,
 } from "../../../constants/global";
-import {
-  ALL_ITEMS_MAP,
-  type LayerItem,
-} from "../../../constants/layer-items";
+import { ALL_ITEMS_MAP, type LayerItem } from "../../../constants/layer-items";
 import { getTileBackgroundData } from "../../../utils/tileset-utils";
 import { renderTilesetLayer } from "../shared/render-tileset-layer";
 
@@ -39,10 +36,8 @@ export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
     );
   }
 
-  /** Background slot (index 1) drives wall stacking / tall layout. */
   const wallBg = resolvedItems[1];
-  const isWallCell =
-    wallBg?.key === "w1t" || wallBg?.key === "w2t";
+  const isWallCell = wallBg?.key === "w1t" || wallBg?.key === "w2t";
 
   return (
     <div
@@ -70,7 +65,9 @@ export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
           isWallCell || isTall ? 0 : `${sizePx * EXTRA_HEIGHT}px`;
 
         const useCompositeBlend =
-          item.baseFrame !== undefined || Boolean(item.color);
+          item.baseFrame !== undefined ||
+          Boolean(item.color) ||
+          (item.rotationDeg != null && item.rotationDeg % 360 !== 0);
 
         if (isEntity) {
           return (
@@ -104,15 +101,19 @@ export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
                 left: 0,
                 width: `${sourceTileSizePx}px`,
                 height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
-                backgroundImage: bgUrl,
-                backgroundPosition: `${bgPosX}px ${bgPosY}px`,
-                backgroundRepeat: "no-repeat",
-                imageRendering: "pixelated",
                 transform: `scale(${scale})`,
                 transformOrigin: "top left",
                 pointerEvents: "none",
               }}
-            />
+            >
+              {renderTilesetLayer({
+                frameId: item.frame,
+                tileSizePx: sourceTileSizePx,
+                heightMultiplier: TALL_WALL_HEIGHT_MULTIPLIER,
+                withWallYOffset: true,
+                rotationDeg: item.rotationDeg,
+              })}
+            </div>
           );
         }
 
@@ -134,6 +135,7 @@ export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
               renderTilesetLayer({
                 frameId: item.baseFrame,
                 direction: item.direction,
+                rotationDeg: item.rotationDeg,
                 tileSizePx: sourceTileSizePx,
                 heightMultiplier: TALL_WALL_HEIGHT_MULTIPLIER,
                 withWallYOffset: true,
@@ -142,6 +144,7 @@ export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
               frameId: item.frame,
               color: item.color,
               direction: item.direction,
+              rotationDeg: item.rotationDeg,
               tileSizePx: sourceTileSizePx,
               heightMultiplier: TALL_WALL_HEIGHT_MULTIPLIER,
               withWallYOffset: true,

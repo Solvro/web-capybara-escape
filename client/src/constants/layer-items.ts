@@ -19,10 +19,6 @@ export const LAYER_ITEM_KEYS = {
 
   LASER: "laser",
   CRATE: "crate",
-  LASER_BEAM_H: "laserBeamH",
-  LASER_BEAM_V: "laserBeamV",
-  LASER_BEAM_H_TIP: "laserBeamHTip",
-  LASER_BEAM_V_TIP: "laserBeamVTip",
   EMPTY_ENTITIES: "empty-entities",
 
   DOOR: "door",
@@ -32,6 +28,60 @@ export const LAYER_ITEM_KEYS = {
   SOL_START: "sol-start",
   VRON_START: "vron-start",
 } as const;
+
+export const FLOOR_DECOY_ROTATION_DEGREES = [0, 90, 180, 270] as const;
+export type FloorDecoyRotationDeg =
+  (typeof FLOOR_DECOY_ROTATION_DEGREES)[number];
+
+export const ROTATABLE_FLOOR_BASE_KEYS_SORTED = [
+  LAYER_ITEM_KEYS.WIRE_CURVE,
+  LAYER_ITEM_KEYS.CABLE_INACTIVE,
+  LAYER_ITEM_KEYS.CABLE_ACTIVE,
+  LAYER_ITEM_KEYS.WIRE,
+] as const;
+
+export type RotatableFloorBaseKey =
+  (typeof ROTATABLE_FLOOR_BASE_KEYS_SORTED)[number];
+
+export function isRotatableFloorBaseKey(
+  key: string,
+): key is RotatableFloorBaseKey {
+  return (ROTATABLE_FLOOR_BASE_KEYS_SORTED as readonly string[]).includes(key);
+}
+
+export function parseRotatableFloorKey(tileKey: string): {
+  baseKey: RotatableFloorBaseKey;
+  rotationDeg: FloorDecoyRotationDeg;
+} | null {
+  for (const base of ROTATABLE_FLOOR_BASE_KEYS_SORTED) {
+    if (tileKey === base) {
+      return { baseKey: base, rotationDeg: 0 };
+    }
+    if (tileKey.startsWith(`${base}-`)) {
+      const suf = tileKey.slice(base.length + 1);
+      const deg = Number(suf) as FloorDecoyRotationDeg;
+      if (
+        Number.isFinite(deg) &&
+        (FLOOR_DECOY_ROTATION_DEGREES as readonly number[]).includes(deg)
+      ) {
+        return { baseKey: base, rotationDeg: deg };
+      }
+    }
+  }
+  return null;
+}
+
+export function creatorPaletteKeyForLookup(tileKey: string): string {
+  return parseRotatableFloorKey(tileKey)?.baseKey ?? tileKey;
+}
+
+export function nextFloorDecoyQuarterTurn(
+  rotationDeg: FloorDecoyRotationDeg,
+): FloorDecoyRotationDeg {
+  const seq = [...FLOOR_DECOY_ROTATION_DEGREES];
+  const idx = seq.indexOf(rotationDeg);
+  return seq[(idx + 1) % seq.length]!;
+}
 
 export interface LayerItem {
   key: string;
@@ -43,6 +93,8 @@ export interface LayerItem {
   direction?: "up" | "down" | "left" | "right";
   colorable?: boolean;
   baseKey?: string;
+  rotationDeg?: FloorDecoyRotationDeg;
+  supportsRotation?: boolean;
 }
 
 const coloredButtons: LayerItem[] = COLOR_LIST.map((color, index) => ({
@@ -133,12 +185,14 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       label: "Cable Active",
       frame: ASSETS.CABLE_END_ACTIVE,
       layer: LAYER_NAMES.FLOOR_DECOYS,
+      supportsRotation: true,
     },
     {
       key: LAYER_ITEM_KEYS.CABLE_INACTIVE,
       label: "Cable Inactive",
       frame: ASSETS.CABLE_END_INACTIVE,
       layer: LAYER_NAMES.FLOOR_DECOYS,
+      supportsRotation: true,
     },
     {
       key: LAYER_ITEM_KEYS.SOCKET,
@@ -151,12 +205,14 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       label: "Wire",
       frame: ASSETS.WIRE,
       layer: LAYER_NAMES.FLOOR_DECOYS,
+      supportsRotation: true,
     },
     {
       key: LAYER_ITEM_KEYS.WIRE_CURVE,
       label: "Wire Curve",
       frame: ASSETS.WIRE_CURVE,
       layer: LAYER_NAMES.FLOOR_DECOYS,
+      supportsRotation: true,
     },
     {
       key: LAYER_ITEM_KEYS.VENT_OPEN,
@@ -183,30 +239,6 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       key: LAYER_ITEM_KEYS.CRATE,
       label: "Crate",
       frame: ASSETS.CRATE,
-      layer: LAYER_NAMES.ENTITIES,
-    },
-    {
-      key: LAYER_ITEM_KEYS.LASER_BEAM_H,
-      label: "Beam Horiz.",
-      frame: ASSETS.LASER_BEAM_HORIZONTAL,
-      layer: LAYER_NAMES.ENTITIES,
-    },
-    {
-      key: LAYER_ITEM_KEYS.LASER_BEAM_V,
-      label: "Beam Vert.",
-      frame: ASSETS.LASER_BEAM_VERTICAL,
-      layer: LAYER_NAMES.ENTITIES,
-    },
-    {
-      key: LAYER_ITEM_KEYS.LASER_BEAM_H_TIP,
-      label: "Beam H Tip",
-      frame: ASSETS.LASER_BEAM_HORIZONTAL_TIP,
-      layer: LAYER_NAMES.ENTITIES,
-    },
-    {
-      key: LAYER_ITEM_KEYS.LASER_BEAM_V_TIP,
-      label: "Beam V Tip",
-      frame: ASSETS.LASER_BEAM_VERTICAL_TIP,
       layer: LAYER_NAMES.ENTITIES,
     },
     {
@@ -251,6 +283,32 @@ Object.values(LAYER_ITEMS)
   .forEach((item) => {
     ALL_ITEMS_MAP[item.key] = item;
   });
+
+for (const item of Object.values(LAYER_ITEMS).flat()) {
+  if (!item.supportsRotation) continue;
+  for (const deg of FLOOR_DECOY_ROTATION_DEGREES) {
+    const k = `${item.key}-${deg}`;
+    ALL_ITEMS_MAP[k] = {
+      ...item,
+      key: k,
+      rotationDeg: deg,
+      label: item.label,
+    };
+  }
+  ALL_ITEMS_MAP[item.key] = ALL_ITEMS_MAP[`${item.key}-0`]!;
+}
+
+export function paletteDisplayLabel(item: LayerItem): string {
+  const paletteKey = creatorPaletteKeyForLookup(item.key);
+  return ALL_ITEMS_MAP[paletteKey]?.label ?? item.label;
+}
+
+export function getRotatedFloorPlacementItem(
+  baseKey: string,
+  rotationDeg: FloorDecoyRotationDeg,
+): LayerItem | null {
+  return ALL_ITEMS_MAP[`${baseKey}-${rotationDeg}`] ?? null;
+}
 
 /**
  * Groups all color variants by their baseKey.

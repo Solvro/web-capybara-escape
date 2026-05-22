@@ -1,7 +1,14 @@
 import { useState } from "react";
 
 import { LAYER_NAMES } from "../../../constants/global";
-import { LAYER_ITEMS, type LayerItem } from "../../../constants/layer-items";
+import type {
+  FloorDecoyRotationDeg,
+  LayerItem,
+} from "../../../constants/layer-items";
+import {
+  LAYER_ITEMS,
+  creatorPaletteKeyForLookup,
+} from "../../../constants/layer-items";
 import { CreatorLayerOptionsGrid } from "./parts/creator-layer-options-grid";
 import { CreatorLayerTabs } from "./parts/creator-layer-tabs";
 import { CreatorSelectedBlock } from "./parts/creator-selected-block";
@@ -17,11 +24,15 @@ const LAYER_TABS = [
 interface CreatorItemsSelectProps {
   activeBlock: LayerItem | null;
   setActiveBlock: (block: LayerItem | null) => void;
+  floorCableRotationByBase: Record<string, FloorDecoyRotationDeg>;
+  rotateCableAtBase: (baseKey: string) => void;
 }
 
 export function CreatorItemsSelect({
   activeBlock,
   setActiveBlock,
+  floorCableRotationByBase,
+  rotateCableAtBase,
 }: CreatorItemsSelectProps) {
   const [selectedLayer, setSelectedLayer] = useState<string>(LAYER_TABS[0].key);
 
@@ -38,8 +49,9 @@ export function CreatorItemsSelect({
   };
 
   const findLayerForBlock = (blockKey: string): string | null => {
+    const paletteKey = creatorPaletteKeyForLookup(blockKey);
     for (const [layerKey, layerItems] of Object.entries(LAYER_ITEMS)) {
-      if (layerItems.some((item) => item.key === blockKey)) {
+      if (layerItems.some((item) => item.key === paletteKey)) {
         return layerKey;
       }
     }
@@ -74,6 +86,8 @@ export function CreatorItemsSelect({
           layerKey={selectedLayer}
           activeBlock={activeBlock}
           setActiveBlock={setActiveBlock}
+          floorCableRotationByBase={floorCableRotationByBase}
+          rotateCableAtBase={rotateCableAtBase}
         />
       </div>
     </div>

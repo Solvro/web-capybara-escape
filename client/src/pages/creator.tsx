@@ -7,6 +7,7 @@ import { CreatorName } from "../components/creator/creator-name/creator-name";
 import { LAYER_NAMES } from "../constants/global";
 import type { LayerItem } from "../constants/layer-items";
 import { LAYER_ITEMS, LAYER_ITEM_KEYS } from "../constants/layer-items";
+import { useCreatorFloorCableRotation } from "../hooks/creator/use-creator-floor-cable-rotation";
 import { type DirectionType } from "../types/direction";
 import { changeBoardSize, generateInitialTiles } from "../utils/tileset-utils";
 
@@ -21,6 +22,9 @@ export function Creator() {
       ) || null
     );
   });
+
+  const { floorCableRotationByBase, rotateCableAtBase } =
+    useCreatorFloorCableRotation(activeBlock, setActiveBlock);
 
   const floorDecoys = [
     LAYER_ITEM_KEYS.VENT_OPEN,
@@ -72,6 +76,8 @@ export function Creator() {
           <CreatorItemsSelect
             activeBlock={activeBlock}
             setActiveBlock={setActiveBlock}
+            floorCableRotationByBase={floorCableRotationByBase}
+            rotateCableAtBase={rotateCableAtBase}
           />
         </div>
         <div className="w-[64dvw]">

@@ -10,6 +10,7 @@ export interface RenderTilesetLayerParams {
   color?: string;
   colorMode?: TilesetLayerColorMode;
   direction?: string;
+  rotationDeg?: number;
   tileSizePx?: number;
   heightMultiplier?: number;
   tilesetCols?: number;
@@ -21,6 +22,7 @@ export function renderTilesetLayer({
   color,
   colorMode = "multiply",
   direction,
+  rotationDeg,
   tileSizePx = 24,
   heightMultiplier = 1,
   tilesetCols = 6,
@@ -32,7 +34,17 @@ export function renderTilesetLayer({
     tileSizePx,
     withWallYOffset,
   );
-  const innerTransform = direction === "left" ? "scaleX(-1)" : "none";
+  const rotations: string[] = [];
+  if (rotationDeg != null && rotationDeg % 360 !== 0) {
+    rotations.push(`rotate(${rotationDeg}deg)`);
+  }
+  if (direction === "left") rotations.push("scaleX(-1)");
+  const transform = rotations.length > 0 ? rotations.join(" ") : undefined;
+
+  const hasRotation = rotationDeg != null && rotationDeg % 360 !== 0;
+  const transformOrigin: CSSProperties["transformOrigin"] = hasRotation
+    ? `${tileSizePx / 2}px ${tileSizePx / 2}px`
+    : "center center";
 
   const frameMaskStyle: CSSProperties = {
     maskImage: `url(${TILESET_URL})`,
@@ -50,8 +62,8 @@ export function renderTilesetLayer({
     width: `${tileSizePx}px`,
     height: `${tileSizePx * heightMultiplier}px`,
     imageRendering: "pixelated",
-    transform: innerTransform,
-    transformOrigin: "center center",
+    transformOrigin,
+    ...(transform !== undefined ? { transform } : {}),
   };
 
   if (color) {
