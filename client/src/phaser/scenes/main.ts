@@ -12,6 +12,7 @@ import type {
   MessageOnAddPlayer,
   MessageOnRemovePlayer,
   MessagePositionUpdate,
+  MessageSteelBoxesUpdate,
 } from "../../types/messages";
 import type { INetworkInterface } from "../../types/network-interface";
 import type { Player as PlayerType } from "../../types/player";
@@ -23,6 +24,7 @@ import { PlayerEntityAnimator } from "../animators/player-entity-animator";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
+import { SteelBox } from "../entities/steel-box";
 import { Display } from "../lib/display";
 import { Button } from "../mechanics/button";
 import { Cable } from "../mechanics/cable";
@@ -38,6 +40,7 @@ export class Main extends Phaser.Scene {
   private capybara: Capybara | null = null;
   private players = new Map<string, Player>();
   private crates = new Map<number, Crate>();
+  private steelBoxes = new Map<number, SteelBox>();
   private buttons = new Map<string, Button>();
   private doors = new Map<string, Door>();
   private lasers = new Map<string, Laser>();
@@ -182,6 +185,14 @@ export class Main extends Phaser.Scene {
         for (const crate of message.crates) {
           this.spawnEntity(this.crates, Crate, crate, LAYER_NAMES.ENTITIES);
         }
+        for (const steelBox of message.steelBoxes) {
+          this.spawnEntity(
+            this.steelBoxes,
+            SteelBox,
+            steelBox,
+            LAYER_NAMES.ENTITIES,
+          );
+        }
 
         for (const button of message.buttons) {
           this.spawnEntity(
@@ -241,6 +252,13 @@ export class Main extends Phaser.Scene {
       room.onMessage("cratesUpdate", (message: MessageCratesUpdate) => {
         for (const crateUpdate of message.crates) {
           this.crates.get(crateUpdate.crateId)?.syncState(crateUpdate);
+        }
+      });
+      room.onMessage("steelBoxUpdate", (message: MessageSteelBoxesUpdate) => {
+        for (const steelBoxUpdate of message.steelBoxes) {
+          this.steelBoxes
+            .get(steelBoxUpdate.steelBoxId)
+            ?.syncState(steelBoxUpdate);
         }
       });
 
@@ -418,6 +436,7 @@ export class Main extends Phaser.Scene {
       this.players,
       this.speechBubbles,
       this.crates,
+      this.steelBoxes,
       this.doors,
       this.buttons,
     ];

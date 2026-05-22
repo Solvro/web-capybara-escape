@@ -5,6 +5,7 @@ import type { Crate } from "../types/crate";
 import type { Door } from "../types/door";
 import type { Laser } from "../types/laser";
 import type { Player } from "../types/player";
+import type { SteelBox } from "../types/steel-box";
 import type { Vent } from "../types/vent";
 import type { Wire } from "../types/wire";
 
@@ -14,6 +15,7 @@ export interface MessageMapInfo {
   height: number;
   players: Player[];
   crates: Crate[];
+  steelBoxes: SteelBox[];
   doors: Door[];
   buttons: Button[];
   lasers: Laser[];
@@ -25,6 +27,13 @@ export interface MessageMapInfo {
 
 export interface MessageCratesUpdate {
   crates: { crateId: number; direction: "left" | "right" | "up" | "down" }[];
+}
+
+export interface MessageSteelBoxesUpdate {
+  steelBoxes: {
+    steelBoxId: number;
+    direction: "left" | "right" | "up" | "down";
+  }[];
 }
 
 export interface MessageCablesUpdate {

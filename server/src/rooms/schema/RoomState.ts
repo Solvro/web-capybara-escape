@@ -8,6 +8,7 @@ import { DoorState } from "./DoorState.js";
 import { LaserState } from "./LaserState.js";
 import { PlayerState } from "./PlayerState.js";
 import { Position } from "./Position.js";
+import { SteelBoxState } from "./SteelBoxState.js";
 import { VentState } from "./VentState.js";
 import { WireState } from "./WireState.js";
 
@@ -20,6 +21,7 @@ export class RoomState extends Schema {
 
   @type(PlayerState) playerState: PlayerState = new PlayerState();
   @type(CrateState) crateState: CrateState = new CrateState();
+  @type(SteelBoxState) steelBoxState: SteelBoxState = new SteelBoxState();
   @type(DoorState) doorState: DoorState = new DoorState();
   @type(ButtonState) buttonState: ButtonState = new ButtonState();
   @type(LaserState) laserState: LaserState = new LaserState();
@@ -46,7 +48,9 @@ export class RoomState extends Schema {
       for (const crateData of jsonData.entities.crates) {
         this.crateState.createCrate(crateData.x, crateData.y);
       }
-
+      for (const steelBoxData of jsonData.entities.steelBoxes ?? []) {
+        this.steelBoxState.createSteelBox(steelBoxData.x, steelBoxData.y);
+      }
       for (const playerData of jsonData.entities.players) {
         this.startingPositions.push(
           new Position().assign({ x: playerData.x, y: playerData.y }),
@@ -143,6 +147,7 @@ export class RoomState extends Schema {
     return (
       this.getCellValue(x, y).startsWith("f") &&
       this.crateState.getCrateAt(x, y) === null &&
+      this.steelBoxState.getSteelBoxAt(x, y) === null &&
       this.doorState.isOpenOrEmptyAt(x, y)
     );
   }
@@ -159,6 +164,8 @@ export class RoomState extends Schema {
     if (playerOccupies) return false;
 
     if (!this.doorState.isOpenOrEmptyAt(x, y)) return false;
+
+    if (this.steelBoxState.getSteelBoxAt(x, y)) return false;
 
     return true;
   }
@@ -315,6 +322,7 @@ export class RoomState extends Schema {
   onRoomDispose() {
     this.playerState.onRoomDispose();
     this.crateState.onRoomDispose();
+    this.steelBoxState.onRoomDispose();
     this.doorState.onRoomDispose();
     this.buttonState.onRoomDispose();
     this.laserState.onRoomDispose();
@@ -336,6 +344,12 @@ export class RoomState extends Schema {
 
     const crate = this.crateState.getCrateAt(newX, newY);
     if (crate && this.moveCrate(crate.id, deltaX, deltaY)) {
+      player.position.x = newX;
+      player.position.y = newY;
+      return true;
+    }
+    const steelBox = this.steelBoxState.getSteelBoxAt(newX, newY);
+    if (steelBox && this.moveSteelBox(steelBox.id, deltaX, deltaY)) {
       player.position.x = newX;
       player.position.y = newY;
       return true;
@@ -425,6 +439,11 @@ export class RoomState extends Schema {
         range = i;
         break;
       }
+      const steelBox = this.steelBoxState.getSteelBoxAt(currentX, currentY);
+      if (steelBox) {
+        range = i;
+        break;
+      }
 
       const crate = this.crateState.getCrateAt(currentX, currentY);
       if (crate) {
@@ -472,6 +491,15 @@ export class RoomState extends Schema {
           y: crate.position.y,
         };
       }),
+      steelBoxes: Array.from(this.steelBoxState.steelBoxes.values()).map(
+        (steelBox) => {
+          return {
+            steelBoxId: steelBox.id,
+            x: steelBox.position.x,
+            y: steelBox.position.y,
+          };
+        },
+      ),
       cables: Array.from(this.cableState.cables.values()).map((cable) => {
         return {
           cableId: cable.id,
@@ -550,6 +578,9 @@ export class RoomState extends Schema {
   despawnCrate(id: string) {
     this.crateState.removeCrate(id);
   }
+  despawnSteelBox(id: string) {
+    this.steelBoxState.removeSteelBox(id);
+  }
 
   // expose toggles/moves for broadcasting
   getAndClearToggledCables() {
@@ -578,6 +609,26 @@ export class RoomState extends Schema {
 
     return true;
   }
+  moveSteelBox(steelBoxId: string, dx: number, dy: number): boolean {
+    const steelBox = this.steelBoxState.steelBoxes.get(steelBoxId);
+    if (!steelBox) return false;
+    const targetX = steelBox.position.x + dx;
+    const targetY = steelBox.position.y + dy;
+    if (!this.isWalkableForCrate(targetX, targetY)) return false;
+    if (this.steelBoxState.getSteelBoxAt(targetX, targetY)) return false;
+    const crate = this.crateState.getCrateAt(targetX, targetY);
+    if (crate && !this.moveCrate(crate.id, dx, dy)) return false;
+    this.steelBoxState.moveSteelBoxIndex(
+      steelBox,
+      steelBox.position.x,
+      steelBox.position.y,
+      dx,
+      dy,
+    );
+    steelBox.position.x = targetX;
+    steelBox.position.y = targetY;
+    return true;
+  }
 
   checkButtonPressed() {
     const doorsAndButtonsToUpdate: {
@@ -597,11 +648,15 @@ export class RoomState extends Schema {
         button.position.x,
         button.position.y,
       );
+      const steelBoxOnButton = !!this.steelBoxState.getSteelBoxAt(
+        button.position.x,
+        button.position.y,
+      );
 
       const door = this.doorState.doors.get(button.doorId);
       if (!door) return;
 
-      const shouldOpen = playerOnButton || crateOnButton;
+      const shouldOpen = playerOnButton || crateOnButton || steelBoxOnButton;
       if (door.open !== shouldOpen) {
         door.open = shouldOpen;
         button.pressed = shouldOpen;
@@ -616,6 +671,7 @@ export class RoomState extends Schema {
   }
   clearState() {
     this.crateState.crates.clear();
+    this.steelBoxState.steelBoxes.clear();
     this.doorState.doors.clear();
     this.buttonState.buttons.clear();
     this.laserState.lasers.clear();
