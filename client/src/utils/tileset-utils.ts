@@ -192,7 +192,7 @@ export const getTileBackgroundData = (
   return {
     isEntity: false,
     isTall: false,
-    bgUrl: `url(${baseUrl}images/capybara-tileset.png)`,
+    bgUrl: `url(${baseUrl}textures/map-tileset.png)`,
     bgPosX: pos.x,
     bgPosY: pos.y,
   };
@@ -220,7 +220,7 @@ export const getUIBlockBackgroundData = (
   );
 
   return {
-    bgUrl: `url(${baseUrl}images/capybara-tileset.png)`,
+    bgUrl: `url(${baseUrl}textures/map-tileset.png)`,
     bgPosX: pos.x,
     bgPosY: pos.y,
   };
