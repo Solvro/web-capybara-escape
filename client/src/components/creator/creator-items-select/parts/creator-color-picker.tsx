@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import { COLOR_LIST } from "../../../../constants/global";
 
 interface CreatorColorPickerProps {
-  /** Index of the currently selected color in COLOR_LIST, or null if none */
   selectedColorIndex: number;
   onSelectColor: (colorIndex: number) => void;
   onClose: () => void;
@@ -22,7 +21,6 @@ export function CreatorColorPicker({
         onClose();
       }
     };
-    // Delay adding listener to prevent immediate close from the same click
     const timeout = setTimeout(() => {
       document.addEventListener("mousedown", handleClickOutside);
     }, 0);

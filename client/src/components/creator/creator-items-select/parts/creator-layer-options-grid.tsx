@@ -83,7 +83,7 @@ export function CreatorLayerOptionsGrid({
         );
 
         return (
-          <div key={item.key} className="relative">
+          <div key={item.baseKey ?? item.key} className="relative">
             <div
               role="button"
               tabIndex={0}
