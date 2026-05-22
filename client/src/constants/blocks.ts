@@ -47,7 +47,7 @@ export const ENTITY_SOURCES = {
 
 export const ENTITY_OFFSET = {
   CAPYBARA: 12,
-  PLAYER: 6,
+  PLAYER: 4,
 };
 
 export interface EntityConfig {
