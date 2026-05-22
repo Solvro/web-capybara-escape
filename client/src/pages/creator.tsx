@@ -17,9 +17,8 @@ export function Creator() {
   const [direction, setDirection] = useState<DirectionType | null>(null);
   const [activeBlock, setActiveBlock] = useState<LayerItem | null>(() => {
     return (
-      LAYER_ITEMS[LAYER_NAMES.BACKGROUND]?.find(
-        (item) => item.label === "Empty",
-      ) || null
+      LAYER_ITEMS[LAYER_NAMES.FLOOR]?.find((item) => item.label === "Empty") ||
+      null
     );
   });
 
@@ -48,7 +47,7 @@ export function Creator() {
   const [rows, cols] = dims;
   useEffect(() => {
     setTileData((prev) => changeBoardSize([rows, cols], direction, prev));
-  }, [rows, cols]);
+  }, [rows, cols, direction]);
 
   const handleReset = () => {
     setTileData(
