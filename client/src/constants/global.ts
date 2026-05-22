@@ -10,6 +10,8 @@ export const TALL_WALL_HEIGHT = 34;
 export const TALL_WALL_HEIGHT_MULTIPLIER = TALL_WALL_HEIGHT / TILE_SIZE;
 export const EXTRA_HEIGHT = TALL_WALL_HEIGHT_MULTIPLIER - 1;
 
+export const TILESET_URL = `${import.meta.env.BASE_URL}images/capybara-tileset.png`;
+
 export const COLOR_LIST = [
   "#FF3B30",
   "#33cc33",
