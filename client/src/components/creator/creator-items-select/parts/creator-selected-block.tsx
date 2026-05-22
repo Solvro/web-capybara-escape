@@ -1,3 +1,4 @@
+import { TEXTURE_PATH } from "../../../../constants/global";
 import type { LayerItem } from "../../../../constants/layer-items";
 
 interface CreatorSelectedBlockProps {
@@ -30,7 +31,7 @@ export function CreatorSelectedBlock({
               style={{
                 width: "24px",
                 height: "24px",
-                backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
+                backgroundImage: TEXTURE_PATH,
                 backgroundPosition: `${String(-(activeBlock.frame % 6) * 24)}px ${String(-Math.floor(activeBlock.frame / 6) * 24)}px`,
                 backgroundRepeat: "no-repeat",
                 imageRendering: "pixelated",

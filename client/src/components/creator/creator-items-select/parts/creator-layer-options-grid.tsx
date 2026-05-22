@@ -1,3 +1,4 @@
+import { TEXTURE_PATH } from "../../../../constants/global";
 import type { LayerItem } from "../../../../constants/layer-items";
 import { getTilesetBackgroundPosition } from "../../../../utils/tileset-utils";
 
@@ -38,7 +39,7 @@ export function CreatorLayerOptionsGrid({
                 style={{
                   width: "24px",
                   height: "24px",
-                  backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
+                  backgroundImage: TEXTURE_PATH,
                   backgroundPosition: `${String(posX)}px ${String(posY)}px`,
                   backgroundRepeat: "no-repeat",
                   imageRendering: "pixelated",

@@ -15,12 +15,14 @@ import type {
 } from "../../types/messages";
 import type { INetworkInterface } from "../../types/network-interface";
 import type { Player as PlayerType } from "../../types/player";
+import { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
+import { SOL_ANIM_CONFIG } from "../animators/config/sol-animator-config";
+import { VRON_ANIM_CONFIG } from "../animators/config/vron-animator-config";
+import { StateController } from "../animators/entity-animator";
+import { PlayerEntityAnimator } from "../animators/player-entity-animator";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
-import { CapybaraEntityAnimator } from "../lib/CapybaraEntityAnimator";
-import { StateController } from "../lib/EntityAnimator";
-import { PlayerEntityAnimator } from "../lib/PlayerEntityAnimator";
 import { Display } from "../lib/display";
 import { Button } from "../mechanics/button";
 import { Cable } from "../mechanics/cable";
@@ -88,8 +90,8 @@ export class Main extends Phaser.Scene {
     this.load.setBaseURL(import.meta.env.BASE_URL);
 
     // game objects
-    this.load.image("crate", "images/crate.png");
-    this.load.spritesheet("tileset", "images/capybara-tileset.png", {
+    this.load.image("crate", "textures/crate.png");
+    this.load.spritesheet("tileset", "textures/map-tileset.png", {
       frameWidth: TILE_SIZE,
       frameHeight: TILE_SIZE,
     });
@@ -97,22 +99,46 @@ export class Main extends Phaser.Scene {
     // miscellaneous
     this.load.atlas(
       "speech-bubble-sprite-sheet",
-      "images/speech-bubble-sprite-sheet.png",
+      "textures/speech-bubble-sprite-sheet.png",
       "data/speech-bubble-data.json",
     );
 
     // capybara
     this.capybaraAnimator = new CapybaraEntityAnimator(
-      "images/capybara",
+      "textures/capybara/capybara-tileset.png",
       new StateController(),
     );
     this.capybaraAnimator.preload(this);
 
     // player textures
-    this.playerEntityAnimators = [1, 2, 3, 4].map((index) => {
+    const playerSetups = [
+      {
+        key: "player1",
+        path: "textures/sol/sol-tileset .png",
+        config: SOL_ANIM_CONFIG,
+      },
+      {
+        key: "player2",
+        path: "textures/vron/vron-tileset.png",
+        config: VRON_ANIM_CONFIG,
+      },
+      {
+        key: "player3",
+        path: "textures/sol/sol-tileset .png",
+        config: SOL_ANIM_CONFIG,
+      },
+      {
+        key: "player4",
+        path: "textures/vron/vron-tileset.png",
+        config: VRON_ANIM_CONFIG,
+      },
+    ] as const;
+
+    this.playerEntityAnimators = playerSetups.map(({ key, path, config }) => {
       const animator = new PlayerEntityAnimator(
-        `player${String(index)}`,
-        `images/players/${String(index)}.png`,
+        key,
+        path,
+        config,
         new StateController(),
       );
       animator.preload(this);

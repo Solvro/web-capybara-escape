@@ -2,6 +2,7 @@ import { TILE_MAPPING } from "../../../constants/blocks";
 import {
   EXTRA_HEIGHT,
   TALL_WALL_HEIGHT_MULTIPLIER,
+  TEXTURE_PATH,
 } from "../../../constants/global";
 import { getTilesetBackgroundPosition } from "../../../utils/tileset-utils";
 
@@ -65,7 +66,7 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
               left: 0,
               width: `${sourceTileSizePx}px`,
               height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
-              backgroundImage: `url(${import.meta.env.BASE_URL}images/capybara-tileset.png)`,
+              backgroundImage: TEXTURE_PATH,
               backgroundPosition: `${x}px ${y}px`,
               backgroundRepeat: "no-repeat",
               imageRendering: "pixelated",

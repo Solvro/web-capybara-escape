@@ -1,9 +1,5 @@
-import {
-  CELL_SIZE,
-  SCALE_FACTOR,
-  SIZE_MULTIPLIER,
-} from "../../constants/global";
-import type { EntityAnimator } from "../lib/EntityAnimator";
+import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
+import type { EntityAnimator } from "../animators/entity-animator";
 
 export type Direction = "left" | "right" | "up" | "down";
 
@@ -26,12 +22,13 @@ export class Entity extends Phaser.GameObjects.Container {
     this.gridY = gridY;
     this.animator = animator;
 
-    this.sprite = this.scene.add.sprite(0, 0, textureKey);
-    if (textureKey !== "crate") {
-      this.sprite.setScale(SCALE_FACTOR * SIZE_MULTIPLIER);
-    } else {
-      this.sprite.setScale(SIZE_MULTIPLIER);
-    }
+    const spriteOffset = animator?.spriteOffset ?? { x: 0, y: 0 };
+    this.sprite = this.scene.add.sprite(
+      spriteOffset.x * SIZE_MULTIPLIER,
+      spriteOffset.y * SIZE_MULTIPLIER,
+      textureKey,
+    );
+    this.sprite.setScale(SIZE_MULTIPLIER);
     this.add(this.sprite);
 
     this.setPosition(

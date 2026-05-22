@@ -1,4 +1,4 @@
-import type { EntityAnimator } from "../lib/EntityAnimator";
+import type { EntityAnimator } from "../animators/entity-animator";
 import { Entity } from "./entity";
 
 export class Capybara extends Entity {

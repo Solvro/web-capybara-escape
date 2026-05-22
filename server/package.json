@@ -13,8 +13,8 @@
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "rimraf build",
-    "import:levels": "tsx src/scripts/export-levels.ts",
-    "import:levels:force": "tsx src/scripts/export-levels.ts --force",
+    "export:levels": "tsx src/scripts/export-levels.ts",
+    "export:levels:force": "tsx src/scripts/export-levels.ts --force",
     "loadtest": "tsx loadtest/example.ts --room game_room --numClients 2",
     "start": "tsx watch src/index.ts",
     "test": "mocha -r tsx test/MyRoom_test.ts --exit --timeout 15000"

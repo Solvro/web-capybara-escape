@@ -1,5 +1,5 @@
 import { CELL_SIZE } from "../../constants/global";
-import type { EntityAnimator } from "../lib/EntityAnimator";
+import type { EntityAnimator } from "../animators/entity-animator";
 import { Entity } from "./entity";
 import type { Direction } from "./entity";
 

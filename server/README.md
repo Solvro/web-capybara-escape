@@ -27,15 +27,13 @@ Due to fact that levels are preferably read from MongoDB database, the following
 - `ADMIN_API_TOKEN`
 - `DEFAULT_LEVEL_SLUG` (optional fallback slug)
 
-You may find an example in .env.example ;)
-
 ### Export room JSON files to MongoDB
 
 Room files from `src/rooms/json/examples` (excluding `default.json`) can be exported into the `levels` collection with:
 
 ```bash
-npm run import:levels          # skips levels that already exist in the database
-npm run import:levels:force    # overwrites existing levels
+npm run export:levels          # skips levels that already exist in the database
+npm run export:levels:force    # overwrites existing levels
 ```
 
 The script creates new levels by slug (based on file name) and marks them as published.

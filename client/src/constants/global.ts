@@ -1,10 +1,8 @@
 export const SIZE_MULTIPLIER = 5;
 
+export const TEXTURE_PATH = `url(${import.meta.env.BASE_URL}textures/map-tileset.png)`;
 export const TILE_SIZE = 24;
 export const CELL_SIZE = TILE_SIZE * SIZE_MULTIPLIER;
-
-export const TILE_SIZE_OLD = 64; // This is temporary tile size used for capybara and player sprites
-export const SCALE_FACTOR = TILE_SIZE / TILE_SIZE_OLD;
 
 export const TALL_WALL_HEIGHT_MULTIPLIER = 1.5;
 export const EXTRA_HEIGHT = TALL_WALL_HEIGHT_MULTIPLIER - 1;
