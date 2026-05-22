@@ -12,6 +12,11 @@ export const EXTRA_HEIGHT = TALL_WALL_HEIGHT_MULTIPLIER - 1;
 
 export const TILESET_URL = `${import.meta.env.BASE_URL}images/capybara-tileset.png`;
 
+export const Z_INDEX = {
+  dialog: 50,
+  creatorPopover: 60,
+} as const;
+
 export const COLOR_LIST = [
   "#FF3B30",
   "#33cc33",

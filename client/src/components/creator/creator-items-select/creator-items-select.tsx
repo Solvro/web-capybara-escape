@@ -57,8 +57,8 @@ export function CreatorItemsSelect({
   };
 
   return (
-    <div className="flex h-full flex-col rounded-lg bg-[#4b2a86] p-4 shadow-lg">
-      <div className="flex h-full w-full max-w-full flex-col">
+    <div className="flex h-full min-h-0 flex-col overflow-visible rounded-lg bg-[#4b2a86] p-4 shadow-lg">
+      <div className="flex h-full min-h-0 w-full max-w-full flex-col overflow-visible">
         <CreatorSelectedBlock
           activeBlock={activeBlock}
           onClick={handleActiveBlockClick}

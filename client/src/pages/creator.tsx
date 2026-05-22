@@ -68,7 +68,7 @@ export function Creator() {
         </div>
       </div>
       <div className="flex h-[80dvh] w-full items-stretch gap-[1dvw]">
-        <div className="w-[30dvw]">
+        <div className="flex h-full min-h-0 w-[30dvw] flex-col overflow-visible">
           <CreatorItemsSelect
             activeBlock={activeBlock}
             setActiveBlock={setActiveBlock}
