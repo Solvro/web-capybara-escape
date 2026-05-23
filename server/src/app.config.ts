@@ -1,6 +1,7 @@
 import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
 import config from "@colyseus/tools";
+import cors from "cors";
 import express from "express";
 
 import { closeMongoConnection, connectMongo } from "./db/mongo";
@@ -34,6 +35,15 @@ export default config({
      * Bind your custom express routes here:
      * Read more: https://expressjs.com/en/starter/basic-routing.html
      */
+
+    app.use(
+      cors({
+        origin: "http:///localhost:5173",
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "x-admin-user"],
+      }),
+    );
+
     app.use(express.json({ limit: "1mb" }));
     app.use("/api", createLevelsRouter());
 
