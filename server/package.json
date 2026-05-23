@@ -25,11 +25,13 @@
     "@colyseus/tools": "^0.17.19",
     "@colyseus/ws-transport": "^0.17.13",
     "colyseus": "^0.17.10",
+    "cors": "^2.8.6",
     "express": "^5.2.1",
     "mongodb": "^7.2.0"
   },
   "devDependencies": {
     "@colyseus/testing": "^0.17.11",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/mocha": "^10.0.1",
     "@types/node": "^24.6.1",

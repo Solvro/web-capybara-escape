@@ -9,6 +9,7 @@ interface CreatorControlProps {
   setDims: (dims: [number, number]) => void;
   onReset?: () => void;
   setDirection: (direction: DirectionType) => void;
+  onRoomSubmit: () => void;
 }
 
 export const clampDim = (value: number) => {
@@ -20,6 +21,7 @@ export function CreatorControl({
   setDims,
   setDirection,
   onReset,
+  onRoomSubmit,
 }: CreatorControlProps) {
   const [rows, cols] = dims;
 
@@ -57,7 +59,7 @@ export function CreatorControl({
         />
       </div>
 
-      <CreatorActionButtons onReset={onReset} />
+      <CreatorActionButtons onReset={onReset} onRoomSubmit={onRoomSubmit} />
     </div>
   );
 }

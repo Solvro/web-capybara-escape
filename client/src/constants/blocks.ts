@@ -83,3 +83,9 @@ export const TILE_MAPPING: Record<
   w2t: { frame: 8, frameSecond: 2, isTall: true }, //server wall
   f1: { frame: 6 }, //floor tile
 };
+
+export const FRAME_TO_KEY: Record<number, string> = {
+  6: "f1",
+  7: "w1t",
+  8: "w2t",
+};

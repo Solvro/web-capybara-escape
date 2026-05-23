@@ -1,7 +1,14 @@
-import { ENTITY_MAPPING } from "../constants/blocks";
+import {
+  ASSETS,
+  ENTITY_MAPPING,
+  FRAME_TO_KEY,
+  TILE_MAPPING,
+} from "../constants/blocks";
+import { LAYER_NAMES, layerNameToIndex } from "../constants/global";
 import { EXTRA_HEIGHT, TILESET_URL } from "../constants/global";
 import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { Direction, type DirectionType } from "../types/direction";
+import type { FormattedLevelType } from "../types/formattedLevel";
 
 export function getTilesetBackgroundPosition(
   frame: number,
@@ -244,4 +251,90 @@ export const getUIBlockBackgroundData = (
     bgPosX: pos.x,
     bgPosY: pos.y,
   };
+};
+
+export const formatLevel = (
+  tileIndices: (number | null)[][],
+  dims: [number, number],
+) => {
+  const formattedLevel: FormattedLevelType = {
+    maxClients: 2,
+    width: dims[0],
+    height: dims[1],
+    layout: [[]],
+    mechanics: [],
+    entities: {
+      players: [],
+      enemies: [],
+      crates: [],
+    },
+  };
+
+  let x = 0,
+    y = 0;
+  let cableCount = 0;
+
+  tileIndices.forEach((element, index) => {
+    const frame =
+      element[1] !== null
+        ? FRAME_TO_KEY[element[1]]
+        : element[0] !== null
+          ? FRAME_TO_KEY[element[0]]
+          : "";
+    formattedLevel.layout[y].push(frame);
+
+    const entityLayer = element[layerNameToIndex[LAYER_NAMES.ENTITIES]];
+    const wallDecoyLayer = element[layerNameToIndex[LAYER_NAMES.WALL_DECOYS]];
+    const floorDecoyLayer = element[layerNameToIndex[LAYER_NAMES.FLOOR_DECOYS]];
+
+    if (entityLayer === ASSETS.SOL_START || entityLayer === ASSETS.VRON_START) {
+      formattedLevel.entities.players.push({ x: x + 1, y: y + 1 });
+    } else if (entityLayer === ASSETS.CRATE) {
+      formattedLevel.entities.crates.push({ x: x + 1, y: y + 1 });
+    } else if (wallDecoyLayer === ASSETS.DOOR_BASE) {
+      formattedLevel.mechanics.push({
+        id: `door-FF0000`,
+        type: "door",
+        color: "#FF0000",
+        x: x + 1,
+        y: y + 1,
+        active: false,
+      });
+    } else if (
+      floorDecoyLayer === ASSETS.CABLE_END_ACTIVE ||
+      floorDecoyLayer === ASSETS.CABLE_END_INACTIVE
+    ) {
+      cableCount++;
+      formattedLevel.mechanics.push({
+        type: `cable-${cableCount}`,
+        x: x + 1,
+        y: y + 1,
+        id: `cable`,
+        direction: "up",
+        damageMs: 1000,
+        safeMs: 1000,
+        startDamaging: floorDecoyLayer === ASSETS.CABLE_END_ACTIVE,
+      });
+    } else if (
+      floorDecoyLayer === ASSETS.BUTTON_PRESSED ||
+      floorDecoyLayer === ASSETS.BUTTON_RELEASED
+    ) {
+      formattedLevel.mechanics.push({
+        id: `button-FF0000`,
+        type: "button",
+        color: "#FF0000",
+        x: x + 1,
+        y: y + 1,
+        doorId: "door-FF0000",
+      });
+    }
+
+    x = (x + 1) % dims[0];
+    if (x === 0 && index !== dims[0] * dims[1] - 1) {
+      y++;
+      formattedLevel.layout.push([]);
+    }
+  });
+
+  return formattedLevel;
 };
