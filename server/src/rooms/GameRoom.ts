@@ -1,23 +1,28 @@
 import { Client, Room } from "@colyseus/core";
+import { CloseCode } from "@colyseus/shared-types";
 
 import { getMoveVectorFromDirection } from "../shared/utils/vectorUtils";
 import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
-import room from "./json/examples/room1.json";
+import fallbackRoom from "./json/examples/default.json";
+import { getRoomForGame } from "./lib/roomLoader";
 import { RoomState } from "./schema/RoomState";
 
 // import room from "./json/examples/room2.json";
 // import room from "./json/examples/room3.json";
 
-export class GameRoom extends Room<RoomState> {
+export class GameRoom extends Room<{ state: RoomState }> {
   maxClients = 2;
   state = new RoomState();
 
-  onCreate(options: any) {
+  private roomData: any = fallbackRoom;
+
+  async onCreate(options: any) {
+    this.roomData = await getRoomForGame(options?.levelSlug);
+    this.maxClients = this.roomData.maxClients ?? this.maxClients;
+
     this.setMetadata({
       isPrivate: !!options.isPrivate,
     });
-
-    this.maxClients = room.maxClients ?? this.maxClients;
 
     if (options.isPrivate) {
       this.setPrivate(true);
@@ -123,7 +128,7 @@ export class GameRoom extends Room<RoomState> {
     this.onMessage("reset", (client) => {
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
 
-      this.state.loadRoomFromJson(room);
+      this.state.loadRoomFromJson(this.roomData);
 
       this.clients.forEach((c) => {
         const player = this.state.playerState.players.get(c.sessionId);
@@ -146,7 +151,7 @@ export class GameRoom extends Room<RoomState> {
 
   private startGame() {
     this.state.gameStarted = true;
-    this.state.loadRoomFromJson(room);
+    this.state.loadRoomFromJson(this.roomData);
 
     this.clients.forEach((client) => {
       const p = this.state.playerState.players.get(client.sessionId);
@@ -175,20 +180,21 @@ export class GameRoom extends Room<RoomState> {
     );
   }
 
-  async onLeave(client: Client, consented: boolean) {
-    try {
-      if (consented) {
-        throw new Error("consented leave");
+  async onLeave(client: Client, code: number) {
+    if (code !== CloseCode.CONSENTED) {
+      try {
+        // allow disconnected client to reconnect into this room until 20 seconds
+        await this.allowReconnection(client, 20);
+        return;
+      } catch {
+        // reconnection failed or timed out — clean up below
       }
-
-      // allow disconnected client to reconnect into this room until 20 seconds
-      await this.allowReconnection(client, 20);
-    } catch (e) {
-      this.broadcast("onRemovePlayer", {
-        sessionId: client.sessionId,
-      });
-      this.state.despawnPlayer(client.sessionId);
     }
+
+    this.broadcast("onRemovePlayer", {
+      sessionId: client.sessionId,
+    });
+    this.state.despawnPlayer(client.sessionId);
   }
 
   onDispose() {

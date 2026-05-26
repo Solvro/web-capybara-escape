@@ -1,5 +1,5 @@
 import { CELL_SIZE } from "../../constants/global";
-import type { SpriteAnimator } from "../lib/sprite-animator";
+import type { EntityAnimator } from "../animators/entity-animator";
 import { Entity } from "./entity";
 import type { Direction } from "./entity";
 
@@ -17,7 +17,7 @@ export class Player extends Entity {
     sessionId: string,
     local = false,
     textureKey = "player",
-    animator: SpriteAnimator | null = null,
+    animator: EntityAnimator | null = null,
   ) {
     super(scene, x, y, textureKey, animator);
     this.name = name;

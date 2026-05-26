@@ -30,7 +30,7 @@ export class RoomState extends Schema {
   @type(Capybara) capybara: Capybara;
 
   private capybaraPath: { x: number; y: number }[] = [];
-  private capybaraVelocity: number = 1000;
+  private capybaraVelocity: number = 500;
   private capybaraTimer: number = 0;
 
   loadRoomFromJson(jsonData: any) {
@@ -241,8 +241,14 @@ export class RoomState extends Schema {
     return null;
   }
 
+  private isCapybaraOnOpenVent(x: number, y: number): boolean {
+    const vent = this.ventState.getVentAt(x, y);
+    return vent !== null && vent !== undefined && vent.open;
+  }
+
   updateCapybara(deltaTime: number) {
     if (!this.capybara) return;
+    if (this.capybara.state === "jump") return;
 
     if (this.capybaraPath.length === 0) {
       const path = this.findPathToVent();
@@ -273,8 +279,22 @@ export class RoomState extends Schema {
 
         this.capybara.position.x = nextStep.x;
         this.capybara.position.y = nextStep.y;
+
+        if (this.isCapybaraOnOpenVent(nextStep.x, nextStep.y)) {
+          this.capybara.state = "jump";
+          this.capybaraPath = [];
+          return;
+        }
+
         this.capybara.state = "run";
       }
+    } else if (
+      this.isCapybaraOnOpenVent(
+        this.capybara.position.x,
+        this.capybara.position.y,
+      )
+    ) {
+      this.capybara.state = "jump";
     } else {
       this.capybara.state = "idle";
     }

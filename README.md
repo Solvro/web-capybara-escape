@@ -36,7 +36,7 @@ npm install
 npm run dev
 ```
 
-Pierwsze `npm install` w roocie instaluje też zależności narzędziowe (Husky, Prettier itd.) i uruchamia `prepare` — **hooki Gita wymagają instalacji w tym właśnie katalogu**. Front i backend startują razem dzięki `concurrently`.
+Pierwsze `npm install` instaluje zależności client i server. Narzędzia w root husky, prettier itd. również są instalowane oraz uruchamia się `prepare` - hooki Gita wymagają instalacji w tym właśnie katalogu. Front i backend startują razem dzięki `concurrently`.
 
 I to tyle, możesz testować lokalnie nasz domyślny poziom 🥱
 
@@ -74,6 +74,27 @@ npm run build --prefix server
 ```
 
 **Husky:** przed commitem odpalane są `lint-staged` oraz `npm run test:server`. Commit nie przejdzie dopóki nie zostaną naprawione błędy
+
+## Baza danych
+
+Do połączenia z bazą danych wymagane są poniższe zmienne środowiskowe
+
+- `MONGODB_URI`
+- `MONGODB_DB_NAME`
+- `ADMIN_API_TOKEN`
+- `DEFAULT_LEVEL_SLUG` (opcjonalnie)
+
+### Export poziomów do Mongo
+
+Pliki poziomów z `server/src/rooms/json/examples` (wyłączając `default.json`) zostaną wyeksportowane do kolekcji `levels`:
+
+```bash
+npm run export:levels          # pomija poziomy, które istnieją już w bazie
+npm run export:levels:force    # nadpisuje istniejące poziomy
+```
+
+Tworzy nowe zasoby w bazie bazując na slugu
+`default.json` - jest używany offline, gdy baza nie jest podłączona
 
 ## Stack
 

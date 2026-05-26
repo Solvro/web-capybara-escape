@@ -7,7 +7,7 @@ export class SpeechBubble extends Phaser.GameObjects.Container {
   private textureKey: string;
   private bubbleSprite: Phaser.GameObjects.Sprite;
   private bubbleText: Phaser.GameObjects.Text;
-  private TOP_WIDTH!: number;
+  private TOP_HEIGHT!: number;
   private MIDDLE_HEIGHT!: number;
   private BOTTOM_HEIGHT!: number;
   private WIDTH!: number;
@@ -49,11 +49,11 @@ export class SpeechBubble extends Phaser.GameObjects.Container {
   private createText(text: string): Phaser.GameObjects.Text {
     const contents = this.scene.add.text(this.x, this.y, text, {
       fontFamily: "ArcadeClassic",
-      fontSize: SIZE_MULTIPLIER * 2.5,
+      fontSize: SIZE_MULTIPLIER * 2.8,
       color: "#000000",
       align: "center",
-      lineSpacing: SIZE_MULTIPLIER * 0.5,
-      wordWrap: { width: 35 * SIZE_MULTIPLIER },
+      lineSpacing: SIZE_MULTIPLIER,
+      wordWrap: { width: 38 * SIZE_MULTIPLIER },
     });
     return contents;
   }
@@ -63,36 +63,38 @@ export class SpeechBubble extends Phaser.GameObjects.Container {
     const speechBubbleTexture = this.scene.textures.addDynamicTexture(
       this.textureKey,
       this.WIDTH,
-      this.TOP_WIDTH + this.BOTTOM_HEIGHT + textRows * this.MIDDLE_HEIGHT,
+      this.TOP_HEIGHT + this.BOTTOM_HEIGHT + textRows * this.MIDDLE_HEIGHT,
     );
     if (speechBubbleTexture != null) {
-      speechBubbleTexture.beginDraw();
-      speechBubbleTexture.batchDrawFrame(
+      const stampTopLeft: Phaser.Types.Textures.StampConfig = {
+        originX: 0,
+        originY: 0,
+      };
+      speechBubbleTexture.stamp(
         "speech-bubble-sprite-sheet",
         "Top",
         0,
         0,
+        stampTopLeft,
       );
       for (let row = 0; row < textRows; row++) {
-        speechBubbleTexture.batchDrawFrame(
+        speechBubbleTexture.stamp(
           "speech-bubble-sprite-sheet",
           "Middle",
           0,
-          this.TOP_WIDTH + row * this.MIDDLE_HEIGHT,
+          this.TOP_HEIGHT + row * this.MIDDLE_HEIGHT,
+          stampTopLeft,
         );
       }
-      speechBubbleTexture.batchDrawFrame(
+      speechBubbleTexture.stamp(
         "speech-bubble-sprite-sheet",
         "Bottom",
         0,
-        this.TOP_WIDTH + textRows * this.MIDDLE_HEIGHT,
+        this.TOP_HEIGHT + textRows * this.MIDDLE_HEIGHT,
+        stampTopLeft,
       );
-      speechBubbleTexture.endDraw();
-      const speechBubbleSprite = this.scene.add.sprite(
-        0,
-        0,
-        speechBubbleTexture,
-      );
+      speechBubbleTexture.render();
+      const speechBubbleSprite = this.scene.add.sprite(0, 0, this.textureKey);
       return speechBubbleSprite;
     }
     return this.scene.add.sprite(this.x, this.y, "crate"); //jeżeli fail to wyświetli się crate
@@ -103,7 +105,7 @@ export class SpeechBubble extends Phaser.GameObjects.Container {
       "speech-bubble-sprite-sheet",
       "Top",
     ).width;
-    this.TOP_WIDTH = this.scene.textures.getFrame(
+    this.TOP_HEIGHT = this.scene.textures.getFrame(
       "speech-bubble-sprite-sheet",
       "Top",
     ).height;

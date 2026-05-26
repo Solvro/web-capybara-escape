@@ -6,6 +6,10 @@ import { after, before, beforeEach, describe, it } from "mocha";
 import appConfig from "../src/app.config";
 import { RoomState } from "../src/rooms/schema/RoomState";
 
+type ClientRoom = {
+  onMessage(type: string, handler: () => void): void;
+};
+
 /** Stops colyseus.js "onMessage() not registered" noise when the test client ignores broadcasts. ADD MORE HANDLERS IF NEEDED (Just to avoid warnings for mocha)*/
 const GAME_ROOM_BROADCAST_TYPES = [
   "onAddPlayer",
@@ -23,7 +27,7 @@ const GAME_ROOM_BROADCAST_TYPES = [
   "__playground_message_types",
 ] as const;
 
-function registerNoopMessageHandlers(clientRoom: Room) {
+function registerNoopMessageHandlers(clientRoom: ClientRoom) {
   for (const type of GAME_ROOM_BROADCAST_TYPES) {
     clientRoom.onMessage(type, () => {});
   }

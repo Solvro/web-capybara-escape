@@ -1,12 +1,6 @@
-import type { Room } from "colyseus.js";
-import * as Phaser from "phaser";
+import type { Room } from "@colyseus/sdk";
 
-import {
-  CELL_SIZE,
-  LAYER_NAMES,
-  TILE_SIZE,
-  TILE_SIZE_OLD,
-} from "../../constants/global";
+import { LAYER_NAMES, TILE_SIZE } from "../../constants/global";
 import type { LAYER_NAME } from "../../constants/global";
 import type {
   MessageCablesUpdate,
@@ -21,17 +15,15 @@ import type {
 } from "../../types/messages";
 import type { INetworkInterface } from "../../types/network-interface";
 import type { Player as PlayerType } from "../../types/player";
+import { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
+import { SOL_ANIM_CONFIG } from "../animators/config/sol-animator-config";
+import { VRON_ANIM_CONFIG } from "../animators/config/vron-animator-config";
+import { StateController } from "../animators/entity-animator";
+import { PlayerEntityAnimator } from "../animators/player-entity-animator";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Player } from "../entities/player";
 import { Display } from "../lib/display";
-import {
-  PLAYER_TEXTURE_KEYS,
-  createPlayerAnimators,
-  getPlayerAnimator,
-  getPlayerTextureKey,
-} from "../lib/player-animators";
-import type { SpriteAnimator } from "../lib/sprite-animator";
 import { Button } from "../mechanics/button";
 import { Cable } from "../mechanics/cable";
 import { Door } from "../mechanics/door";
@@ -64,7 +56,8 @@ export class Main extends Phaser.Scene {
   private speakInput!: Phaser.Input.Keyboard.Key;
   private resetInput!: Phaser.Input.Keyboard.Key;
   private playerMoveDebounce = 0;
-  private playerAnimators!: SpriteAnimator[];
+  private playerEntityAnimators!: PlayerEntityAnimator[];
+  private capybaraAnimator!: CapybaraEntityAnimator;
 
   constructor() {
     super({ key: "Main" });
@@ -97,8 +90,8 @@ export class Main extends Phaser.Scene {
     this.load.setBaseURL(import.meta.env.BASE_URL);
 
     // game objects
-    this.load.image("crate", "images/crate.png");
-    this.load.spritesheet("tileset", "images/capybara-tileset.png", {
+    this.load.image("crate", "textures/crate.png");
+    this.load.spritesheet("tileset", "textures/map-tileset.png", {
       frameWidth: TILE_SIZE,
       frameHeight: TILE_SIZE,
     });
@@ -106,31 +99,58 @@ export class Main extends Phaser.Scene {
     // miscellaneous
     this.load.atlas(
       "speech-bubble-sprite-sheet",
-      "images/speech-bubble-sprite-sheet.png",
+      "textures/speech-bubble-sprite-sheet.png",
       "data/speech-bubble-data.json",
     );
 
     // capybara
-    this.load.image("capybara", "images/capybara/back_1.png");
+    this.capybaraAnimator = new CapybaraEntityAnimator(
+      "textures/capybara/capybara-tileset.png",
+      new StateController(),
+    );
+    this.capybaraAnimator.preload(this);
 
     // player textures
-    for (const [index, textureKey] of PLAYER_TEXTURE_KEYS.entries()) {
-      this.load.spritesheet(
-        textureKey,
-        `images/players/${String(index + 1)}.png`,
-        {
-          frameWidth: TILE_SIZE_OLD,
-          frameHeight: TILE_SIZE_OLD,
-        },
+    const playerSetups = [
+      {
+        key: "player1",
+        path: "textures/sol/sol-tileset .png",
+        config: SOL_ANIM_CONFIG,
+      },
+      {
+        key: "player2",
+        path: "textures/vron/vron-tileset.png",
+        config: VRON_ANIM_CONFIG,
+      },
+      {
+        key: "player3",
+        path: "textures/sol/sol-tileset .png",
+        config: SOL_ANIM_CONFIG,
+      },
+      {
+        key: "player4",
+        path: "textures/vron/vron-tileset.png",
+        config: VRON_ANIM_CONFIG,
+      },
+    ] as const;
+
+    this.playerEntityAnimators = playerSetups.map(({ key, path, config }) => {
+      const animator = new PlayerEntityAnimator(
+        key,
+        path,
+        config,
+        new StateController(),
       );
-    }
+      animator.preload(this);
+      return animator;
+    });
   }
 
   create() {
-    this.playerAnimators = createPlayerAnimators();
-    for (const animator of this.playerAnimators) {
+    for (const animator of this.playerEntityAnimators) {
       animator.register(this);
     }
+    this.capybaraAnimator.register(this);
 
     // Input setup
     if (this.input.keyboard !== null) {
@@ -262,12 +282,7 @@ export class Main extends Phaser.Scene {
       room.onMessage(
         "capybaraUpdate",
         (message: { x: number; y: number; state: string }) => {
-          if (this.capybara !== null) {
-            this.capybara.setPosition(
-              message.x * CELL_SIZE + CELL_SIZE / 2,
-              message.y * CELL_SIZE + CELL_SIZE / 2,
-            );
-          }
+          this.capybara?.syncServerState(message);
         },
       );
 
@@ -330,6 +345,11 @@ export class Main extends Phaser.Scene {
       this.room.send("generateLine");
     }
 
+    for (const player of this.players.values()) {
+      player.animate();
+    }
+    this.capybara?.animate();
+
     if (time - this.playerMoveDebounce < 250) {
       return;
     }
@@ -338,11 +358,11 @@ export class Main extends Phaser.Scene {
   }
 
   private addPlayer(playerSpawnInfo: PlayerType) {
-    const textureKey = getPlayerTextureKey(playerSpawnInfo.index);
-    const animator = getPlayerAnimator(
-      this.playerAnimators,
-      playerSpawnInfo.index,
+    const index = Math.max(
+      0,
+      Math.min(playerSpawnInfo.index, this.playerEntityAnimators.length - 1),
     );
+    const animator = this.playerEntityAnimators[index];
 
     const player = new Player(
       this,
@@ -351,7 +371,7 @@ export class Main extends Phaser.Scene {
       playerSpawnInfo.name,
       playerSpawnInfo.sessionId,
       playerSpawnInfo.isLocal,
-      textureKey,
+      animator.textureKey,
       animator,
     );
     this.players.set(playerSpawnInfo.sessionId, player);
@@ -363,7 +383,12 @@ export class Main extends Phaser.Scene {
       this.capybara.destroy();
     }
 
-    this.capybara = new Capybara(this, capybaraInfo.x, capybaraInfo.y);
+    this.capybara = new Capybara(
+      this,
+      capybaraInfo.x,
+      capybaraInfo.y,
+      this.capybaraAnimator,
+    );
     this.displayHandler.add("entities", this.capybara);
   }
 

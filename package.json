@@ -1,6 +1,7 @@
 {
   "name": "web-capybara-escape",
   "version": "1.0.0",
+  "private": true,
   "description": "",
   "keywords": [],
   "homepage": "https://github.com/Solvro/web-capybara-escape#readme",
@@ -15,8 +16,14 @@
   "author": "",
   "type": "commonjs",
   "main": "index.js",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run start --prefix server\" \"npm run dev --prefix client\"",
+    "export:levels": "npm run export:levels --prefix server",
+    "export:levels:force": "npm run export:levels:force --prefix server",
     "format": "prettier --write client server",
     "format:check": "prettier --check client server",
     "prepare": "husky",
@@ -26,9 +33,15 @@
   "lint-staged": {
     "*": "prettier -w --ignore-unknown"
   },
+  "overrides": {
+    "glob": "^13.0.6"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
-    "@solvro/config": "^2.0.7",
+    "@solvro/config": "^2.3.3",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "concurrently": "^9.2.1",
     "husky": "^9.1.7",

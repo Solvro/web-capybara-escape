@@ -1,9 +1,5 @@
-import {
-  CELL_SIZE,
-  SCALE_FACTOR,
-  SIZE_MULTIPLIER,
-} from "../../constants/global";
-import type { SpriteAnimator } from "../lib/sprite-animator";
+import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
+import type { EntityAnimator } from "../animators/entity-animator";
 
 export type Direction = "left" | "right" | "up" | "down";
 
@@ -11,14 +7,14 @@ export class Entity extends Phaser.GameObjects.Container {
   protected sprite: Phaser.GameObjects.Sprite;
   protected gridX: number;
   protected gridY: number;
-  protected animator: SpriteAnimator | null;
+  protected animator: EntityAnimator | null;
 
   constructor(
     scene: Phaser.Scene,
     gridX: number,
     gridY: number,
     textureKey = "player",
-    animator: SpriteAnimator | null = null,
+    animator: EntityAnimator | null = null,
   ) {
     super(scene);
 
@@ -26,12 +22,13 @@ export class Entity extends Phaser.GameObjects.Container {
     this.gridY = gridY;
     this.animator = animator;
 
-    this.sprite = this.scene.add.sprite(0, 0, textureKey);
-    if (textureKey !== "crate") {
-      this.sprite.setScale(SCALE_FACTOR * SIZE_MULTIPLIER);
-    } else {
-      this.sprite.setScale(SIZE_MULTIPLIER);
-    }
+    const spriteOffset = animator?.spriteOffset ?? { x: 0, y: 0 };
+    this.sprite = this.scene.add.sprite(
+      spriteOffset.x * SIZE_MULTIPLIER,
+      spriteOffset.y * SIZE_MULTIPLIER,
+      textureKey,
+    );
+    this.sprite.setScale(SIZE_MULTIPLIER);
     this.add(this.sprite);
 
     this.setPosition(
@@ -42,21 +39,39 @@ export class Entity extends Phaser.GameObjects.Container {
     this.setDepth(this.y);
   }
 
-  playAnim(animName: string): void {
+  animate(): void {
     if (this.animator !== null) {
-      this.animator.play(this.sprite, animName);
+      this.animator.animate(this.sprite);
     }
   }
 
-  stopAnim(animName: string, idleAnimName?: string): void {
-    if (this.animator !== null) {
-      this.animator.stop(this.sprite, animName, idleAnimName);
+  syncGridPosition(x: number, y: number, onArrived?: () => void): void {
+    if (x === this.gridX && y === this.gridY) {
+      onArrived?.();
+      return;
     }
+
+    const dx = x - this.gridX;
+    const dy = y - this.gridY;
+
+    if (Math.abs(dx) + Math.abs(dy) === 1) {
+      this.move(this.directionFromDelta(dx, dy), "Linear", onArrived);
+      return;
+    }
+
+    this.scene.tweens.killTweensOf(this);
+    this.gridX = x;
+    this.gridY = y;
+    this.setPosition(
+      this.gridX * CELL_SIZE + CELL_SIZE / 2,
+      this.gridY * CELL_SIZE + CELL_SIZE / 2,
+    );
+    this.setDepth(this.y);
+    this.animator?.notifyStop(this.directionFromDelta(dx, dy));
+    onArrived?.();
   }
 
-  move(direction: Direction, ease = "Linear") {
-    const walkAnimName = `walk-${direction}`;
-
+  move(direction: Direction, ease = "Linear", onComplete?: () => void) {
     switch (direction) {
       case "left": {
         this.gridX -= 1;
@@ -79,7 +94,7 @@ export class Entity extends Phaser.GameObjects.Container {
     const targetX = this.gridX * CELL_SIZE + CELL_SIZE / 2;
     const targetY = this.gridY * CELL_SIZE + CELL_SIZE / 2;
 
-    this.playAnim(walkAnimName);
+    this.animator?.notifyMove(direction);
 
     this.scene.tweens.add({
       targets: this,
@@ -92,7 +107,8 @@ export class Entity extends Phaser.GameObjects.Container {
       },
       onComplete: () => {
         this.setPosition(targetX, targetY);
-        this.stopAnim(walkAnimName, `idle-${direction}`);
+        this.animator?.notifyStop(direction);
+        onComplete?.();
       },
     });
   }
@@ -100,5 +116,12 @@ export class Entity extends Phaser.GameObjects.Container {
   destroy(): void {
     this.sprite.destroy();
     super.destroy();
+  }
+
+  private directionFromDelta(dx: number, dy: number): Direction {
+    if (dx < 0) return "left";
+    if (dx > 0) return "right";
+    if (dy < 0) return "up";
+    return "down";
   }
 }
