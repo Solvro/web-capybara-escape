@@ -34,7 +34,6 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       setJoinError(false);
       let joinedRoom: Room;
 
-      console.warn({ playerName, mode, roomCode, isPrivate });
       if (mode === "create") {
         joinedRoom = await client.create("game_room", {
           name: playerName,
@@ -47,13 +46,22 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       ) {
         joinedRoom = await client.joinById(roomCode, {
           name: playerName,
-          //isPrivate: true,
         });
       } else {
         joinedRoom = await client.joinOrCreate("game_room", {
           name: playerName,
           isPrivate: false,
         });
+      }
+
+      if (joinedRoom && joinedRoom.reconnectionToken) {
+        localStorage.setItem(
+          "reconnection",
+          JSON.stringify({
+            token: joinedRoom.reconnectionToken,
+            playerName,
+          }),
+        );
       }
 
       setRoom(joinedRoom);
@@ -85,7 +93,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         isReconnecting = true;
         try {
           const parsed = JSON.parse(cached) as CachedReconnection;
-          const { token } = parsed;
+          const { token } = JSON.parse(cached);
 
           const reconnected = await client.reconnect(token);
 

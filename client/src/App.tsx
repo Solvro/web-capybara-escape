@@ -1,4 +1,9 @@
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
 
 import { Creator } from "./pages/creator";
 import { Game } from "./pages/game";
@@ -18,6 +23,7 @@ export function App() {
           <Route path="/game" element={<Game />} />
           <Route path="/creator" element={<Creator />} />
           <Route path="/playground" element={<Playground />} />
+          <Route path="*" element={<Navigate to="/start" />} />
         </Routes>
       </Router>
     </div>

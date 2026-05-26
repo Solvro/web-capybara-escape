@@ -19,7 +19,7 @@ export class GameRoom extends Room<RoomState> {
 
     this.maxClients = room.maxClients ?? this.maxClients;
 
-    if (options.private) {
+    if (options.isPrivate) {
       this.setPrivate(true);
     }
 
@@ -29,24 +29,12 @@ export class GameRoom extends Room<RoomState> {
         player.ready = !player.ready;
       }
 
-      if (this.clients.length === 2) {
+      if (this.clients.length >= 1) {
         const allReady = Array.from(
           this.state.playerState.players.values(),
         ).every((p) => p.ready);
         if (allReady) {
-          this.state.gameStarted = true;
-          this.state.loadRoomFromJson(room);
-          this.clients.forEach((client) => {
-            const p = this.state.playerState.players.get(client.sessionId);
-            const startPos =
-              this.state.startingPositions[
-                p.index % this.state.startingPositions.length
-              ];
-            if (p && startPos) {
-              p.position.x = startPos.x;
-              p.position.y = startPos.y;
-            }
-          });
+          this.startGame();
         }
       }
     });
@@ -156,16 +144,31 @@ export class GameRoom extends Room<RoomState> {
     });
   }
 
+  private startGame() {
+    this.state.gameStarted = true;
+    this.state.loadRoomFromJson(room);
+
+    this.clients.forEach((client) => {
+      const p = this.state.playerState.players.get(client.sessionId);
+      if (p) {
+        const startPos =
+          this.state.startingPositions[
+            p.index % this.state.startingPositions.length
+          ];
+        if (startPos) {
+          p.position.x = startPos.x;
+          p.position.y = startPos.y;
+        }
+      }
+    });
+  }
+
   onJoin(client: Client, options: any) {
     const nickname = options.name;
 
     this.state.spawnNewPlayer(client.sessionId, nickname);
 
     const player = this.state.playerState.players.get(client.sessionId);
-
-    // Player index 0 = Sol
-    // Player index 1 = Vron
-    const character = player.index === 0 ? "Sol" : "Vron";
 
     console.log(
       `Gracz ${player.name} dołączył jako ${player.index === 0 ? "Sol" : "Vron"}`,

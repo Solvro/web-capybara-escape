@@ -38,7 +38,7 @@ export function Game() {
         <Button
           disabled={false}
           onClick={async () => {
-            await navigate("/");
+            await navigate("/start");
           }}
         >
           Powrót do menu

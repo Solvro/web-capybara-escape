@@ -40,7 +40,7 @@ export function Intro() {
       });
       await navigate("/game");
     } catch {
-      setErrorMessage("Nie udało się dołaczyć do gry. Spróbuj ponownie.");
+      setErrorMessage("Nie udało się dołączyć do gry. Spróbuj ponownie.");
       setStatus("error");
     }
   }, [connect, name, navigate]);

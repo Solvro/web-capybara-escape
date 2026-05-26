@@ -21,7 +21,7 @@ export function Start() {
   });
 
   const [name, setName] = useState("");
-  const [mode, setMode] = useState<"join" | "create">("join");
+  const [mode, setMode] = useState<"join" | "create">("create");
   const [roomCode, setRoomCode] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
 
@@ -176,7 +176,7 @@ export function Start() {
             onClick={handlePlay}
             disabled={status === "loading" || name.trim() === ""}
           >
-            {status === "loading" ? "Ładowanie..." : "Graj"}
+            {status === "loading" ? "Ładowanie..." : "Start"}
           </Button>
         </>
       )}

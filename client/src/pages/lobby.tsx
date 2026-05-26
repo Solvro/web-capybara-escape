@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import { useRoom } from "../lib/use-room";
 
@@ -30,7 +30,7 @@ export function Lobby() {
     };
   }, [room, navigate]);
 
-  if (!isConnected || !room) return <div>Łączenie...</div>;
+  if (!isConnected || !room) return <Navigate to="/start" replace={true} />;
 
   const myPlayer = players.find((p) => p.sessionId === room.sessionId);
 
