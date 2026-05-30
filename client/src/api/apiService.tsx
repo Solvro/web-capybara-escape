@@ -1,0 +1,31 @@
+import type { CreateLevelInput } from "../types/createLevelInput";
+import api from "./api";
+
+const ApiService = {
+  URL: import.meta.env.VITE_PHASER_API,
+
+  headerWithAuth: {
+    "Content-Type": "application/json",
+    Authorization: "Bearer giga_dlugi_token",
+  },
+
+  async sendRoom(createLevelInput: CreateLevelInput) {
+    console.log(createLevelInput);
+    return await api
+      .post(
+        this.URL + "/api/admin/levels",
+        {
+          slug: createLevelInput.slug,
+          name: createLevelInput.name,
+          data: createLevelInput.data,
+          isPublished: createLevelInput.isPublished,
+        },
+        { headers: this.headerWithAuth },
+      )
+      .then((response) => {
+        return response;
+      });
+  },
+};
+
+export default ApiService;

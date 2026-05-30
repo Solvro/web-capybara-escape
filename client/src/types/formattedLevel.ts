@@ -5,8 +5,10 @@ export type FormattedLevelType = {
   layout: string[][];
   mechanics: unknown[];
   entities: {
-    players: unknown[];
+    players: { x: number; y: number }[];
     enemies: unknown[];
-    crates: unknown[];
+    crates: { x: number; y: number }[];
+    vents: { x: number; y: number; open: boolean }[];
+    capybara: { x: number; y: number };
   };
 };
