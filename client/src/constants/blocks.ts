@@ -40,37 +40,37 @@ export const ASSETS = {
 };
 
 export const ENTITY_SOURCES = {
-  CAPYBARA: "/images/capybara/capybara.png",
-  SOL: "/images/players/Sol.png",
-  VRON: "/images/players/Vron.png",
-};
-
-export const ENTITY_OFFSET = {
-  CAPYBARA: 12,
-  PLAYER: 4,
+  CAPYBARA: "/textures/capybara/capybara-tileset.png",
+  SOL: "/textures/sol/sol-tileset .png",
+  VRON: "/textures/vron/vron-tileset.png",
 };
 
 export interface EntityConfig {
   src: string;
   isTall: boolean;
-  offset: number;
+  /** Frame index in the entity spritesheet used for creator preview */
+  previewFrame: number;
+  frameHeight?: number;
+  tilesetCols?: number;
 }
 
 export const ENTITY_MAPPING: Record<number, EntityConfig> = {
   [ASSETS.CAPYBARA_START]: {
     src: ENTITY_SOURCES.CAPYBARA,
     isTall: true,
-    offset: ENTITY_OFFSET.CAPYBARA,
+    previewFrame: 4,
   },
   [ASSETS.SOL_START]: {
     src: ENTITY_SOURCES.SOL,
     isTall: true,
-    offset: ENTITY_OFFSET.PLAYER,
+    previewFrame: 4,
+    frameHeight: 30,
   },
   [ASSETS.VRON_START]: {
     src: ENTITY_SOURCES.VRON,
     isTall: true,
-    offset: ENTITY_OFFSET.PLAYER,
+    previewFrame: 6,
+    frameHeight: 30,
   },
 };
 

@@ -90,7 +90,6 @@ export class Main extends Phaser.Scene {
     this.load.setBaseURL(import.meta.env.BASE_URL);
 
     // game objects
-    this.load.image("crate", "textures/crate.png");
     this.load.spritesheet("tileset", "textures/map-tileset.png", {
       frameWidth: TILE_SIZE,
       frameHeight: TILE_SIZE,

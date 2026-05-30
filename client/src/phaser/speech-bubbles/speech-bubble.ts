@@ -97,7 +97,7 @@ export class SpeechBubble extends Phaser.GameObjects.Container {
       const speechBubbleSprite = this.scene.add.sprite(0, 0, this.textureKey);
       return speechBubbleSprite;
     }
-    return this.scene.add.sprite(this.x, this.y, "crate"); //jeżeli fail to wyświetli się crate
+    return this.scene.add.sprite(this.x, this.y, "tileset", 0);
   }
 
   private readDimensions() {
