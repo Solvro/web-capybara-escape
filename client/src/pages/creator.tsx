@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import api from "../api/apiService";
 import { CreatorBoard } from "../components/creator/creator-board/creator-board";
 import { CreatorControl } from "../components/creator/creator-control/creator-control";
 import { CreatorItemsSelect } from "../components/creator/creator-items-select/creator-items-select";
@@ -10,7 +11,6 @@ import { LAYER_ITEMS, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { useCreatorFloorCableRotation } from "../hooks/creator/use-creator-floor-cable-rotation";
 import type { CreateLevelInput } from "../types/createLevelInput";
 import { type DirectionType } from "../types/direction";
-import api from "../utils/api";
 import {
   changeBoardSize,
   formatLevel,
@@ -73,6 +73,7 @@ export function Creator() {
     const createLevelInput: CreateLevelInput = {
       slug: levelName,
       name: levelName,
+      isPublished: true,
       data: JSON.parse(formattedLevel),
     };
 

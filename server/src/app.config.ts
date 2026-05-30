@@ -36,14 +36,6 @@ export default config({
      * Read more: https://expressjs.com/en/starter/basic-routing.html
      */
 
-    app.use(
-      cors({
-        origin: "http:///localhost:5173",
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization", "x-admin-user"],
-      }),
-    );
-
     app.use(express.json({ limit: "1mb" }));
     app.use("/api", createLevelsRouter());
 

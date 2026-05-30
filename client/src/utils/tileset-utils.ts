@@ -259,14 +259,16 @@ export const formatLevel = (
 ) => {
   const formattedLevel: FormattedLevelType = {
     maxClients: 2,
-    width: dims[0],
-    height: dims[1],
+    height: dims[0],
+    width: dims[1],
     layout: [[]],
     mechanics: [],
     entities: {
       players: [],
       enemies: [],
       crates: [],
+      vents: [],
+      capybara: { x: 0, y: 0 },
     },
   };
 
@@ -287,17 +289,22 @@ export const formatLevel = (
     const wallDecoyLayer = element[layerNameToIndex[LAYER_NAMES.WALL_DECOYS]];
     const floorDecoyLayer = element[layerNameToIndex[LAYER_NAMES.FLOOR_DECOYS]];
 
-    if (entityLayer === ASSETS.SOL_START || entityLayer === ASSETS.VRON_START) {
-      formattedLevel.entities.players.push({ x: x + 1, y: y + 1 });
+    if (entityLayer === ASSETS.CAPYBARA_START) {
+      formattedLevel.entities.capybara = { x: x, y: y };
+    } else if (
+      entityLayer === ASSETS.SOL_START ||
+      entityLayer === ASSETS.VRON_START
+    ) {
+      formattedLevel.entities.players.push({ x: x, y: y });
     } else if (entityLayer === ASSETS.CRATE) {
-      formattedLevel.entities.crates.push({ x: x + 1, y: y + 1 });
+      formattedLevel.entities.crates.push({ x: x, y: y });
     } else if (wallDecoyLayer === ASSETS.DOOR_BASE) {
       formattedLevel.mechanics.push({
         id: `door-FF0000`,
         type: "door",
         color: "#FF0000",
-        x: x + 1,
-        y: y + 1,
+        x: x,
+        y: y,
         active: false,
       });
     } else if (
@@ -306,10 +313,10 @@ export const formatLevel = (
     ) {
       cableCount++;
       formattedLevel.mechanics.push({
-        type: `cable-${cableCount}`,
-        x: x + 1,
-        y: y + 1,
-        id: `cable`,
+        type: `cable`,
+        x: x,
+        y: y,
+        id: `cable-${cableCount}`,
         direction: "up",
         damageMs: 1000,
         safeMs: 1000,
@@ -323,14 +330,30 @@ export const formatLevel = (
         id: `button-FF0000`,
         type: "button",
         color: "#FF0000",
-        x: x + 1,
-        y: y + 1,
+        x: x,
+        y: y,
         doorId: "door-FF0000",
+      });
+    } else if (floorDecoyLayer === ASSETS.VENT_CLOSED) {
+      formattedLevel.entities.vents.push({ x: x, y: y, open: true });
+    } else if (entityLayer === ASSETS.LASER_GUN) {
+      formattedLevel.mechanics.push({
+        type: "laser",
+        x: x,
+        y: y,
+        id: "laser-FF0000",
+        direction: "right",
+        range: 4,
+        color: "#FF0000",
+        active: true,
+        activeDuration: 2000,
+        inactiveDuration: 2000,
+        delay: 2000,
       });
     }
 
-    x = (x + 1) % dims[0];
-    if (x === 0 && index !== dims[0] * dims[1] - 1) {
+    x = (x + 1) % dims[1];
+    if (x === 0 && index !== dims[1] * dims[0] - 1) {
       y++;
       formattedLevel.layout.push([]);
     }
