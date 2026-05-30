@@ -1,3 +1,4 @@
+import { ASSETS } from "../../constants/blocks";
 import type { Crate as CrateType } from "../../types/crate";
 import type { INetworkInterface } from "../../types/network-interface";
 import { Entity } from "./entity";
@@ -7,7 +8,8 @@ export class Crate extends Entity implements INetworkInterface<CrateType> {
   public readonly networkId: string | number;
 
   constructor(scene: Phaser.Scene, data: CrateType) {
-    super(scene, data.x, data.y, "crate", null);
+    super(scene, data.x, data.y, "tileset", null);
+    this.sprite.setFrame(ASSETS.CRATE);
     this.crateId = data.crateId;
     this.networkId = data.crateId;
   }

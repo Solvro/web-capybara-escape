@@ -1,5 +1,5 @@
 import { ENTITY_MAPPING } from "../constants/blocks";
-import { EXTRA_HEIGHT } from "../constants/global";
+import { EXTRA_HEIGHT, TILESET_URL } from "../constants/global";
 import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { Direction, type DirectionType } from "../types/direction";
 
@@ -183,12 +183,17 @@ export const getTileBackgroundData = (
   const entity = ENTITY_MAPPING[tileIndex];
 
   if (entity) {
+    const pos = getTilesetBackgroundPosition(
+      entity.previewFrame,
+      entity.tilesetCols ?? TILESET_COLUMNS,
+      entity.frameHeight ?? sourceTileSizePx,
+    );
     return {
       isEntity: true,
       isTall: entity.isTall,
       bgUrl: `url(${baseUrl}${entity.src.substring(1)})`,
-      bgPosX: 0,
-      bgPosY: entity.offset,
+      bgPosX: pos.x,
+      bgPosY: pos.y,
     };
   }
 
@@ -201,7 +206,7 @@ export const getTileBackgroundData = (
   return {
     isEntity: false,
     isTall: false,
-    bgUrl: `url(${baseUrl}textures/map-tileset.png)`,
+    bgUrl: `url(${TILESET_URL})`,
     bgPosX: pos.x,
     bgPosY: pos.y,
   };
@@ -215,10 +220,16 @@ export const getUIBlockBackgroundData = (
   const isEntity = ENTITY_MAPPING[frame] !== undefined;
 
   if (isEntity) {
+    const entity = ENTITY_MAPPING[frame];
+    const pos = getTilesetBackgroundPosition(
+      entity?.previewFrame ?? 0,
+      entity?.tilesetCols ?? TILESET_COLUMNS,
+      entity?.frameHeight ?? sourceTileSizePx,
+    );
     return {
-      bgUrl: `url(${baseUrl}${ENTITY_MAPPING[frame]?.src.substring(1)})`,
-      bgPosX: 0,
-      bgPosY: 0,
+      bgUrl: `url(${baseUrl}${entity?.src.substring(1) ?? ""})`,
+      bgPosX: pos.x,
+      bgPosY: pos.y,
     };
   }
 
@@ -229,7 +240,7 @@ export const getUIBlockBackgroundData = (
   );
 
   return {
-    bgUrl: `url(${baseUrl}textures/map-tileset.png)`,
+    bgUrl: `url(${TILESET_URL})`,
     bgPosX: pos.x,
     bgPosY: pos.y,
   };
