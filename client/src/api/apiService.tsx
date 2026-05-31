@@ -10,7 +10,6 @@ const ApiService = {
   },
 
   async sendRoom(createLevelInput: CreateLevelInput) {
-    console.log(createLevelInput);
     return await api
       .post(
         this.URL + "/api/admin/levels",

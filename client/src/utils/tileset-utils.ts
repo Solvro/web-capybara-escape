@@ -1,10 +1,4 @@
-import {
-  ANGLE_TO_TEXT,
-  ASSETS,
-  ENTITY_MAPPING,
-  FRAME_TO_KEY,
-  TILE_MAPPING,
-} from "../constants/blocks";
+import { ANGLE_TO_TEXT, ENTITY_MAPPING } from "../constants/blocks";
 import { COLOR_LIST, LAYER_NAMES, layerNameToIndex } from "../constants/global";
 import { EXTRA_HEIGHT, TILESET_URL } from "../constants/global";
 import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";

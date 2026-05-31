@@ -63,8 +63,6 @@ export function Creator() {
     );
   };
 
-  console.log(tileData);
-
   const onRoomSubmit = () => {
     const newFormattedLevel = formatLevel(tileData, dims);
     setFormattedLevel(JSON.stringify(newFormattedLevel, null, 2));
