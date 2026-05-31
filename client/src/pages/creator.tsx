@@ -105,8 +105,8 @@ export function Creator() {
               activeBlock={activeBlock}
               setActiveBlock={setActiveBlock}
               floorCableRotationByBase={floorCableRotationByBase}
-            rotateCableAtBase={rotateCableAtBase}
-          />
+              rotateCableAtBase={rotateCableAtBase}
+            />
           </div>
           <div className="w-[64dvw]">
             <CreatorBoard
