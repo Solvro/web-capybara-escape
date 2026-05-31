@@ -1,10 +1,11 @@
 import {
+  ANGLE_TO_TEXT,
   ASSETS,
   ENTITY_MAPPING,
   FRAME_TO_KEY,
   TILE_MAPPING,
 } from "../constants/blocks";
-import { LAYER_NAMES, layerNameToIndex } from "../constants/global";
+import { COLOR_LIST, LAYER_NAMES, layerNameToIndex } from "../constants/global";
 import { EXTRA_HEIGHT, TILESET_URL } from "../constants/global";
 import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { Direction, type DirectionType } from "../types/direction";
@@ -254,7 +255,7 @@ export const getUIBlockBackgroundData = (
 };
 
 export const formatLevel = (
-  tileIndices: (number | null)[][],
+  tileIndices: (string | null)[][],
   dims: [number, number],
 ) => {
   const formattedLevel: FormattedLevelType = {
@@ -274,82 +275,108 @@ export const formatLevel = (
 
   let x = 0,
     y = 0;
-  let cableCount = 0;
+  let cableCount = 0,
+    laserCount = 0,
+    doorCount = 0,
+    buttonCount = 0;
 
   tileIndices.forEach((element, index) => {
     const frame =
-      element[1] !== null
-        ? FRAME_TO_KEY[element[1]]
-        : element[0] !== null
-          ? FRAME_TO_KEY[element[0]]
-          : "";
+      element[1] !== null ? element[1] : element[0] !== null ? element[0] : "";
     formattedLevel.layout[y].push(frame);
 
-    const entityLayer = element[layerNameToIndex[LAYER_NAMES.ENTITIES]];
-    const wallDecoyLayer = element[layerNameToIndex[LAYER_NAMES.WALL_DECOYS]];
-    const floorDecoyLayer = element[layerNameToIndex[LAYER_NAMES.FLOOR_DECOYS]];
+    const entityLayer =
+      element[layerNameToIndex[LAYER_NAMES.ENTITIES]]?.split("-");
+    const wallDecoyLayer =
+      element[layerNameToIndex[LAYER_NAMES.WALL_DECOYS]]?.split("-");
+    const floorDecoyLayer =
+      element[layerNameToIndex[LAYER_NAMES.FLOOR_DECOYS]]?.split("-");
 
-    if (entityLayer === ASSETS.CAPYBARA_START) {
-      formattedLevel.entities.capybara = { x: x, y: y };
-    } else if (
-      entityLayer === ASSETS.SOL_START ||
-      entityLayer === ASSETS.VRON_START
-    ) {
-      formattedLevel.entities.players.push({ x: x, y: y });
-    } else if (entityLayer === ASSETS.CRATE) {
-      formattedLevel.entities.crates.push({ x: x, y: y });
-    } else if (wallDecoyLayer === ASSETS.DOOR_BASE) {
+    if (entityLayer) {
+      if (entityLayer[0] === LAYER_ITEM_KEYS.CAPYBARA_START) {
+        formattedLevel.entities.capybara = { x, y };
+      } else if (entityLayer[1] === "start") {
+        formattedLevel.entities.players.push({ x, y });
+      } else if (entityLayer[0] === LAYER_ITEM_KEYS.CRATE) {
+        formattedLevel.entities.crates.push({ x, y });
+      } else if (entityLayer[0] === LAYER_ITEM_KEYS.LASER) {
+        const color = COLOR_LIST[Number.parseInt(entityLayer[1])];
+        formattedLevel.mechanics.push({
+          type: "laser",
+          x,
+          y,
+          id: `laser-${color}-${laserCount}`,
+          direction: entityLayer[2],
+          range: 4,
+          color,
+          active: true,
+          activeDuration: 2000,
+          inactiveDuration: 2000,
+          delay: 2000,
+        });
+        laserCount++;
+      }
+    }
+
+    if (wallDecoyLayer && wallDecoyLayer[0] === LAYER_ITEM_KEYS.DOOR) {
+      const color = COLOR_LIST[Number.parseInt(wallDecoyLayer[1])];
       formattedLevel.mechanics.push({
-        id: `door-FF0000`,
+        id: `door-${color}-${doorCount}`,
         type: "door",
-        color: "#FF0000",
-        x: x,
-        y: y,
+        color,
+        x,
+        y,
         active: false,
       });
-    } else if (
-      floorDecoyLayer === ASSETS.CABLE_END_ACTIVE ||
-      floorDecoyLayer === ASSETS.CABLE_END_INACTIVE
-    ) {
-      cableCount++;
-      formattedLevel.mechanics.push({
-        type: `cable`,
-        x: x,
-        y: y,
-        id: `cable-${cableCount}`,
-        direction: "up",
-        damageMs: 1000,
-        safeMs: 1000,
-        startDamaging: floorDecoyLayer === ASSETS.CABLE_END_ACTIVE,
-      });
-    } else if (
-      floorDecoyLayer === ASSETS.BUTTON_PRESSED ||
-      floorDecoyLayer === ASSETS.BUTTON_RELEASED
-    ) {
-      formattedLevel.mechanics.push({
-        id: `button-FF0000`,
-        type: "button",
-        color: "#FF0000",
-        x: x,
-        y: y,
-        doorId: "door-FF0000",
-      });
-    } else if (floorDecoyLayer === ASSETS.VENT_CLOSED) {
-      formattedLevel.entities.vents.push({ x: x, y: y, open: true });
-    } else if (entityLayer === ASSETS.LASER_GUN) {
-      formattedLevel.mechanics.push({
-        type: "laser",
-        x: x,
-        y: y,
-        id: "laser-FF0000",
-        direction: "right",
-        range: 4,
-        color: "#FF0000",
-        active: true,
-        activeDuration: 2000,
-        inactiveDuration: 2000,
-        delay: 2000,
-      });
+      doorCount++;
+    }
+
+    if (floorDecoyLayer) {
+      if (
+        floorDecoyLayer[0] === LAYER_ITEM_KEYS.WIRE ||
+        floorDecoyLayer[0] === LAYER_ITEM_KEYS.WIRE_CURVE
+      ) {
+        formattedLevel.mechanics.push({
+          type: floorDecoyLayer[0],
+          x,
+          y,
+          direction: ANGLE_TO_TEXT[floorDecoyLayer[1]],
+        });
+      } else if (
+        floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_ACTIVE ||
+        floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_INACTIVE
+      ) {
+        cableCount++;
+        formattedLevel.mechanics.push({
+          type: "cable",
+          x,
+          y,
+          id: `cable-${cableCount}`,
+          direction: ANGLE_TO_TEXT[floorDecoyLayer[1]],
+          damageMs: 1000,
+          safeMs: 1000,
+          startDamaging: floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_ACTIVE,
+        });
+      } else if (floorDecoyLayer[0] === LAYER_ITEM_KEYS.BUTTON) {
+        const color = COLOR_LIST[Number.parseInt(floorDecoyLayer[1])];
+        formattedLevel.mechanics.push({
+          id: `button-${color}-${buttonCount}`,
+          type: "button",
+          color,
+          x,
+          y,
+          doorId: `door-${color}`,
+        });
+      } else if (
+        floorDecoyLayer[0] === LAYER_ITEM_KEYS.VENT_CLOSED ||
+        floorDecoyLayer[0] === LAYER_ITEM_KEYS.VENT_OPEN
+      ) {
+        formattedLevel.entities.vents.push({
+          x: x,
+          y: y,
+          open: floorDecoyLayer[0] === LAYER_ITEM_KEYS.VENT_OPEN,
+        });
+      }
     }
 
     x = (x + 1) % dims[1];

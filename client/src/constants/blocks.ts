@@ -89,3 +89,10 @@ export const FRAME_TO_KEY: Record<number, string> = {
   7: "w1t",
   8: "w2t",
 };
+
+export const ANGLE_TO_TEXT: Record<string, string> = {
+  "0": "up",
+  "90": "right",
+  "180": "down",
+  "270": "left",
+};
