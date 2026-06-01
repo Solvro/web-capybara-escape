@@ -26,9 +26,11 @@ export class Player extends Entity {
 
     this.nameText = this.scene.add
       .text(0, -(CELL_SIZE / 2) - 4, name, {
-        fontSize: "24px",
+        fontSize: "26px",
         color: local ? "#ffdd77" : "#fff",
         align: "center",
+        stroke: "#000",
+        strokeThickness: 2,
       })
       .setOrigin(0.5, 1);
     this.add(this.nameText);
