@@ -1,9 +1,12 @@
 import { ASSETS } from "../../constants/blocks";
-import type { SteelBox as SteelBoxType } from "../../types/steel-box";
 import type { INetworkInterface } from "../../types/network-interface";
+import type { SteelBox as SteelBoxType } from "../../types/steel-box";
 import { Entity } from "./entity";
 
-export class SteelBox extends Entity implements INetworkInterface<SteelBoxType> {
+export class SteelBox
+  extends Entity
+  implements INetworkInterface<SteelBoxType>
+{
   public readonly steelBoxId: number;
   public readonly networkId: string | number;
 
