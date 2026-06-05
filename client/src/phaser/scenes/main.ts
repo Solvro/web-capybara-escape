@@ -1,6 +1,6 @@
 import type { Room } from "@colyseus/sdk";
 
-import { LAYER_NAMES, TILE_SIZE } from "../../constants/global";
+import { CELL_SIZE, LAYER_NAMES, TILE_SIZE } from "../../constants/global";
 import type { LAYER_NAME } from "../../constants/global";
 import type {
   MessageCablesUpdate,
@@ -169,6 +169,10 @@ export class Main extends Phaser.Scene {
       const room = this.registry.get("room") as Room;
 
       room.onMessage("mapInfo", (message: MessageMapInfo) => {
+        this.scale.resize(
+          message.width * CELL_SIZE,
+          message.height * CELL_SIZE,
+        );
         this.displayHandler.createMap(
           message.grid,
           message.width,
