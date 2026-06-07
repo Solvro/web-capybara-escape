@@ -31,6 +31,7 @@ import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
 import { Wire } from "../mechanics/wire";
 import { SpeechBubble } from "../speech-bubbles/speech-bubble";
+import { STOPWATCH_EVENT, Stopwatch } from "../ui/stopwatch";
 
 export class Main extends Phaser.Scene {
   private room!: Room;
@@ -55,6 +56,7 @@ export class Main extends Phaser.Scene {
   };
   private speakInput!: Phaser.Input.Keyboard.Key;
   private resetInput!: Phaser.Input.Keyboard.Key;
+  private stopwatch!: Stopwatch;
   private playerMoveDebounce = 0;
   private playerEntityAnimators!: PlayerEntityAnimator[];
   private capybaraAnimator!: CapybaraEntityAnimator;
@@ -163,6 +165,11 @@ export class Main extends Phaser.Scene {
       this.speakInput = this.input.keyboard.addKey("L");
       this.resetInput = this.input.keyboard.addKey("R");
     }
+
+    this.stopwatch = new Stopwatch((display) => {
+      this.game.events.emit(STOPWATCH_EVENT, display);
+    });
+    this.stopwatch.start();
 
     // Colyseus message handlers
     try {
@@ -336,13 +343,15 @@ export class Main extends Phaser.Scene {
     );
   }
 
-  update(time: number) {
+  update(time: number, delta: number) {
     if (Phaser.Input.Keyboard.JustDown(this.resetInput)) {
       this.room.send("reset");
     }
     if (Phaser.Input.Keyboard.JustDown(this.speakInput)) {
       this.room.send("generateLine");
     }
+
+    this.stopwatch.tick(delta);
 
     for (const player of this.players.values()) {
       player.animate();
@@ -430,5 +439,8 @@ export class Main extends Phaser.Scene {
     }
 
     this.children.removeAll();
+
+    this.stopwatch.reset();
+    this.stopwatch.start();
   }
 }
