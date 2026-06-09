@@ -6,7 +6,7 @@ const ApiService = {
 
   headerWithAuth: {
     "Content-Type": "application/json",
-    Authorization: "Bearer giga_dlugi_token",
+    Authorization: `Bearer ${import.meta.env.VITE_API_TOKEN}`,
   },
 
   async sendRoom(createLevelInput: CreateLevelInput) {

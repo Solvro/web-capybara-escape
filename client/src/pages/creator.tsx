@@ -1,3 +1,4 @@
+import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
 import api from "../api/apiService";
@@ -23,6 +24,7 @@ export function Creator() {
   const [direction, setDirection] = useState<DirectionType | null>(null);
   const [formattedLevel, setFormattedLevel] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [activeBlock, setActiveBlock] = useState<LayerItem | null>(() => {
     return (
       LAYER_ITEMS[LAYER_NAMES.FLOOR]?.find((item) => item.label === "Empty") ||
@@ -77,8 +79,9 @@ export function Creator() {
       data: JSON.parse(formattedLevel),
     };
 
-    api.sendRoom(createLevelInput);
-
+    api.sendRoom(createLevelInput).catch((error: AxiosError) => {
+      alert(`An error occurred, message: ${error.message}`);
+    });
     setIsModalOpen(false);
   };
 
