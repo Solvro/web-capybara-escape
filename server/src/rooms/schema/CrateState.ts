@@ -7,6 +7,7 @@ import { Position } from "./Position";
 export class Crate extends Schema {
   @type("string") id: string;
   @type(Position) position: Position;
+  @type("boolean") isSteel: boolean = false;
 }
 
 export class CrateState extends Schema {
@@ -25,6 +26,14 @@ export class CrateState extends Schema {
   }
 
   createCrate(x: number, y: number): Crate {
+    return this._create(x, y, false);
+  }
+
+  createSteelBox(x: number, y: number): Crate {
+    return this._create(x, y, true);
+  }
+
+  private _create(x: number, y: number, isSteel: boolean): Crate {
     const id = this.nextAvailableId++;
     this.usedIds.add(id);
 
@@ -33,6 +42,7 @@ export class CrateState extends Schema {
     crate.position = new Position();
     crate.position.x = x;
     crate.position.y = y;
+    crate.isSteel = isSteel;
 
     this.crates.set(crate.id, crate);
 

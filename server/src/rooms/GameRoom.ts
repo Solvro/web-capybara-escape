@@ -41,15 +41,12 @@ export class GameRoom extends Room<{ state: RoomState }> {
         });
 
         const movedCrates = this.state.crateState.getAndClearMovedCrates();
-        const movedSteelBoxes =
-          this.state.steelBoxState.getAndClearMovedSteelBoxes();
 
         const positionsToCheck = new Set<string>();
         positionsToCheck.add(`${oldX}_${oldY}`);
         positionsToCheck.add(`${newX}_${newY}`);
 
         this.broadcast("cratesUpdate", { crates: movedCrates });
-        this.broadcast("steelBoxesUpdate", { steelBoxes: movedSteelBoxes });
 
         const doorsAndButtonsToUpdate = this.state.checkButtonPressed();
 
