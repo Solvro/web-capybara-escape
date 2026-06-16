@@ -4,10 +4,10 @@ import { CreatorBoard } from "../components/creator/creator-board/creator-board"
 import { CreatorControl } from "../components/creator/creator-control/creator-control";
 import { CreatorItemsSelect } from "../components/creator/creator-items-select/creator-items-select";
 import { CreatorName } from "../components/creator/creator-name/creator-name";
-import { ASSETS, TILE_MAPPING } from "../constants/blocks";
 import { LAYER_NAMES } from "../constants/global";
 import type { LayerItem } from "../constants/layer-items";
-import { LAYER_ITEMS } from "../constants/layer-items";
+import { LAYER_ITEMS, LAYER_ITEM_KEYS } from "../constants/layer-items";
+import { useCreatorFloorCableRotation } from "../hooks/creator/use-creator-floor-cable-rotation";
 import { type DirectionType } from "../types/direction";
 import { changeBoardSize, generateInitialTiles } from "../utils/tileset-utils";
 
@@ -17,45 +17,41 @@ export function Creator() {
   const [direction, setDirection] = useState<DirectionType | null>(null);
   const [activeBlock, setActiveBlock] = useState<LayerItem | null>(() => {
     return (
-      LAYER_ITEMS[LAYER_NAMES.BACKGROUND]?.find(
-        (item) => item.label === "Empty",
-      ) || null
+      LAYER_ITEMS[LAYER_NAMES.FLOOR]?.find((item) => item.label === "Empty") ||
+      null
     );
   });
 
+  const { floorCableRotationByBase, rotateCableAtBase } =
+    useCreatorFloorCableRotation(activeBlock, setActiveBlock);
+
   const floorDecoys = [
-    ASSETS.VENT_OPEN,
-    ASSETS.VENT_CLOSED,
-    ASSETS.WIRE,
-    ASSETS.BUTTON_RELEASED,
+    LAYER_ITEM_KEYS.VENT_OPEN,
+    LAYER_ITEM_KEYS.VENT_CLOSED,
+    LAYER_ITEM_KEYS.WIRE,
+    `${LAYER_ITEM_KEYS.BUTTON}-0`,
   ];
   const entities = [
-    ASSETS.CRATE,
-    ASSETS.LASER_GUN,
-    ASSETS.CAPYBARA_START,
-    ASSETS.SOL_START,
-    ASSETS.VRON_START,
+    LAYER_ITEM_KEYS.CRATE,
+    `${LAYER_ITEM_KEYS.LASER}-0-right`,
+    LAYER_ITEM_KEYS.CAPYBARA_START,
+    LAYER_ITEM_KEYS.SOL_START,
+    LAYER_ITEM_KEYS.VRON_START,
   ];
-  const wallDecoys = [ASSETS.DOOR_CLOSED];
+  const wallDecoys = [`${LAYER_ITEM_KEYS.DOOR}-0`];
 
-  const [tileIndices, setTileIndices] = useState<(number | null)[][]>(() =>
-    generateInitialTiles(dims, floorDecoys, entities, wallDecoys, TILE_MAPPING),
+  const [tileData, setTileData] = useState<(string | null)[][]>(() =>
+    generateInitialTiles(dims, floorDecoys, entities, wallDecoys),
   );
 
   const [rows, cols] = dims;
   useEffect(() => {
-    setTileIndices((prev) => changeBoardSize([rows, cols], direction, prev));
-  }, [rows, cols]);
+    setTileData((prev) => changeBoardSize([rows, cols], direction, prev));
+  }, [rows, cols, direction]);
 
   const handleReset = () => {
-    setTileIndices(
-      generateInitialTiles(
-        [rows, cols],
-        floorDecoys,
-        entities,
-        wallDecoys,
-        TILE_MAPPING,
-      ),
+    setTileData(
+      generateInitialTiles([rows, cols], floorDecoys, entities, wallDecoys),
     );
   };
 
@@ -75,10 +71,12 @@ export function Creator() {
         </div>
       </div>
       <div className="flex h-[80dvh] w-full items-stretch gap-[1dvw]">
-        <div className="w-[30dvw]">
+        <div className="flex h-full min-h-0 w-[30dvw] flex-col overflow-visible">
           <CreatorItemsSelect
             activeBlock={activeBlock}
             setActiveBlock={setActiveBlock}
+            floorCableRotationByBase={floorCableRotationByBase}
+            rotateCableAtBase={rotateCableAtBase}
           />
         </div>
         <div className="w-[64dvw]">
@@ -87,8 +85,8 @@ export function Creator() {
             setDirection={setDirection}
             setDims={setDims}
             activeBlock={activeBlock}
-            tileIndices={tileIndices}
-            setTileIndices={setTileIndices}
+            tileData={tileData}
+            setTileData={setTileData}
           />
         </div>
       </div>

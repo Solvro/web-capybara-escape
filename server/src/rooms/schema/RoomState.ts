@@ -16,6 +16,7 @@ export class RoomState extends Schema {
   @type("number") width: number = 10;
   @type("number") height: number = 7;
   @type("boolean") gameStarted: boolean = false;
+  @type("boolean") isPaused: boolean = false;
 
   @type([Position]) startingPositions = new ArraySchema<Position>();
 
@@ -461,6 +462,7 @@ export class RoomState extends Schema {
       grid: this.getGridAs2DArray(),
       width: this.width,
       height: this.height,
+      isPaused: this.isPaused,
       players: Array.from(this.playerState.players.values()).map((player) => {
         return {
           index: player.index,

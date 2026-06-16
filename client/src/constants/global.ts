@@ -10,6 +10,25 @@ export const TALL_WALL_HEIGHT = 34;
 export const TALL_WALL_HEIGHT_MULTIPLIER = TALL_WALL_HEIGHT / TILE_SIZE;
 export const EXTRA_HEIGHT = TALL_WALL_HEIGHT_MULTIPLIER - 1;
 
+export const TILESET_URL = `${import.meta.env.BASE_URL}textures/map-tileset.png`;
+
+export const Z_INDEX = {
+  dialog: 50,
+  creatorPopover: 60,
+} as const;
+
+export const COLOR_LIST = [
+  "#FF3B30",
+  "#33cc33",
+  "#007AFF",
+  "#ffaa00",
+  "#aa44ff",
+  "#FF00FF",
+  "#33CC66",
+  "#3399FF",
+  "#FF3344",
+];
+
 export const LAYER_NAMES = {
   FLOOR: "floor", //Floor tiles
   BACKGROUND: "background", //Wall tiles

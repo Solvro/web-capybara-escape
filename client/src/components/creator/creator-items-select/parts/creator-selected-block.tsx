@@ -1,5 +1,9 @@
-import type { LayerItem } from "../../../../constants/layer-items";
+import {
+  type LayerItem,
+  paletteDisplayLabel,
+} from "../../../../constants/layer-items";
 import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
+import { renderTilesetLayer } from "../../shared/render-tileset-layer";
 
 interface CreatorSelectedBlockProps {
   activeBlock: LayerItem | null;
@@ -26,33 +30,73 @@ export function CreatorSelectedBlock({
         </span>
       ) : (
         <>
-          <div className="h-13 w-13 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
+          <div className="relative h-13 w-13 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
             {(() => {
-              const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(
-                activeBlock.frame,
-                24,
-                import.meta.env.BASE_URL,
-              );
+              const composite =
+                activeBlock.baseFrame !== undefined ||
+                Boolean(activeBlock.color) ||
+                (activeBlock.rotationDeg != null &&
+                  activeBlock.rotationDeg % 360 !== 0);
+
+              if (!composite) {
+                const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(
+                  activeBlock.frame,
+                  24,
+                  import.meta.env.BASE_URL,
+                );
+                return (
+                  <div
+                    className="h-6 w-6"
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      backgroundImage: bgUrl,
+                      backgroundPosition: `${bgPosX}px ${bgPosY}px`,
+                      backgroundRepeat: "no-repeat",
+                      imageRendering: "pixelated",
+                      transform: "scale(2)",
+                      transformOrigin: "top left",
+                    }}
+                  />
+                );
+              }
+
               return (
                 <div
                   style={{
                     width: "24px",
                     height: "24px",
-                    backgroundImage: bgUrl,
-                    backgroundPosition: `${bgPosX}px ${bgPosY}px`,
-                    backgroundRepeat: "no-repeat",
-                    imageRendering: "pixelated",
                     transform: "scale(2)",
                     transformOrigin: "top left",
+                    position: "relative",
                   }}
-                  className="h-6 w-6"
-                />
+                >
+                  {activeBlock.baseFrame !== undefined &&
+                    renderTilesetLayer({
+                      frameId: activeBlock.baseFrame,
+                      direction: activeBlock.direction,
+                      rotationDeg: activeBlock.rotationDeg,
+                    })}
+                  {renderTilesetLayer({
+                    frameId: activeBlock.frame,
+                    color: activeBlock.color,
+                    direction: activeBlock.direction,
+                    rotationDeg: activeBlock.rotationDeg,
+                  })}
+                </div>
               );
             })()}
           </div>
-          <span className="text-sm font-bold text-violet-50">
-            {activeBlock.label}
+          <span className="min-w-0 shrink text-sm font-bold break-words text-violet-50">
+            {paletteDisplayLabel(activeBlock)}
           </span>
+          {activeBlock.color && (
+            <div
+              className="h-4 w-4 rounded-full border border-white/50"
+              style={{ backgroundColor: activeBlock.color }}
+              title="Selected color"
+            />
+          )}
         </>
       )}
     </button>

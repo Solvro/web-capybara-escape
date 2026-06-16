@@ -12,8 +12,8 @@ import { CreatorTile } from "./creator-tile";
 interface CreatorBoardProps {
   dims: [number, number];
   activeBlock: LayerItem | null;
-  tileIndices: (number | null)[][];
-  setTileIndices: React.Dispatch<React.SetStateAction<(number | null)[][]>>;
+  tileData: (string | null)[][];
+  setTileData: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
   setDims: (dims: [number, number]) => void;
   setDirection: (direction: DirectionType) => void;
 }
@@ -21,8 +21,8 @@ interface CreatorBoardProps {
 export function CreatorBoard({
   dims,
   activeBlock,
-  tileIndices,
-  setTileIndices,
+  tileData,
+  setTileData,
   setDims,
   setDirection,
 }: CreatorBoardProps) {
@@ -109,18 +109,12 @@ export function CreatorBoard({
       const layerIdx = layerNameToIndex[activeBlock.layer];
 
       const valueToSet =
-        activeBlock.frame === ASSETS.EMPTY ? null : activeBlock.frame;
+        activeBlock.frame === ASSETS.EMPTY ? null : activeBlock.key;
 
       if (layerIdx === undefined) return;
-      setTileIndices((prev) => {
+      setTileData((prev) => {
         const next = prev.map((arr) => [...arr]);
-        if (layerIdx === 0) {
-          next[tileIdx][0] = valueToSet;
-        } else {
-          for (let i = 1; i <= 4; i++) {
-            next[tileIdx][i] = i === layerIdx ? valueToSet : null;
-          }
-        }
+        next[tileIdx][layerIdx] = valueToSet;
         return next;
       });
     }
@@ -147,7 +141,7 @@ export function CreatorBoard({
     const tileIdx = row * cols + col;
 
     if (e.shiftKey) {
-      setTileIndices((prev) => {
+      setTileData((prev) => {
         const next = prev.map((arr) => [...arr]);
         next[tileIdx] = [null, null, null, null, null];
         return next;
@@ -156,7 +150,7 @@ export function CreatorBoard({
       const layerIdx = layerNameToIndex[activeBlock.layer];
       if (layerIdx === undefined) return;
 
-      setTileIndices((prev) => {
+      setTileData((prev) => {
         const next = prev.map((arr) => [...arr]);
         next[tileIdx][layerIdx] = null;
         return next;
@@ -170,6 +164,7 @@ export function CreatorBoard({
       ref={boardRef}
     >
       <CreatorDimensionButtons
+        dimensionAxis="rows"
         dimension={rows}
         onChange={(e) => {
           handleRowsChange(e);
@@ -180,6 +175,7 @@ export function CreatorBoard({
       />
       <div className="flex w-full items-center flex-1">
         <CreatorDimensionButtons
+          dimensionAxis="cols"
           vertical
           dimension={cols}
           onChange={(e) => {
@@ -216,16 +212,14 @@ export function CreatorBoard({
                         : "",
                   }}
                 >
-                  <CreatorTile
-                    sizePx={tileSize}
-                    tileIndices={tileIndices[tileIdx]}
-                  />
+                  <CreatorTile sizePx={tileSize} tileKeys={tileData[tileIdx]} />
                 </div>
               );
             }),
           )}
         </div>
         <CreatorDimensionButtons
+          dimensionAxis="cols"
           vertical
           dimension={cols}
           onChange={(e) => {
@@ -237,6 +231,7 @@ export function CreatorBoard({
         />
       </div>
       <CreatorDimensionButtons
+        dimensionAxis="rows"
         dimension={rows}
         onChange={(e) => {
           handleRowsChange(e);

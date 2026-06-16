@@ -1,7 +1,14 @@
 import { useState } from "react";
 
 import { LAYER_NAMES } from "../../../constants/global";
-import { LAYER_ITEMS, type LayerItem } from "../../../constants/layer-items";
+import type {
+  FloorDecoyRotationDeg,
+  LayerItem,
+} from "../../../constants/layer-items";
+import {
+  LAYER_ITEMS,
+  creatorPaletteKeyForLookup,
+} from "../../../constants/layer-items";
 import { CreatorLayerOptionsGrid } from "./parts/creator-layer-options-grid";
 import { CreatorLayerTabs } from "./parts/creator-layer-tabs";
 import { CreatorSelectedBlock } from "./parts/creator-selected-block";
@@ -17,15 +24,17 @@ const LAYER_TABS = [
 interface CreatorItemsSelectProps {
   activeBlock: LayerItem | null;
   setActiveBlock: (block: LayerItem | null) => void;
+  floorCableRotationByBase: Record<string, FloorDecoyRotationDeg>;
+  rotateCableAtBase: (baseKey: string) => void;
 }
 
 export function CreatorItemsSelect({
   activeBlock,
   setActiveBlock,
+  floorCableRotationByBase,
+  rotateCableAtBase,
 }: CreatorItemsSelectProps) {
   const [selectedLayer, setSelectedLayer] = useState<string>(LAYER_TABS[0].key);
-
-  const items = LAYER_ITEMS[selectedLayer] ?? [];
 
   const handleLayerChange = (layer: string) => {
     setSelectedLayer(layer);
@@ -40,8 +49,9 @@ export function CreatorItemsSelect({
   };
 
   const findLayerForBlock = (blockKey: string): string | null => {
+    const paletteKey = creatorPaletteKeyForLookup(blockKey);
     for (const [layerKey, layerItems] of Object.entries(LAYER_ITEMS)) {
-      if (layerItems.some((item) => item.key === blockKey)) {
+      if (layerItems.some((item) => item.key === paletteKey)) {
         return layerKey;
       }
     }
@@ -59,8 +69,8 @@ export function CreatorItemsSelect({
   };
 
   return (
-    <div className="flex h-full flex-col rounded-lg bg-[#4b2a86] p-4 shadow-lg">
-      <div className="flex h-full w-full max-w-full flex-col">
+    <div className="flex h-full min-h-0 flex-col overflow-visible rounded-lg bg-[#4b2a86] p-4 shadow-lg">
+      <div className="flex h-full min-h-0 w-full max-w-full flex-col overflow-visible">
         <CreatorSelectedBlock
           activeBlock={activeBlock}
           onClick={handleActiveBlockClick}
@@ -73,9 +83,11 @@ export function CreatorItemsSelect({
         />
 
         <CreatorLayerOptionsGrid
-          items={items}
+          layerKey={selectedLayer}
           activeBlock={activeBlock}
           setActiveBlock={setActiveBlock}
+          floorCableRotationByBase={floorCableRotationByBase}
+          rotateCableAtBase={rotateCableAtBase}
         />
       </div>
     </div>

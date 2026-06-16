@@ -1,25 +1,30 @@
-import { TILE_MAPPING } from "../../../constants/blocks";
 import {
   EXTRA_HEIGHT,
   TALL_WALL_HEIGHT_MULTIPLIER,
 } from "../../../constants/global";
+import { ALL_ITEMS_MAP, type LayerItem } from "../../../constants/layer-items";
 import { getTileBackgroundData } from "../../../utils/tileset-utils";
+import { renderTilesetLayer } from "../shared/render-tileset-layer";
 
 interface CreatorTileProps {
   sizePx: number;
-  tileIndices: (number | null)[];
+  tileKeys: (string | null)[];
 }
 
-export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
+export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
   const sourceTileSizePx = 24;
   const scale = sizePx / sourceTileSizePx;
 
-  const safeTileIndices =
-    Array.isArray(tileIndices) && tileIndices.length === 5
-      ? tileIndices
+  const safeKeys =
+    Array.isArray(tileKeys) && tileKeys.length === 5
+      ? tileKeys
       : [null, null, null, null, null];
 
-  if (!safeTileIndices.some((idx) => idx !== null)) {
+  const resolvedItems: (LayerItem | null)[] = safeKeys.map((key) =>
+    key ? (ALL_ITEMS_MAP[key] ?? null) : null,
+  );
+
+  if (!resolvedItems.some((item) => item !== null)) {
     return (
       <div
         className="overflow-hidden border-4 border-emerald-950 bg-transparent"
@@ -31,7 +36,9 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
     );
   }
 
-  // Render in stacking order: first index at the bottom
+  const wallBg = resolvedItems[1];
+  const isWallCell = wallBg?.key === "w1t" || wallBg?.key === "w2t";
+
   return (
     <div
       className="overflow-hidden bg-blue-400"
@@ -44,37 +51,105 @@ export function CreatorTile({ sizePx, tileIndices }: CreatorTileProps) {
         background: "transparent",
       }}
     >
-      {safeTileIndices.map((tileIndex, layerId) => {
-        if (tileIndex === null) return null;
-        const { isTall, bgUrl, bgPosX, bgPosY } = getTileBackgroundData(
-          tileIndex,
-          sourceTileSizePx,
-          import.meta.env.BASE_URL,
-        );
+      {resolvedItems.map((item, layerId) => {
+        if (item === null) return null;
+
+        const { isEntity, isTall, bgUrl, bgPosX, bgPosY } =
+          getTileBackgroundData(
+            item.frame,
+            sourceTileSizePx,
+            import.meta.env.BASE_URL,
+          );
+
+        const topPosition =
+          isWallCell || isTall ? 0 : `${sizePx * EXTRA_HEIGHT}px`;
+
+        const useCompositeBlend =
+          item.baseFrame !== undefined ||
+          Boolean(item.color) ||
+          (item.rotationDeg != null && item.rotationDeg % 360 !== 0);
+
+        if (isEntity) {
+          return (
+            <div
+              key={layerId}
+              style={{
+                position: "absolute",
+                top: topPosition,
+                left: 0,
+                width: `${sourceTileSizePx}px`,
+                height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
+                backgroundImage: bgUrl,
+                backgroundPosition: `${bgPosX}px ${bgPosY}px`,
+                backgroundRepeat: "no-repeat",
+                imageRendering: "pixelated",
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                pointerEvents: "none",
+              }}
+            />
+          );
+        }
+
+        if (!useCompositeBlend) {
+          return (
+            <div
+              key={layerId}
+              style={{
+                position: "absolute",
+                top: topPosition,
+                left: 0,
+                width: `${sourceTileSizePx}px`,
+                height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                pointerEvents: "none",
+              }}
+            >
+              {renderTilesetLayer({
+                frameId: item.frame,
+                tileSizePx: sourceTileSizePx,
+                heightMultiplier: TALL_WALL_HEIGHT_MULTIPLIER,
+                withWallYOffset: true,
+                rotationDeg: item.rotationDeg,
+              })}
+            </div>
+          );
+        }
 
         return (
           <div
             key={layerId}
             style={{
               position: "absolute",
-              top:
-                tileIndices[1] === TILE_MAPPING.w1t.frame ||
-                tileIndices[1] === TILE_MAPPING.w2t.frame ||
-                isTall
-                  ? 0
-                  : `${sizePx * EXTRA_HEIGHT}px`, // AAAAAAAAAA SINGLE SOURCE OF TRUTH
+              top: topPosition,
               left: 0,
               width: `${sourceTileSizePx}px`,
               height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
-              backgroundImage: bgUrl,
-              backgroundPosition: `${bgPosX}px ${bgPosY}px`,
-              backgroundRepeat: "no-repeat",
-              imageRendering: "pixelated",
               transform: `scale(${scale})`,
               transformOrigin: "top left",
               pointerEvents: "none",
             }}
-          />
+          >
+            {item.baseFrame !== undefined &&
+              renderTilesetLayer({
+                frameId: item.baseFrame,
+                direction: item.direction,
+                rotationDeg: item.rotationDeg,
+                tileSizePx: sourceTileSizePx,
+                heightMultiplier: TALL_WALL_HEIGHT_MULTIPLIER,
+                withWallYOffset: true,
+              })}
+            {renderTilesetLayer({
+              frameId: item.frame,
+              color: item.color,
+              direction: item.direction,
+              rotationDeg: item.rotationDeg,
+              tileSizePx: sourceTileSizePx,
+              heightMultiplier: TALL_WALL_HEIGHT_MULTIPLIER,
+              withWallYOffset: true,
+            })}
+          </div>
         );
       })}
     </div>

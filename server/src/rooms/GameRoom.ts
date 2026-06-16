@@ -45,7 +45,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage("move", (client, message) => {
-      if (!this.state.gameStarted) return;
+      if (!this.state.gameStarted || this.state.isPaused) return;
 
       const player = this.state.playerState.players.get(client.sessionId);
       if (!player) return;
@@ -96,7 +96,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.setSimulationInterval((deltaTime) => {
-      if (!this.state.gameStarted) return;
+      if (!this.state.gameStarted || this.state.isPaused) return;
 
       const result = this.state.updateLasers(deltaTime);
       if (result.length > 0) {
@@ -145,6 +145,14 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.broadcast("roomReset", {
         message: "Level has been reset",
         mapInfo: this.state.getMapInfo(),
+      });
+    });
+
+    this.onMessage("togglePause", (client) => {
+      this.state.isPaused = !this.state.isPaused;
+
+      this.broadcast("pauseToggled", {
+        isPaused: this.state.isPaused,
       });
     });
   }
