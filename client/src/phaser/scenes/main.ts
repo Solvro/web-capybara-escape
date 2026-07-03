@@ -1,6 +1,6 @@
 import type { Room } from "@colyseus/sdk";
 
-import { LAYER_NAMES, TILE_SIZE } from "../../constants/global";
+import { CELL_SIZE, LAYER_NAMES, TILE_SIZE } from "../../constants/global";
 import type { LAYER_NAME } from "../../constants/global";
 import type {
   MessageCablesUpdate,
@@ -174,6 +174,13 @@ export class Main extends Phaser.Scene {
 
       room.onMessage("mapInfo", (message: MessageMapInfo) => {
         this.syncPauseState(message.isPaused);
+
+        // Resize the canvas to the full map so the whole map is rendered.
+        // The on-screen size is then multiplied by the zoom (MAP_SCALER).
+        this.scale.resize(
+          message.width * CELL_SIZE,
+          message.height * CELL_SIZE,
+        );
 
         this.displayHandler.createMap(
           message.grid,
