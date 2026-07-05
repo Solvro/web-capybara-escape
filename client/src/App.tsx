@@ -7,7 +7,7 @@ import {
 
 import { Creator } from "./pages/creator";
 import { Game } from "./pages/game";
-import { Intro } from "./pages/intro";
+// import { Intro } from "./pages/intro";
 import { Lobby } from "./pages/lobby";
 import { Playground } from "./pages/playground";
 import { Start } from "./pages/start";
