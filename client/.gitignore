@@ -25,5 +25,5 @@ package-lock.json
 *.sw?
 
 .env
-.env.*
+.env.developmnet
 !.env.example

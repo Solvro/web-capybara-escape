@@ -1,5 +1,6 @@
 import { Client, Room } from "@colyseus/core";
 import { CloseCode } from "@colyseus/shared-types";
+import { isDeepStrictEqual } from "node:util";
 
 import { getMoveVectorFromDirection } from "../shared/utils/vectorUtils";
 import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
@@ -15,11 +16,11 @@ export class GameRoom extends Room<{ state: RoomState }> {
   state = new RoomState();
 
   private roomData: any = fallbackRoom;
+  private readonly isDevelopment = process.env.NODE_ENV === "development";
 
   async onCreate(options: any) {
     this.roomData = await getRoomForGame(options?.levelSlug);
     this.maxClients = this.roomData.maxClients ?? this.maxClients;
-
     this.setMetadata({
       isPrivate: !!options.isPrivate,
     });
@@ -34,12 +35,26 @@ export class GameRoom extends Room<{ state: RoomState }> {
         player.ready = !player.ready;
       }
 
-      if (this.clients.length >= 1) {
-        const allReady = Array.from(
-          this.state.playerState.players.values(),
-        ).every((p) => p.ready);
-        if (allReady) {
-          this.startGame();
+      if (this.isDevelopment) {
+        if (this.clients.length >= 1) {
+          const allReady = Array.from(
+            this.state.playerState.players.values(),
+          ).every((p) => p.ready);
+          if (allReady) {
+            this.startGame();
+            return;
+          }
+        }
+      } else {
+        if (this.clients.length >= this.maxClients) {
+          const allReady = Array.from(
+            this.state.playerState.players.values(),
+          ).every((p) => p.ready);
+          if (allReady) {
+            this.startGame();
+            this.lock();
+            return;
+          }
         }
       }
     });
@@ -155,9 +170,14 @@ export class GameRoom extends Room<{ state: RoomState }> {
         isPaused: this.state.isPaused,
       });
     });
+
+    if (this.isDevelopment) {
+      this.autoDispose = false;
+    }
   }
 
   private startGame() {
+    if (this.state.gameStarted) return;
     this.state.gameStarted = true;
     this.state.loadRoomFromJson(this.roomData);
 
@@ -176,33 +196,90 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
   }
 
+  onAuth(client: Client, options: any, request: any) {
+    if (!this.isDevelopment) {
+      if (this.state.gameStarted) {
+        throw new Error("Game already started. You cannot join.");
+      }
+    }
+    return true;
+  }
+
   onJoin(client: Client, options: any) {
     const nickname = options.name;
 
+    if (this.state.gameStarted) {
+      if (this.state.playerState.players.has(client.sessionId)) {
+        console.log(`Player ${nickname} succesfully reconnected.`);
+        return;
+      }
+
+      // W trybie dev
+      console.log(
+        `Game in progress. Spawning player ${nickname} at an available starting position.`,
+      );
+      this.state.spawnNewPlayer(client.sessionId, nickname);
+
+      const player = this.state.playerState.players.get(client.sessionId);
+      if (player) {
+        const startPos =
+          this.state.startingPositions[
+            player.index % this.state.startingPositions.length
+          ];
+        if (startPos) {
+          player.position.x = startPos.x;
+          player.position.y = startPos.y;
+        }
+      }
+
+      this.broadcast("onAddPlayer", {
+        sessionId: client.sessionId,
+        playerName: player.name,
+        position: {
+          x: player.position.x,
+          y: player.position.y,
+        },
+        index: player.index,
+      });
+
+      return;
+    }
     this.state.spawnNewPlayer(client.sessionId, nickname);
-
     const player = this.state.playerState.players.get(client.sessionId);
-
     console.log(
-      `Gracz ${player.name} dołączył jako ${player.index === 0 ? "Sol" : "Vron"}`,
+      `Player ${player.name} joined as ${player.index === 0 ? "Sol" : "Vron"}`,
     );
   }
 
   async onLeave(client: Client, code: number) {
-    if (code !== CloseCode.CONSENTED) {
+    if (this.isDevelopment) {
+      console.log("Development build: Room stays open.");
       try {
-        // allow disconnected client to reconnect into this room until 20 seconds
+        await this.allowReconnection(client, 10);
+        console.log(`Player ${client.sessionId} reconnected in DEV mode.`);
+      } catch (e) {
+        console.log("Player did not return. Cleaning up player from dev room.");
+        this.broadcast("onRemovePlayer", { sessionId: client.sessionId });
+        this.state.despawnPlayer(client.sessionId);
+      }
+    } else {
+      try {
+        if (code == CloseCode.CONSENTED) {
+          throw new Error("Player left on purpose.");
+        }
+
         await this.allowReconnection(client, 20);
-        return;
-      } catch {
-        // reconnection failed or timed out — clean up below
+        console.log(`Player ${client.sessionId} reconnected.`);
+      } catch (e) {
+        console.log("Player did not return. Game closed.");
+
+        this.broadcast(
+          "error",
+          "One of the players left the game. Room closed.",
+        );
+        this.disconnect(); // Close room and disconnect rest of players
       }
     }
-
-    this.broadcast("onRemovePlayer", {
-      sessionId: client.sessionId,
-    });
-    this.state.despawnPlayer(client.sessionId);
   }
 
   onDispose() {

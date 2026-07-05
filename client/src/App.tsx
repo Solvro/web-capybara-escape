@@ -17,7 +17,7 @@ export function App() {
     <div className="arcade-font flex min-h-screen items-center justify-center bg-violet-950 text-white">
       <Router>
         <Routes>
-          <Route path="/" element={<Intro />} />
+          <Route path="/" element={<Start />} />
           <Route path="/start" element={<Start />} />
           <Route path="/lobby" element={<Lobby />} />
           <Route path="/game" element={<Game />} />

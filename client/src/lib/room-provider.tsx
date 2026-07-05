@@ -93,9 +93,9 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         isReconnecting = true;
         try {
           const parsed = JSON.parse(cached) as CachedReconnection;
-          const { token } = JSON.parse(cached);
+          const { token } = parsed;
 
-          const reconnected = await client.reconnect(token, "game_room");
+          const reconnected = await client.reconnect(token);
 
           setRoom(reconnected);
           setIsConnected(true);
