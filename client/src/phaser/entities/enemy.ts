@@ -23,7 +23,7 @@ export class Enemy extends Entity implements INetworkInterface<EnemyState> {
     return this.enemyId;
   }
 
-  syncServerState({ x, y }: EnemyState): void {
+  syncState({ x, y }: EnemyState): void {
     this.syncGridPosition(x, y);
   }
 }

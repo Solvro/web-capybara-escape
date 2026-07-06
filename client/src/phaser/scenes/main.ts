@@ -311,7 +311,7 @@ export class Main extends Phaser.Scene {
       );
 
       room.onMessage("enemyUpdate", (message: MessageEnemyUpdate) => {
-        this.enemies.get(message.id)?.syncServerState(message);
+        this.enemies.get(message.id)?.syncState(message);
       });
 
       room.onMessage("line", (message: MessageGenerateLines) => {
