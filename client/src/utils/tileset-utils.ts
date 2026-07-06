@@ -368,15 +368,33 @@ export const formatLevel = (
     }
 
     if (floorDecoyLayer) {
-      if (
-        floorDecoyLayer[0] === LAYER_ITEM_KEYS.WIRE ||
-        floorDecoyLayer[0] === LAYER_ITEM_KEYS.WIRE_CURVE
-      ) {
+      if (floorDecoyLayer[0] === LAYER_ITEM_KEYS.WIRE) {
         formattedLevel.mechanics.push({
-          type: floorDecoyLayer[0],
+          type: "wire",
           x,
           y,
           direction: ANGLE_TO_TEXT[floorDecoyLayer[1]],
+        });
+      } else if (floorDecoyLayer[0] === LAYER_ITEM_KEYS.WIRE_CURVE) {
+        const curveDirectionByAngle: Record<string, string> = {
+          "0": "down-right",
+          "90": "down-left",
+          "180": "up-left",
+          "270": "up-right",
+        };
+
+        formattedLevel.mechanics.push({
+          type: "wire",
+          x,
+          y,
+          direction: curveDirectionByAngle[floorDecoyLayer[1]],
+        });
+      } else if (floorDecoyLayer[0] === LAYER_ITEM_KEYS.SOCKET) {
+        formattedLevel.mechanics.push({
+          type: "wire",
+          x,
+          y,
+          direction: "socket",
         });
       } else if (
         floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_ACTIVE ||

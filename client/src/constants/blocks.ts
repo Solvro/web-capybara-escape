@@ -104,7 +104,7 @@ export const FRAME_TO_KEY: Record<number, string> = {
 
 export const ANGLE_TO_TEXT: Record<string, string> = {
   "0": "right",
-  "90": "downt",
+  "90": "down",
   "180": "left",
   "270": "up",
 };
