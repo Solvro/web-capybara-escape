@@ -13,7 +13,11 @@ import {
   paletteDisplayLabel,
   parseRotatableFloorKey,
 } from "../../../../constants/layer-items";
-import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
+import {
+  getEntityRenderData,
+  getUIBlockBackgroundData,
+} from "../../../../utils/tileset-utils";
+import { CreatorEntityPreview } from "../../shared/creator-entity-preview";
 import { renderTilesetLayer } from "../../shared/render-tileset-layer";
 import { CreatorColorPicker } from "./creator-color-picker";
 
@@ -120,6 +124,12 @@ export function CreatorLayerOptionsGrid({
           displayItem.rotationDeg != null &&
           displayItem.rotationDeg % 360 !== 0;
 
+        const entityPreview = getEntityRenderData(
+          displayItem.frame,
+          24,
+          import.meta.env.BASE_URL,
+        );
+
         const previewUsesTilesetLayers =
           useCompositeBlend || needsRotatePreview;
 
@@ -166,7 +176,11 @@ export function CreatorLayerOptionsGrid({
               title={tileHoverTitle}
             >
               <div className="relative h-20 w-20 overflow-hidden border-4 border-emerald-950 bg-blue-400">
-                {!previewUsesTilesetLayers ? (
+                {entityPreview ? (
+                  <div className="flex h-full w-full items-end justify-center">
+                    <CreatorEntityPreview entity={entityPreview} scale={2.5} />
+                  </div>
+                ) : !previewUsesTilesetLayers ? (
                   <div
                     className="h-6 w-6"
                     style={{

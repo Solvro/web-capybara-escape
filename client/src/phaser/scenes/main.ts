@@ -119,7 +119,7 @@ export class Main extends Phaser.Scene {
     const playerSetups = [
       {
         key: "player1",
-        path: "textures/sol/sol-tileset .png",
+        path: "textures/sol/sol-tileset.png",
         config: SOL_ANIM_CONFIG,
       },
       {
@@ -129,7 +129,7 @@ export class Main extends Phaser.Scene {
       },
       {
         key: "player3",
-        path: "textures/sol/sol-tileset .png",
+        path: "textures/sol/sol-tileset.png",
         config: SOL_ANIM_CONFIG,
       },
       {
