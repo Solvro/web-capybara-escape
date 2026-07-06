@@ -38,12 +38,14 @@ export const ASSETS = {
   CAPYBARA_START: 100,
   SOL_START: 101,
   VRON_START: 102,
+  ENEMY_START: 103,
 };
 
 export const ENTITY_SOURCES = {
   CAPYBARA: "/textures/capybara/capybara-tileset.png",
   SOL: "/textures/sol/sol-tileset.png",
   VRON: "/textures/vron/vron-tileset.png",
+  ENEMY: "/textures/enemy/evil-drone-tileset.png",
 };
 
 export interface EntityConfig {
@@ -83,6 +85,14 @@ export const ENTITY_MAPPING: Record<number, EntityConfig> = {
     frameHeight: 30,
     tilesetCols: 6,
     spriteOffset: { x: 0, y: -3 },
+    floorAnchored: true,
+  },
+  [ASSETS.ENEMY_START]: {
+    src: ENTITY_SOURCES.ENEMY,
+    previewFrame: 0,
+    frameWidth: 24,
+    frameHeight: 24,
+    tilesetCols: 4,
     floorAnchored: true,
   },
 };

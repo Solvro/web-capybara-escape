@@ -49,6 +49,7 @@ export function Creator() {
   ];
   const entities = [
     LAYER_ITEM_KEYS.CRATE,
+    LAYER_ITEM_KEYS.ENEMY,
     `${LAYER_ITEM_KEYS.LASER}-0-right`,
     LAYER_ITEM_KEYS.CAPYBARA_START,
     LAYER_ITEM_KEYS.SOL_START,

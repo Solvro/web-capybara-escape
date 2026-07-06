@@ -5,6 +5,7 @@ import { CableState } from "./CableState.js";
 import { Capybara } from "./Capybara.js";
 import { CrateState } from "./CrateState.js";
 import { DoorState } from "./DoorState.js";
+import { EnemyState } from "./EnemyState.js";
 import { LaserState } from "./LaserState.js";
 import { PlayerState } from "./PlayerState.js";
 import { Position } from "./Position.js";
@@ -28,10 +29,13 @@ export class RoomState extends Schema {
   @type(WireState) wireState: WireState = new WireState();
   @type(VentState) ventState: VentState = new VentState();
   @type(Capybara) capybara: Capybara;
+  @type(EnemyState) enemyState: EnemyState = new EnemyState();
 
   private capybaraPath: { x: number; y: number }[] = [];
   private capybaraVelocity: number = 500;
   private capybaraTimer: number = 0;
+  private enemyVelocity: number = 200;
+  private enemyTimers = new Map<number, number>();
 
   loadRoomFromJson(jsonData: any) {
     try {
@@ -62,6 +66,9 @@ export class RoomState extends Schema {
       if (jsonData.entities.capybara) {
         const { x, y } = jsonData.entities.capybara;
         this.capybara = new Capybara(x, y);
+      }
+      for (const enemyData of jsonData.entities.enemies ?? []) {
+        this.enemyState.createEnemy(enemyData.x, enemyData.y);
       }
     } catch (error) {
       throw `Error loading room data: ${error} `;
@@ -248,58 +255,265 @@ export class RoomState extends Schema {
     return vent !== null && vent !== undefined && vent.open;
   }
 
+  private getEnemyChaseTargets(): { x: number; y: number }[] {
+    const targets = [...this.playerState.players.values()].map((player) => ({
+      x: player.position.x,
+      y: player.position.y,
+    }));
+
+    if (this.capybara && this.capybara.state !== "jump") {
+      targets.push({
+        x: this.capybara.position.x,
+        y: this.capybara.position.y,
+      });
+    }
+
+    return targets;
+  }
+
+  private isOccupiedByOtherEnemy(
+    x: number,
+    y: number,
+    enemyId: number,
+  ): boolean {
+    return [...this.enemyState.enemies.values()].some(
+      (enemy) =>
+        enemy.id !== enemyId &&
+        enemy.position.x === x &&
+        enemy.position.y === y,
+    );
+  }
+
+  private isEnemyTargetTile(x: number, y: number): boolean {
+    const playerOnTile = [...this.playerState.players.values()].some(
+      (player) => player.position.x === x && player.position.y === y,
+    );
+
+    const capybaraOnTile =
+      this.capybara !== undefined &&
+      this.capybara.state !== "jump" &&
+      this.capybara.position.x === x &&
+      this.capybara.position.y === y;
+
+    return playerOnTile || capybaraOnTile;
+  }
+
+  private isEnemyOnChaseTarget(enemy: { position: Position }): boolean {
+    return this.isEnemyTargetTile(enemy.position.x, enemy.position.y);
+  }
+
+  private isWalkableForEnemy(x: number, y: number, enemyId: number): boolean {
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) return false;
+
+    const cell = this.getCellValue(x, y);
+    if (!cell.startsWith("f")) return false;
+
+    if (this.crateState.getCrateAt(x, y)) return false;
+    if (!this.doorState.isOpenOrEmptyAt(x, y)) return false;
+    if (this.isOccupiedByOtherEnemy(x, y, enemyId)) return false;
+
+    return true;
+  }
+
+  private findPathToTarget(
+    startNode: { x: number; y: number },
+    targetNode: { x: number; y: number },
+    enemyId: number,
+  ): { x: number; y: number }[] | null {
+    const queue: { x: number; y: number }[] = [startNode];
+    const visited = new Set<string>([`${startNode.x}_${startNode.y}`]);
+    const parents = new Map<string, { x: number; y: number }>();
+    const delta = [
+      { x: 0, y: 1 },
+      { x: 0, y: -1 },
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+    ];
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      if (current.x === targetNode.x && current.y === targetNode.y) {
+        return this.reconstructPath(parents, current);
+      }
+
+      for (const nextMove of delta) {
+        const nextX = current.x + nextMove.x;
+        const nextY = current.y + nextMove.y;
+        const nextKey = `${nextX}_${nextY}`;
+
+        if (visited.has(nextKey)) continue;
+
+        const isTarget = nextX === targetNode.x && nextY === targetNode.y;
+        if (!isTarget && !this.isWalkableForEnemy(nextX, nextY, enemyId)) {
+          continue;
+        }
+
+        visited.add(nextKey);
+        parents.set(nextKey, current);
+        queue.push({ x: nextX, y: nextY });
+      }
+    }
+
+    return null;
+  }
+
+  private findPathToNearestEnemyTarget(
+    enemyId: number,
+  ): { x: number; y: number }[] | null {
+    const enemy = [...this.enemyState.enemies.values()].find(
+      (entry) => entry.id === enemyId,
+    );
+    if (!enemy) return null;
+
+    if (this.isEnemyOnChaseTarget(enemy)) {
+      return null;
+    }
+
+    const startNode = {
+      x: enemy.position.x,
+      y: enemy.position.y,
+    };
+
+    let bestPath: { x: number; y: number }[] | null = null;
+    for (const target of this.getEnemyChaseTargets()) {
+      const path = this.findPathToTarget(startNode, target, enemyId);
+      if (path === null || path.length <= 1) continue;
+      if (bestPath === null || path.length < bestPath.length) {
+        bestPath = path;
+      }
+    }
+
+    return bestPath;
+  }
+
+  private updateEnemies(deltaTime: number) {
+    const updates: { id: number; x: number; y: number; state: string }[] = [];
+
+    for (const enemy of this.enemyState.enemies.values()) {
+      if (this.isEnemyOnChaseTarget(enemy)) {
+        enemy.state = "idle";
+        updates.push({
+          id: enemy.id,
+          x: enemy.position.x,
+          y: enemy.position.y,
+          state: enemy.state,
+        });
+        continue;
+      }
+
+      const timer = (this.enemyTimers.get(enemy.id) ?? 0) + deltaTime;
+      this.enemyTimers.set(enemy.id, timer);
+
+      const path = this.findPathToNearestEnemyTarget(enemy.id);
+      if (path === null) {
+        enemy.state = "idle";
+        updates.push({
+          id: enemy.id,
+          x: enemy.position.x,
+          y: enemy.position.y,
+          state: enemy.state,
+        });
+        continue;
+      }
+
+      if (timer < this.enemyVelocity) {
+        updates.push({
+          id: enemy.id,
+          x: enemy.position.x,
+          y: enemy.position.y,
+          state: enemy.state,
+        });
+        continue;
+      }
+
+      this.enemyTimers.set(enemy.id, 0);
+
+      const nextStep = path[1];
+      if (nextStep && this.isEnemyTargetTile(nextStep.x, nextStep.y)) {
+        enemy.position.x = nextStep.x;
+        enemy.position.y = nextStep.y;
+        enemy.state = "idle";
+      } else if (
+        nextStep &&
+        this.isWalkableForEnemy(nextStep.x, nextStep.y, enemy.id)
+      ) {
+        enemy.position.x = nextStep.x;
+        enemy.position.y = nextStep.y;
+        enemy.state = "run";
+      } else {
+        enemy.state = "idle";
+      }
+
+      updates.push({
+        id: enemy.id,
+        x: enemy.position.x,
+        y: enemy.position.y,
+        state: enemy.state,
+      });
+    }
+
+    return updates;
+  }
+
   updateCapybara(deltaTime: number) {
-    if (!this.capybara) return;
-    if (this.capybara.state === "jump") return;
+    if (this.capybara && this.capybara.state !== "jump") {
+      if (this.capybaraPath.length === 0) {
+        const path = this.findPathToVent();
 
-    if (this.capybaraPath.length === 0) {
-      const path = this.findPathToVent();
+        if (path && path.length > 1) {
+          path.shift();
+          this.capybaraPath = path;
+        }
+      }
 
-      if (path && path.length > 1) {
-        path.shift();
-        this.capybaraPath = path;
+      if (this.capybaraPath.length > 0) {
+        this.capybaraTimer += deltaTime;
+
+        if (this.capybaraTimer >= this.capybaraVelocity) {
+          this.capybaraTimer = 0;
+          const nextStep = this.capybaraPath.shift();
+
+          if (nextStep) {
+            if (
+              !this.isWalkableForCapybara(nextStep.x, nextStep.y) ||
+              !this.ventState.isOpenOrEmptyAt(nextStep.x, nextStep.y)
+            ) {
+              this.capybaraPath = [];
+            } else {
+              this.capybara.position.x = nextStep.x;
+              this.capybara.position.y = nextStep.y;
+
+              if (this.isCapybaraOnOpenVent(nextStep.x, nextStep.y)) {
+                this.capybara.state = "jump";
+                this.capybaraPath = [];
+              } else {
+                this.capybara.state = "run";
+              }
+            }
+          }
+        }
+      } else if (
+        this.isCapybaraOnOpenVent(
+          this.capybara.position.x,
+          this.capybara.position.y,
+        )
+      ) {
+        this.capybara.state = "jump";
+      } else {
+        this.capybara.state = "idle";
       }
     }
 
-    if (this.capybaraPath.length > 0) {
-      this.capybaraTimer += deltaTime;
-
-      if (this.capybaraTimer < this.capybaraVelocity) {
-        return;
-      }
-      this.capybaraTimer = 0;
-      const nextStep = this.capybaraPath.shift();
-
-      if (nextStep) {
-        if (
-          !this.isWalkableForCapybara(nextStep.x, nextStep.y) ||
-          !this.ventState.isOpenOrEmptyAt(nextStep.x, nextStep.y)
-        ) {
-          this.capybaraPath = [];
-          return;
-        }
-
-        this.capybara.position.x = nextStep.x;
-        this.capybara.position.y = nextStep.y;
-
-        if (this.isCapybaraOnOpenVent(nextStep.x, nextStep.y)) {
-          this.capybara.state = "jump";
-          this.capybaraPath = [];
-          return;
-        }
-
-        this.capybara.state = "run";
-      }
-    } else if (
-      this.isCapybaraOnOpenVent(
-        this.capybara.position.x,
-        this.capybara.position.y,
-      )
-    ) {
-      this.capybara.state = "jump";
-    } else {
-      this.capybara.state = "idle";
-    }
+    return {
+      capybara: this.capybara
+        ? {
+            x: this.capybara.position.x,
+            y: this.capybara.position.y,
+            state: this.capybara.state,
+          }
+        : null,
+      enemies: this.updateEnemies(deltaTime),
+    };
   }
 
   spawnNewPlayer(sessionId: string, name: string = null) {
@@ -323,6 +537,7 @@ export class RoomState extends Schema {
     this.laserState.onRoomDispose();
     this.cableState.onRoomDispose();
     this.wireState.onRoomDispose();
+    this.enemyState.clear();
   }
 
   movePlayer(sessionId: string, deltaX: number, deltaY: number): boolean {
@@ -537,6 +752,12 @@ export class RoomState extends Schema {
             state: this.capybara.state,
           }
         : null,
+      enemies: Array.from(this.enemyState.enemies.values()).map((enemy) => ({
+        id: enemy.id,
+        x: enemy.position.x,
+        y: enemy.position.y,
+        state: enemy.state,
+      })),
     };
   }
 
@@ -639,6 +860,8 @@ export class RoomState extends Schema {
     this.grid.clear();
     this.startingPositions.clear();
     this.capybaraPath = [];
+    this.enemyTimers.clear();
     this.capybara = undefined;
+    this.enemyState.clear();
   }
 }

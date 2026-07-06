@@ -6,6 +6,7 @@ import type {
   MessageCablesUpdate,
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
+  MessageEnemyUpdate,
   MessageGenerateLines,
   MessageLasersUpdate,
   MessageMapInfo,
@@ -19,10 +20,12 @@ import type { Player as PlayerType } from "../../types/player";
 import { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
 import { SOL_ANIM_CONFIG } from "../animators/config/sol-animator-config";
 import { VRON_ANIM_CONFIG } from "../animators/config/vron-animator-config";
+import { EnemyEntityAnimator } from "../animators/enemy-entity-animator";
 import { StateController } from "../animators/entity-animator";
 import { PlayerEntityAnimator } from "../animators/player-entity-animator";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
+import { Enemy } from "../entities/enemy";
 import { Player } from "../entities/player";
 import { Display } from "../lib/display";
 import { Button } from "../mechanics/button";
@@ -38,6 +41,7 @@ export class Main extends Phaser.Scene {
   private room!: Room;
   displayHandler!: Display;
   private capybara: Capybara | null = null;
+  private enemies = new Map<number, Enemy>();
   private players = new Map<string, Player>();
   private crates = new Map<number, Crate>();
 
@@ -64,6 +68,7 @@ export class Main extends Phaser.Scene {
   private playerEntityAnimators!: PlayerEntityAnimator[];
   private isPaused = false;
   private capybaraAnimator!: CapybaraEntityAnimator;
+  private enemyAnimatorTemplate!: EnemyEntityAnimator;
 
   constructor() {
     super({ key: "Main" });
@@ -115,6 +120,12 @@ export class Main extends Phaser.Scene {
     );
     this.capybaraAnimator.preload(this);
 
+    this.enemyAnimatorTemplate = new EnemyEntityAnimator(
+      "textures/enemy/evil-drone-tileset.png",
+      new StateController(),
+    );
+    this.enemyAnimatorTemplate.preload(this);
+
     // player textures
     const playerSetups = [
       {
@@ -156,6 +167,7 @@ export class Main extends Phaser.Scene {
       animator.register(this);
     }
     this.capybaraAnimator.register(this);
+    this.enemyAnimatorTemplate.register(this);
 
     // Input setup
     if (this.input.keyboard !== null) {
@@ -225,6 +237,10 @@ export class Main extends Phaser.Scene {
         }
 
         this.addCapybara(message.capybara);
+
+        for (const enemy of message.enemies) {
+          this.addEnemy(enemy);
+        }
       });
 
       room.onMessage("onAddPlayer", (message: MessageOnAddPlayer) => {
@@ -293,6 +309,10 @@ export class Main extends Phaser.Scene {
           this.capybara?.syncServerState(message);
         },
       );
+
+      room.onMessage("enemyUpdate", (message: MessageEnemyUpdate) => {
+        this.enemies.get(message.id)?.syncServerState(message);
+      });
 
       room.onMessage("line", (message: MessageGenerateLines) => {
         const player = this.players.get(message.sessionId);
@@ -379,6 +399,9 @@ export class Main extends Phaser.Scene {
       player.animate();
     }
     this.capybara?.animate();
+    for (const enemy of this.enemies.values()) {
+      enemy.animate();
+    }
 
     if (time - this.playerMoveDebounce < 250) {
       return;
@@ -434,6 +457,28 @@ export class Main extends Phaser.Scene {
     this.displayHandler.add("entities", this.capybara);
   }
 
+  private addEnemy(enemyInfo: { id: number; x: number; y: number }) {
+    const existing = this.enemies.get(enemyInfo.id);
+    if (existing !== undefined) {
+      existing.destroy();
+    }
+
+    const animator = new EnemyEntityAnimator(
+      "textures/enemy/evil-drone-tileset.png",
+      new StateController(),
+    );
+
+    const enemy = new Enemy(
+      this,
+      enemyInfo.x,
+      enemyInfo.y,
+      enemyInfo.id,
+      animator,
+    );
+    this.enemies.set(enemyInfo.id, enemy);
+    this.displayHandler.add(LAYER_NAMES.ENTITIES, enemy);
+  }
+
   handleInput(time: number) {
     let direction = "";
 
@@ -464,6 +509,7 @@ export class Main extends Phaser.Scene {
       this.crates,
       this.doors,
       this.buttons,
+      this.enemies,
     ];
 
     for (const object of mapsToDestroy) {

@@ -3,6 +3,7 @@ import type { Cable } from "../types/cable";
 import type { Capybara } from "../types/capybara";
 import type { Crate } from "../types/crate";
 import type { Door } from "../types/door";
+import type { Enemy } from "../types/enemy";
 import type { Laser } from "../types/laser";
 import type { Player } from "../types/player";
 import type { Vent } from "../types/vent";
@@ -22,6 +23,14 @@ export interface MessageMapInfo {
   wires: Wire[];
   vents: Vent[];
   capybara: Capybara;
+  enemies: Enemy[];
+}
+
+export interface MessageEnemyUpdate {
+  id: number;
+  x: number;
+  y: number;
+  state: string;
 }
 
 export interface MessageCratesUpdate {

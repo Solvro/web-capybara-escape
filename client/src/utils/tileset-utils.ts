@@ -331,6 +331,8 @@ export const formatLevel = (
     if (entityKey) {
       if (entityKey === LAYER_ITEM_KEYS.CAPYBARA_START) {
         formattedLevel.entities.capybara = { x, y };
+      } else if (entityKey === LAYER_ITEM_KEYS.ENEMY) {
+        formattedLevel.entities.enemies.push({ x, y });
       } else if (entityLayer?.[1] === "start") {
         formattedLevel.entities.players.push({ x, y });
       } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.CRATE) {

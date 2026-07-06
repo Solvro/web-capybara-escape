@@ -6,7 +6,7 @@ export type FormattedLevelType = {
   mechanics: unknown[];
   entities: {
     players: { x: number; y: number }[];
-    enemies: unknown[];
+    enemies: { x: number; y: number }[];
     crates: { x: number; y: number }[];
     vents: { x: number; y: number; open: boolean }[];
     capybara: { x: number; y: number };
