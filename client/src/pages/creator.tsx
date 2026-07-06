@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import api from "../api/apiService";
 import { CreatorBoard } from "../components/creator/creator-board/creator-board";
 import { CreatorControl } from "../components/creator/creator-control/creator-control";
+import {
+  CreatorExportModal,
+  type CreatorExportUploadStatus,
+} from "../components/creator/creator-export-modal/creator-export-modal";
 import { CreatorItemsSelect } from "../components/creator/creator-items-select/creator-items-select";
 import { CreatorName } from "../components/creator/creator-name/creator-name";
 import { LAYER_NAMES } from "../constants/global";
@@ -24,6 +28,8 @@ export function Creator() {
   const [direction, setDirection] = useState<DirectionType | null>(null);
   const [formattedLevel, setFormattedLevel] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [uploadStatus, setUploadStatus] =
+    useState<CreatorExportUploadStatus>("idle");
 
   const [activeBlock, setActiveBlock] = useState<LayerItem | null>(() => {
     return (
@@ -68,10 +74,11 @@ export function Creator() {
   const onRoomSubmit = () => {
     const newFormattedLevel = formatLevel(tileData, dims);
     setFormattedLevel(JSON.stringify(newFormattedLevel, null, 2));
+    setUploadStatus("idle");
     setIsModalOpen(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const createLevelInput: CreateLevelInput = {
       slug: levelName,
       name: levelName,
@@ -79,10 +86,25 @@ export function Creator() {
       data: JSON.parse(formattedLevel),
     };
 
-    api.sendRoom(createLevelInput).catch((error: AxiosError) => {
-      alert(`An error occurred, message: ${error.message}`);
-    });
+    setUploadStatus("loading");
+
+    try {
+      await api.sendRoom(createLevelInput);
+      setUploadStatus("success");
+    } catch (error) {
+      console.error("Failed to upload level:", error);
+      if (error instanceof Error && "response" in error) {
+        const axiosError = error as AxiosError;
+        console.error("Upload response:", axiosError.response?.data);
+        console.error("Upload status:", axiosError.response?.status);
+      }
+      setUploadStatus("error");
+    }
+  };
+
+  const handleCloseModal = () => {
     setIsModalOpen(false);
+    setUploadStatus("idle");
   };
 
   return (
@@ -124,31 +146,14 @@ export function Creator() {
         </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50">
-          <div className="absolute left-[2.5%] top-[18%] flex h-[80%] w-[30%] flex-col gap-4 rounded bg-white p-6 text-black shadow-lg">
-            <textarea
-              className="w-full flex-grow resize-none rounded border border-gray-300 p-2 font-mono text-sm"
-              value={formattedLevel}
-              onChange={(e) => setFormattedLevel(e.target.value)}
-            />
-            <div className="flex justify-end gap-4">
-              <button
-                className="rounded bg-gray-300 px-4 py-2 font-semibold hover:bg-gray-400"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
-                onClick={handleConfirm}
-              >
-                Send
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CreatorExportModal
+        isOpen={isModalOpen}
+        formattedLevel={formattedLevel}
+        uploadStatus={uploadStatus}
+        onFormattedLevelChange={setFormattedLevel}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirm}
+      />
     </>
   );
 }
