@@ -41,36 +41,48 @@ export const ASSETS = {
 
 export const ENTITY_SOURCES = {
   CAPYBARA: "/textures/capybara/capybara-tileset.png",
-  SOL: "/textures/sol/sol-tileset .png",
+  SOL: "/textures/sol/sol-tileset.png",
   VRON: "/textures/vron/vron-tileset.png",
 };
 
 export interface EntityConfig {
   src: string;
-  isTall: boolean;
   /** Frame index in the entity spritesheet used for creator preview */
   previewFrame: number;
+  frameWidth?: number;
   frameHeight?: number;
   tilesetCols?: number;
+  spriteOffset?: { x: number; y: number };
+  /** Align sprite feet to the floor row in the creator grid */
+  floorAnchored?: boolean;
 }
 
 export const ENTITY_MAPPING: Record<number, EntityConfig> = {
   [ASSETS.CAPYBARA_START]: {
     src: ENTITY_SOURCES.CAPYBARA,
-    isTall: true,
     previewFrame: 4,
+    frameWidth: 24,
+    frameHeight: 24,
+    tilesetCols: 4,
+    floorAnchored: true,
   },
   [ASSETS.SOL_START]: {
     src: ENTITY_SOURCES.SOL,
-    isTall: true,
     previewFrame: 4,
+    frameWidth: 24,
     frameHeight: 30,
+    tilesetCols: 4,
+    spriteOffset: { x: 0, y: -3 },
+    floorAnchored: true,
   },
   [ASSETS.VRON_START]: {
     src: ENTITY_SOURCES.VRON,
-    isTall: true,
     previewFrame: 6,
+    frameWidth: 24,
     frameHeight: 30,
+    tilesetCols: 6,
+    spriteOffset: { x: 0, y: -3 },
+    floorAnchored: true,
   },
 };
 

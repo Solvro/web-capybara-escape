@@ -2,7 +2,11 @@ import {
   type LayerItem,
   paletteDisplayLabel,
 } from "../../../../constants/layer-items";
-import { getUIBlockBackgroundData } from "../../../../utils/tileset-utils";
+import {
+  getEntityRenderData,
+  getUIBlockBackgroundData,
+} from "../../../../utils/tileset-utils";
+import { CreatorEntityPreview } from "../../shared/creator-entity-preview";
 import { renderTilesetLayer } from "../../shared/render-tileset-layer";
 
 interface CreatorSelectedBlockProps {
@@ -32,11 +36,25 @@ export function CreatorSelectedBlock({
         <>
           <div className="relative h-13 w-13 overflow-hidden border-2 border-amber-400 bg-blue-400 shadow-[0_0_8px_rgba(251,191,36,0.4)]">
             {(() => {
+              const entityPreview = activeBlock
+                ? getEntityRenderData(
+                    activeBlock.frame,
+                    24,
+                    import.meta.env.BASE_URL,
+                  )
+                : null;
               const composite =
-                activeBlock.baseFrame !== undefined ||
-                Boolean(activeBlock.color) ||
-                (activeBlock.rotationDeg != null &&
-                  activeBlock.rotationDeg % 360 !== 0);
+                activeBlock !== null &&
+                (activeBlock.baseFrame !== undefined ||
+                  Boolean(activeBlock.color) ||
+                  (activeBlock.rotationDeg != null &&
+                    activeBlock.rotationDeg % 360 !== 0));
+
+              if (entityPreview) {
+                return (
+                  <CreatorEntityPreview entity={entityPreview} scale={2} />
+                );
+              }
 
               if (!composite) {
                 const { bgUrl, bgPosX, bgPosY } = getUIBlockBackgroundData(

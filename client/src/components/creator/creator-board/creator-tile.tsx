@@ -3,7 +3,7 @@ import {
   TALL_WALL_HEIGHT_MULTIPLIER,
 } from "../../../constants/global";
 import { ALL_ITEMS_MAP, type LayerItem } from "../../../constants/layer-items";
-import { getTileBackgroundData } from "../../../utils/tileset-utils";
+import { getEntityRenderData } from "../../../utils/tileset-utils";
 import { renderTilesetLayer } from "../shared/render-tileset-layer";
 
 interface CreatorTileProps {
@@ -54,33 +54,31 @@ export function CreatorTile({ sizePx, tileKeys }: CreatorTileProps) {
       {resolvedItems.map((item, layerId) => {
         if (item === null) return null;
 
-        const { isEntity, isTall, bgUrl, bgPosX, bgPosY } =
-          getTileBackgroundData(
-            item.frame,
-            sourceTileSizePx,
-            import.meta.env.BASE_URL,
-          );
+        const entityRenderData = getEntityRenderData(
+          item.frame,
+          sourceTileSizePx,
+          import.meta.env.BASE_URL,
+        );
 
-        const topPosition =
-          isWallCell || isTall ? 0 : `${sizePx * EXTRA_HEIGHT}px`;
+        const topPosition = isWallCell ? 0 : `${sizePx * EXTRA_HEIGHT}px`;
 
         const useCompositeBlend =
           item.baseFrame !== undefined ||
           Boolean(item.color) ||
           (item.rotationDeg != null && item.rotationDeg % 360 !== 0);
 
-        if (isEntity) {
+        if (entityRenderData) {
           return (
             <div
               key={layerId}
               style={{
                 position: "absolute",
-                top: topPosition,
+                top: `${(entityRenderData.topSourcePx / sourceTileSizePx) * sizePx}px`,
                 left: 0,
-                width: `${sourceTileSizePx}px`,
-                height: `${sourceTileSizePx * TALL_WALL_HEIGHT_MULTIPLIER}px`,
-                backgroundImage: bgUrl,
-                backgroundPosition: `${bgPosX}px ${bgPosY}px`,
+                width: `${entityRenderData.frameWidth}px`,
+                height: `${entityRenderData.frameHeight}px`,
+                backgroundImage: entityRenderData.bgUrl,
+                backgroundPosition: `${entityRenderData.bgPosX}px ${entityRenderData.bgPosY}px`,
                 backgroundRepeat: "no-repeat",
                 imageRendering: "pixelated",
                 transform: `scale(${scale})`,

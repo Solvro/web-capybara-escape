@@ -1,6 +1,12 @@
 import { ANGLE_TO_TEXT, ENTITY_MAPPING } from "../constants/blocks";
-import { COLOR_LIST, LAYER_NAMES, layerNameToIndex } from "../constants/global";
-import { EXTRA_HEIGHT, TILESET_URL } from "../constants/global";
+import {
+  COLOR_LIST,
+  EXTRA_HEIGHT,
+  LAYER_NAMES,
+  TALL_WALL_HEIGHT,
+  TILESET_URL,
+  layerNameToIndex,
+} from "../constants/global";
 import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { Direction, type DirectionType } from "../types/direction";
 import type { FormattedLevelType } from "../types/formattedLevel";
@@ -177,25 +183,69 @@ export function changeBoardSize(
 
 const TILESET_COLUMNS = 6;
 
+function buildEntityTextureUrl(src: string, baseUrl: string) {
+  const normalizedBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const path = src.startsWith("/") ? src.slice(1) : src;
+  return `url("${encodeURI(`${normalizedBase}${path}`)}")`;
+}
+
+export type EntityRenderData = {
+  bgUrl: string;
+  bgPosX: number;
+  bgPosY: number;
+  frameWidth: number;
+  frameHeight: number;
+  topSourcePx: number;
+};
+
+export function getEntityRenderData(
+  frame: number,
+  sourceTileSizePx: number,
+  baseUrl: string,
+): EntityRenderData | null {
+  const entity = ENTITY_MAPPING[frame];
+  if (!entity) return null;
+
+  const frameWidth = entity.frameWidth ?? sourceTileSizePx;
+  const frameHeight = entity.frameHeight ?? sourceTileSizePx;
+  const tilesetCols = entity.tilesetCols ?? TILESET_COLUMNS;
+  const spriteOffset = entity.spriteOffset ?? { x: 0, y: 0 };
+  const pos = getTilesetBackgroundPosition(
+    entity.previewFrame,
+    tilesetCols,
+    frameHeight,
+  );
+
+  const topSourcePx = entity.floorAnchored
+    ? TALL_WALL_HEIGHT - frameHeight + spriteOffset.y
+    : 0;
+
+  return {
+    bgUrl: buildEntityTextureUrl(entity.src, baseUrl),
+    bgPosX: pos.x + spriteOffset.x,
+    bgPosY: pos.y,
+    frameWidth,
+    frameHeight,
+    topSourcePx,
+  };
+}
+
 export const getTileBackgroundData = (
   tileIndex: number,
   sourceTileSizePx: number,
   baseUrl: string,
 ) => {
-  const entity = ENTITY_MAPPING[tileIndex];
+  const entityRenderData = getEntityRenderData(
+    tileIndex,
+    sourceTileSizePx,
+    baseUrl,
+  );
 
-  if (entity) {
-    const pos = getTilesetBackgroundPosition(
-      entity.previewFrame,
-      entity.tilesetCols ?? TILESET_COLUMNS,
-      entity.frameHeight ?? sourceTileSizePx,
-    );
+  if (entityRenderData) {
     return {
       isEntity: true,
-      isTall: entity.isTall,
-      bgUrl: `url(${baseUrl}${entity.src.substring(1)})`,
-      bgPosX: pos.x,
-      bgPosY: pos.y,
+      isTall: false,
+      ...entityRenderData,
     };
   }
 
@@ -219,20 +269,14 @@ export const getUIBlockBackgroundData = (
   sourceTileSizePx: number,
   baseUrl: string,
 ) => {
-  const isEntity = ENTITY_MAPPING[frame] !== undefined;
+  const entityRenderData = getEntityRenderData(
+    frame,
+    sourceTileSizePx,
+    baseUrl,
+  );
 
-  if (isEntity) {
-    const entity = ENTITY_MAPPING[frame];
-    const pos = getTilesetBackgroundPosition(
-      entity?.previewFrame ?? 0,
-      entity?.tilesetCols ?? TILESET_COLUMNS,
-      entity?.frameHeight ?? sourceTileSizePx,
-    );
-    return {
-      bgUrl: `url(${baseUrl}${entity?.src.substring(1) ?? ""})`,
-      bgPosX: pos.x,
-      bgPosY: pos.y,
-    };
+  if (entityRenderData) {
+    return entityRenderData;
   }
 
   const pos = getTilesetBackgroundPosition(
@@ -270,30 +314,28 @@ export const formatLevel = (
   let x = 0,
     y = 0;
   let cableCount = 0,
-    laserCount = 0,
-    doorCount = 0,
-    buttonCount = 0;
+    laserCount = 0;
 
   tileIndices.forEach((element, index) => {
     const frame =
       element[1] !== null ? element[1] : element[0] !== null ? element[0] : "";
     formattedLevel.layout[y].push(frame);
 
-    const entityLayer =
-      element[layerNameToIndex[LAYER_NAMES.ENTITIES]]?.split("-");
+    const entityKey = element[layerNameToIndex[LAYER_NAMES.ENTITIES]];
+    const entityLayer = entityKey?.split("-");
     const wallDecoyLayer =
       element[layerNameToIndex[LAYER_NAMES.WALL_DECOYS]]?.split("-");
     const floorDecoyLayer =
       element[layerNameToIndex[LAYER_NAMES.FLOOR_DECOYS]]?.split("-");
 
-    if (entityLayer) {
-      if (entityLayer[0] === LAYER_ITEM_KEYS.CAPYBARA_START) {
+    if (entityKey) {
+      if (entityKey === LAYER_ITEM_KEYS.CAPYBARA_START) {
         formattedLevel.entities.capybara = { x, y };
-      } else if (entityLayer[1] === "start") {
+      } else if (entityLayer?.[1] === "start") {
         formattedLevel.entities.players.push({ x, y });
-      } else if (entityLayer[0] === LAYER_ITEM_KEYS.CRATE) {
+      } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.CRATE) {
         formattedLevel.entities.crates.push({ x, y });
-      } else if (entityLayer[0] === LAYER_ITEM_KEYS.LASER) {
+      } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.LASER) {
         const color = COLOR_LIST[Number.parseInt(entityLayer[1])];
         formattedLevel.mechanics.push({
           type: "laser",
@@ -313,16 +355,16 @@ export const formatLevel = (
     }
 
     if (wallDecoyLayer && wallDecoyLayer[0] === LAYER_ITEM_KEYS.DOOR) {
-      const color = COLOR_LIST[Number.parseInt(wallDecoyLayer[1])];
+      const colorIndex = Number.parseInt(wallDecoyLayer[1]);
+      const color = COLOR_LIST[colorIndex];
       formattedLevel.mechanics.push({
-        id: `door-${color}-${doorCount}`,
+        id: `door-${color}-${colorIndex}`,
         type: "door",
         color,
         x,
         y,
         active: false,
       });
-      doorCount++;
     }
 
     if (floorDecoyLayer) {
@@ -352,14 +394,15 @@ export const formatLevel = (
           startDamaging: floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_ACTIVE,
         });
       } else if (floorDecoyLayer[0] === LAYER_ITEM_KEYS.BUTTON) {
-        const color = COLOR_LIST[Number.parseInt(floorDecoyLayer[1])];
+        const colorIndex = Number.parseInt(floorDecoyLayer[1]);
+        const color = COLOR_LIST[colorIndex];
         formattedLevel.mechanics.push({
-          id: `button-${color}-${buttonCount}`,
+          id: `button-${color}-${colorIndex}`,
           type: "button",
           color,
           x,
           y,
-          doorId: `door-${color}`,
+          doorId: `door-${color}-${colorIndex}`,
         });
       } else if (
         floorDecoyLayer[0] === LAYER_ITEM_KEYS.VENT_CLOSED ||
