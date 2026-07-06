@@ -31,6 +31,7 @@ import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
 import { Wire } from "../mechanics/wire";
+import { NameTag } from "../speech-bubbles/name-tag";
 import { SpeechBubble } from "../speech-bubbles/speech-bubble";
 
 export class Main extends Phaser.Scene {
@@ -46,6 +47,7 @@ export class Main extends Phaser.Scene {
   private wires = new Map<string, Wire>();
   private vents = new Map<number, Vent>();
   private speechBubbles = new Map<string, SpeechBubble>();
+  private nameTags = new Map<string, NameTag>();
   private bubbleTimer!: Phaser.Time.TimerEvent;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: {
@@ -232,16 +234,11 @@ export class Main extends Phaser.Scene {
           x: message.position.x,
           y: message.position.y,
           index: message.index,
-          isLocal: message.sessionId === this.room.sessionId,
         });
       });
 
       room.onMessage("onRemovePlayer", (message: MessageOnRemovePlayer) => {
-        const player = this.players.get(message.sessionId);
-        if (player !== undefined) {
-          player.destroy();
-          this.players.delete(message.sessionId);
-        }
+        this.removePlayer(message.sessionId);
       });
 
       room.onMessage("positionUpdate", (message: MessagePositionUpdate) => {
@@ -392,6 +389,7 @@ export class Main extends Phaser.Scene {
   }
 
   private addPlayer(playerSpawnInfo: PlayerType) {
+    const isLocal = playerSpawnInfo.sessionId === this.room.sessionId;
     const index = Math.max(
       0,
       Math.min(playerSpawnInfo.index, this.playerEntityAnimators.length - 1),
@@ -404,12 +402,23 @@ export class Main extends Phaser.Scene {
       playerSpawnInfo.y,
       playerSpawnInfo.name,
       playerSpawnInfo.sessionId,
-      playerSpawnInfo.isLocal,
+      isLocal,
       animator.textureKey,
       animator,
     );
     this.players.set(playerSpawnInfo.sessionId, player);
     this.displayHandler.add(LAYER_NAMES.ENTITIES, player);
+
+    const nameTag = new NameTag(this, player, playerSpawnInfo.name);
+    this.nameTags.set(playerSpawnInfo.sessionId, nameTag);
+    this.displayHandler.add(LAYER_NAMES.EFFECTS, nameTag, true);
+  }
+
+  private removePlayer(sessionId: string) {
+    this.players.get(sessionId)?.destroy();
+    this.players.delete(sessionId);
+    this.nameTags.get(sessionId)?.destroy();
+    this.nameTags.delete(sessionId);
   }
 
   private addCapybara(capybaraInfo: { x: number; y: number }) {
@@ -451,6 +460,7 @@ export class Main extends Phaser.Scene {
     const mapsToDestroy = [
       this.cables,
       this.players,
+      this.nameTags,
       this.speechBubbles,
       this.crates,
       this.doors,

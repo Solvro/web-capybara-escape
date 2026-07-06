@@ -1,4 +1,3 @@
-import { CELL_SIZE } from "../../constants/global";
 import type { EntityAnimator } from "../animators/entity-animator";
 import { Entity } from "./entity";
 import type { Direction } from "./entity";
@@ -7,7 +6,6 @@ export class Player extends Entity {
   public readonly name: string;
   public readonly sessionId: string;
   public readonly local: boolean;
-  private nameText: Phaser.GameObjects.Text;
 
   constructor(
     scene: Phaser.Scene,
@@ -23,15 +21,6 @@ export class Player extends Entity {
     this.name = name;
     this.sessionId = sessionId;
     this.local = local;
-
-    this.nameText = this.scene.add
-      .text(0, -(CELL_SIZE / 2) - 4, name, {
-        fontSize: "24px",
-        color: local ? "#ffdd77" : "#fff",
-        align: "center",
-      })
-      .setOrigin(0.5, 1);
-    this.add(this.nameText);
   }
 
   move(direction: Direction, ease = "Circular") {

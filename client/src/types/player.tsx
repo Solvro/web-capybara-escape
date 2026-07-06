@@ -4,5 +4,5 @@ export interface Player {
   y: number;
   index: number;
   sessionId: string;
-  isLocal: boolean;
+  isLocal?: boolean;
 }
