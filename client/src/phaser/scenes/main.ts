@@ -220,7 +220,7 @@ export class Main extends Phaser.Scene {
         }
 
         for (const door of message.doors) {
-          this.spawnEntity(this.doors, Door, door, LAYER_NAMES.WALL_DECOYS);
+          this.spawnEntity(this.doors, Door, door, LAYER_NAMES.BACKGROUND);
         }
 
         for (const laser of message.lasers) {
