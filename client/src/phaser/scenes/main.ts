@@ -40,6 +40,7 @@ export class Main extends Phaser.Scene {
   private capybara: Capybara | null = null;
   private players = new Map<string, Player>();
   private crates = new Map<number, Crate>();
+
   private buttons = new Map<string, Button>();
   private doors = new Map<string, Door>();
   private lasers = new Map<string, Laser>();
@@ -197,7 +198,6 @@ export class Main extends Phaser.Scene {
         for (const crate of message.crates) {
           this.spawnEntity(this.crates, Crate, crate, LAYER_NAMES.ENTITIES);
         }
-
         for (const button of message.buttons) {
           this.spawnEntity(
             this.buttons,
@@ -253,7 +253,6 @@ export class Main extends Phaser.Scene {
           this.crates.get(crateUpdate.crateId)?.syncState(crateUpdate);
         }
       });
-
       room.onMessage("lasersUpdated", (message: MessageLasersUpdate) => {
         for (const laserUpdate of message.lasers) {
           const laser = this.lasers.get(laserUpdate.laserId);

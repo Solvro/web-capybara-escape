@@ -194,6 +194,11 @@
           "type": "array",
           "items": { "$ref": "#/$defs/pos" },
           "default": []
+        },
+        "steelBoxes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pos" },
+          "default": []
         }
       },
       "required": ["players", "enemies", "capybara", "crates"]

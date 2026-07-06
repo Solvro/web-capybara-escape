@@ -9,7 +9,7 @@ export class Crate extends Entity implements INetworkInterface<CrateType> {
 
   constructor(scene: Phaser.Scene, data: CrateType) {
     super(scene, data.x, data.y, "tileset", null);
-    this.sprite.setFrame(ASSETS.CRATE);
+    this.sprite.setFrame(data.isSteel ? ASSETS.STEEL_BOX : ASSETS.CRATE);
     this.crateId = data.crateId;
     this.networkId = data.crateId;
   }

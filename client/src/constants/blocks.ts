@@ -5,6 +5,7 @@ export const ASSETS = {
   BUTTON_BASE: 15,
   DOOR_BASE: 16,
   CRATE: 19,
+  STEEL_BOX: 20,
   POINT_BUTTON: 21,
   DOOR_CLOSED: 22,
   VENT_OPEN: 18,

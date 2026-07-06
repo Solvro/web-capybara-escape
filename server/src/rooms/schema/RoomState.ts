@@ -47,7 +47,9 @@ export class RoomState extends Schema {
       for (const crateData of jsonData.entities.crates) {
         this.crateState.createCrate(crateData.x, crateData.y);
       }
-
+      for (const steelBoxData of jsonData.entities.steelBoxes ?? []) {
+        this.crateState.createSteelBox(steelBoxData.x, steelBoxData.y);
+      }
       for (const playerData of jsonData.entities.players) {
         this.startingPositions.push(
           new Position().assign({ x: playerData.x, y: playerData.y }),
@@ -335,8 +337,8 @@ export class RoomState extends Schema {
       return true;
     }
 
-    const crate = this.crateState.getCrateAt(newX, newY);
-    if (crate && this.moveCrate(crate.id, deltaX, deltaY)) {
+    const box = this.crateState.getCrateAt(newX, newY);
+    if (box && this.moveCrate(box.id, deltaX, deltaY)) {
       player.position.x = newX;
       player.position.y = newY;
       return true;
@@ -427,14 +429,18 @@ export class RoomState extends Schema {
         break;
       }
 
-      const crate = this.crateState.getCrateAt(currentX, currentY);
-      if (crate) {
+      const box = this.crateState.getCrateAt(currentX, currentY);
+      if (box) {
+        if (box.isSteel) {
+          range = i;
+          break;
+        }
         cratesDestroyed.push({
-          crateId: crate.id,
+          crateId: box.id,
           x: currentX,
           y: currentY,
         });
-        this.crateState.removeCrate(crate.id);
+        this.crateState.removeCrate(box.id);
       }
 
       currentX += dx;
@@ -472,6 +478,7 @@ export class RoomState extends Schema {
           crateId: crate.id,
           x: crate.position.x,
           y: crate.position.y,
+          isSteel: crate.isSteel,
         };
       }),
       cables: Array.from(this.cableState.cables.values()).map((cable) => {
@@ -567,8 +574,11 @@ export class RoomState extends Schema {
 
     if (!this.isWalkableForCrate(targetX, targetY)) return false;
 
-    const nextCrate = this.crateState.getCrateAt(targetX, targetY);
-    if (nextCrate && !this.moveCrate(nextCrate.id, dx, dy)) return false;
+    const nextBox = this.crateState.getCrateAt(targetX, targetY);
+    if (nextBox) {
+      if (nextBox.isSteel) return false;
+      if (!this.moveCrate(nextBox.id, dx, dy)) return false;
+    }
 
     const oldX = crate.position.x;
     const oldY = crate.position.y;
@@ -595,7 +605,7 @@ export class RoomState extends Schema {
           p.position.y === button.position.y,
       );
 
-      const crateOnButton = !!this.crateState.getCrateAt(
+      const boxOnButton = !!this.crateState.getCrateAt(
         button.position.x,
         button.position.y,
       );
@@ -603,7 +613,7 @@ export class RoomState extends Schema {
       const door = this.doorState.doors.get(button.doorId);
       if (!door) return;
 
-      const shouldOpen = playerOnButton || crateOnButton;
+      const shouldOpen = playerOnButton || boxOnButton;
       if (door.open !== shouldOpen) {
         door.open = shouldOpen;
         button.pressed = shouldOpen;
@@ -616,6 +626,7 @@ export class RoomState extends Schema {
     }
     return doorsAndButtonsToUpdate;
   }
+
   clearState() {
     this.crateState.crates.clear();
     this.doorState.doors.clear();
