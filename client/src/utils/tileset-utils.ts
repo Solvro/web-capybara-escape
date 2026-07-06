@@ -306,6 +306,7 @@ export const formatLevel = (
       players: [],
       enemies: [],
       crates: [],
+      steelBoxes: [],
       vents: [],
       capybara: { x: 0, y: 0 },
     },
@@ -335,6 +336,8 @@ export const formatLevel = (
         formattedLevel.entities.enemies.push({ x, y });
       } else if (entityLayer?.[1] === "start") {
         formattedLevel.entities.players.push({ x, y });
+      } else if (entityKey === LAYER_ITEM_KEYS.STEEL_BOX) {
+        formattedLevel.entities.steelBoxes.push({ x, y });
       } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.CRATE) {
         formattedLevel.entities.crates.push({ x, y });
       } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.LASER) {

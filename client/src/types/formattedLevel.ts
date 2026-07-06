@@ -8,6 +8,7 @@ export type FormattedLevelType = {
     players: { x: number; y: number }[];
     enemies: { x: number; y: number }[];
     crates: { x: number; y: number }[];
+    steelBoxes: { x: number; y: number }[];
     vents: { x: number; y: number; open: boolean }[];
     capybara: { x: number; y: number };
   };
