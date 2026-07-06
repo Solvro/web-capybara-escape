@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "../components/button";
 import { PauseModal } from "../components/pause-modal";
+import {
+  GAME_VIEW_HEIGHT,
+  GAME_VIEW_WIDTH,
+  MAP_SCALER,
+} from "../constants/global";
 import { useRoom } from "../lib/use-room";
 import { PhaserGame } from "../phaser/game";
 import type { MessagePauseToggled } from "../types/messages";
@@ -69,7 +74,17 @@ export function Game() {
 
   return (
     <>
-      <div className="flex h-[560px] w-[800px] items-center justify-center overflow-hidden rounded-2xl bg-violet-950">
+      <div
+        className="flex items-center justify-center overflow-hidden rounded-2xl bg-violet-950"
+        style={{
+          width: GAME_VIEW_WIDTH * MAP_SCALER,
+          height: GAME_VIEW_HEIGHT * MAP_SCALER,
+          // Never let the view spill outside the window; the map stays fully
+          // visible because Phaser FIT scales it down to whatever fits.
+          maxWidth: "95vw",
+          maxHeight: "95vh",
+        }}
+      >
         <PhaserGame room={room} />
       </div>
 
