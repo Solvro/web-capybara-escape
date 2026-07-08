@@ -25,6 +25,10 @@ const ApiService = {
         return response;
       });
   },
+  updateRoom: async (slug: string, levelData: CreateLevelInput) => {
+    const response = await api.put(`/rooms/${slug}`, levelData);
+    return response.data;
+  },
 };
 
 export default ApiService;
