@@ -133,6 +133,7 @@ export function Creator() {
               setActiveBlock={setActiveBlock}
               floorCableRotationByBase={floorCableRotationByBase}
               rotateCableAtBase={rotateCableAtBase}
+              tileData={tileData}
             />
           </div>
           <div className="w-[64dvw]">

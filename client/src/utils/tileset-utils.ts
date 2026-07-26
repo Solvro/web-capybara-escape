@@ -11,6 +11,27 @@ import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { Direction, type DirectionType } from "../types/direction";
 import type { FormattedLevelType } from "../types/formattedLevel";
 
+export function countEntityOccurrences(
+  tileData: (string | null)[][],
+  entityKey: string,
+  excludeTileIdx?: number,
+): number {
+  const layerIdx = layerNameToIndex[LAYER_NAMES.ENTITIES];
+  let count = 0;
+
+  tileData.forEach((tile, tileIdx) => {
+    if (tileIdx === excludeTileIdx) return;
+    const value = tile[layerIdx];
+    if (!value) return;
+    const baseKey = value.split("-")[0];
+    if (value === entityKey || baseKey === entityKey) {
+      count++;
+    }
+  });
+
+  return count;
+}
+
 export function getTilesetBackgroundPosition(
   frame: number,
   tilesetCols = 6,
