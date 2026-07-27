@@ -87,12 +87,18 @@ export class RoomState extends Schema {
           mechanicData.y,
         );
       } else if (mechanicType === "button") {
+        const doorIds: string[] = Array.isArray(mechanicData.doorIds)
+          ? mechanicData.doorIds
+          : mechanicData.doorId
+            ? [mechanicData.doorId]
+            : [];
+
         this.buttonState.createButton(
           mechanicData.id,
           mechanicData.color,
           mechanicData.x,
           mechanicData.y,
-          mechanicData.doorId,
+          doorIds,
         );
       } else if (mechanicType === "laser") {
         this.laserState.createLaser(
@@ -819,6 +825,9 @@ export class RoomState extends Schema {
       open: boolean;
     }[] = [];
 
+    const desiredDoorState = new Map<string, boolean>();
+    const buttonsByDoor = new Map<string, string[]>(); // doorId -> buttonIds that control it
+
     for (const button of this.buttonState.buttons.values()) {
       const playerOnButton = [...this.playerState.players.values()].some(
         (p) =>
@@ -831,20 +840,31 @@ export class RoomState extends Schema {
         button.position.y,
       );
 
-      const door = this.doorState.doors.get(button.doorId);
-      if (!door) return;
-
       const shouldOpen = playerOnButton || boxOnButton;
-      if (door.open !== shouldOpen) {
-        door.open = shouldOpen;
-        button.pressed = shouldOpen;
-        doorsAndButtonsToUpdate.push({
-          doorId: door.id,
-          buttonId: button.id,
-          open: door.open,
-        });
+      button.pressed = shouldOpen;
+
+      for (const doorId of button.doorIds) {
+        desiredDoorState.set(
+          doorId,
+          (desiredDoorState.get(doorId) ?? false) || shouldOpen,
+        );
+        if (!buttonsByDoor.has(doorId)) buttonsByDoor.set(doorId, []);
+        buttonsByDoor.get(doorId)!.push(button.id);
       }
     }
+
+    for (const [doorId, shouldOpen] of desiredDoorState) {
+      const door = this.doorState.doors.get(doorId);
+      if (!door) continue;
+
+      if (door.open !== shouldOpen) {
+        door.open = shouldOpen;
+        for (const buttonId of buttonsByDoor.get(doorId) ?? []) {
+          doorsAndButtonsToUpdate.push({ doorId, buttonId, open: shouldOpen });
+        }
+      }
+    }
+
     return doorsAndButtonsToUpdate;
   }
 

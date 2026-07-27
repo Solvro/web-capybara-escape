@@ -1,4 +1,4 @@
-import { MapSchema, Schema, type } from "@colyseus/schema";
+import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
 
 import { Position } from "./Position";
 
@@ -7,7 +7,7 @@ export class Button extends Schema {
   @type(Position) position: Position = new Position();
   @type("boolean") pressed: boolean = false;
   @type("string") color: string;
-  @type("string") doorId: string;
+  @type(["string"]) doorIds = new ArraySchema<string>();
 }
 
 export class ButtonState extends Schema {
@@ -19,14 +19,14 @@ export class ButtonState extends Schema {
     color: string,
     x: number,
     y: number,
-    doorId: string,
+    doorId: string[],
   ): Button {
     const button = new Button();
     button.id = id;
     button.color = color;
     button.position.x = x;
     button.position.y = y;
-    button.doorId = doorId;
+    button.doorIds.push(...doorId);
     button.pressed = false;
     this.buttons.set(id, button);
     this.positionMap.set(`${x}_${y}`, id);

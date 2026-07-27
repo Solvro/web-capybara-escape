@@ -315,7 +315,11 @@ export const formatLevel = (
   let x = 0,
     y = 0;
   let cableCount = 0,
-    laserCount = 0;
+    laserCount = 0,
+    doorCount = 0;
+
+  const doorIdsByColor: Record<string, string[]> = {};
+  const buttonsToLink: { color: string; doorIds: string[] }[] = [];
 
   tileIndices.forEach((element, index) => {
     const frame =
@@ -362,14 +366,19 @@ export const formatLevel = (
     if (wallDecoyLayer && wallDecoyLayer[0] === LAYER_ITEM_KEYS.DOOR) {
       const colorIndex = Number.parseInt(wallDecoyLayer[1]);
       const color = COLOR_LIST[colorIndex];
+      const doorId = `door-${color}-${doorCount}`;
+      doorCount++;
+
       formattedLevel.mechanics.push({
-        id: `door-${color}-${colorIndex}`,
+        id: doorId,
         type: "door",
         color,
         x,
         y,
         active: false,
       });
+
+      (doorIdsByColor[color] ??= []).push(doorId);
     }
 
     if (floorDecoyLayer) {
@@ -419,14 +428,16 @@ export const formatLevel = (
       } else if (floorDecoyLayer[0] === LAYER_ITEM_KEYS.BUTTON) {
         const colorIndex = Number.parseInt(floorDecoyLayer[1]);
         const color = COLOR_LIST[colorIndex];
-        formattedLevel.mechanics.push({
-          id: `button-${color}-${colorIndex}`,
-          type: "button",
+        const button = {
+          id: `button-${color}-${colorIndex}-${x}-${y}`,
+          type: "button" as const,
           color,
           x,
           y,
-          doorId: `door-${color}-${colorIndex}`,
-        });
+          doorIds: [] as string[],
+        };
+        formattedLevel.mechanics.push(button);
+        buttonsToLink.push(button);
       } else if (
         floorDecoyLayer[0] === LAYER_ITEM_KEYS.VENT_CLOSED ||
         floorDecoyLayer[0] === LAYER_ITEM_KEYS.VENT_OPEN
@@ -445,6 +456,10 @@ export const formatLevel = (
       formattedLevel.layout.push([]);
     }
   });
+
+  for (const button of buttonsToLink) {
+    button.doorIds = doorIdsByColor[button.color] ?? [];
+  }
 
   return formattedLevel;
 };
