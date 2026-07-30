@@ -98,10 +98,7 @@ export function Creator() {
     } catch (error) {
       if (error instanceof Error && "response" in error) {
         const axiosError = error as AxiosError;
-        if (
-          axiosError.response?.status === 400 ||
-          axiosError.response?.status === 409
-        ) {
+        if (axiosError.response?.status === 409) {
           setUploadStatus("idle");
           setIsOverwriteModalOpen(true);
           return;
