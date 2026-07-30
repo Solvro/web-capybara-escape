@@ -21,7 +21,8 @@ function assertValidName(name: string) {
     throw new Error("Level name is required.");
   }
 }
-function assertValidData(data: any) {
+
+function assertValidData(data: unknown) {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     throw new Error("Level data must be a JSON object.");
   }
