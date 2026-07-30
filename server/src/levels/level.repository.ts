@@ -69,6 +69,8 @@ export class LevelRepository {
 
     await collection.createIndex({ slug: 1 }, { unique: true });
     await collection.createIndex({ isPublished: 1, updatedAt: -1 });
+
+    await collection.createIndex({ id: 1 }, { unique: true });
   }
 
   async listLevels(options?: ListLevelsOptions) {
