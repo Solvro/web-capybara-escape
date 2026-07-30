@@ -21,8 +21,7 @@ function assertValidName(name: string) {
     throw new Error("Level name is required.");
   }
 }
-
-function assertValidData(data: unknown) {
+function assertValidData(data: any) {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
     throw new Error("Level data must be a JSON object.");
   }
@@ -69,8 +68,6 @@ export class LevelRepository {
 
     await collection.createIndex({ slug: 1 }, { unique: true });
     await collection.createIndex({ isPublished: 1, updatedAt: -1 });
-
-    await collection.createIndex({ id: 1 }, { unique: true });
   }
 
   async listLevels(options?: ListLevelsOptions) {
