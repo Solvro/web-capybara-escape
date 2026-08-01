@@ -322,8 +322,6 @@ export class Main extends Phaser.Scene {
       });
 
       room.onMessage("roomReset", () => {
-        // console.log(`Resetting scene graphics...`);
-
         this.resetGraphics();
 
         this.room.send("getMapInfo");
@@ -448,6 +446,10 @@ export class Main extends Phaser.Scene {
       this.capybara.destroy();
     }
 
+    if (!capybaraInfo) {
+      return;
+    }
+
     this.capybara = new Capybara(
       this,
       capybaraInfo.x,
@@ -499,8 +501,6 @@ export class Main extends Phaser.Scene {
   }
 
   private resetGraphics() {
-    //("Resetting scene graphics...");
-
     const mapsToDestroy = [
       this.cables,
       this.players,
@@ -519,6 +519,6 @@ export class Main extends Phaser.Scene {
       object.clear();
     }
 
-    this.children.removeAll();
+    this.displayHandler.clear();
   }
 }
