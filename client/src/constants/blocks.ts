@@ -5,6 +5,7 @@ export const ASSETS = {
   BUTTON_BASE: 15,
   DOOR_BASE: 16,
   CRATE: 19,
+  STEEL_BOX: 20,
   POINT_BUTTON: 21,
   DOOR_CLOSED: 22,
   VENT_OPEN: 18,
@@ -37,40 +38,62 @@ export const ASSETS = {
   CAPYBARA_START: 100,
   SOL_START: 101,
   VRON_START: 102,
+  ENEMY_START: 103,
 };
 
 export const ENTITY_SOURCES = {
   CAPYBARA: "/textures/capybara/capybara-tileset.png",
-  SOL: "/textures/sol/sol-tileset .png",
+  SOL: "/textures/sol/sol-tileset.png",
   VRON: "/textures/vron/vron-tileset.png",
+  ENEMY: "/textures/enemy/evil-drone-tileset.png",
 };
 
 export interface EntityConfig {
   src: string;
-  isTall: boolean;
   /** Frame index in the entity spritesheet used for creator preview */
   previewFrame: number;
+  frameWidth?: number;
   frameHeight?: number;
   tilesetCols?: number;
+  spriteOffset?: { x: number; y: number };
+  /** Align sprite feet to the floor row in the creator grid */
+  floorAnchored?: boolean;
 }
 
 export const ENTITY_MAPPING: Record<number, EntityConfig> = {
   [ASSETS.CAPYBARA_START]: {
     src: ENTITY_SOURCES.CAPYBARA,
-    isTall: true,
     previewFrame: 4,
+    frameWidth: 24,
+    frameHeight: 24,
+    tilesetCols: 4,
+    floorAnchored: true,
   },
   [ASSETS.SOL_START]: {
     src: ENTITY_SOURCES.SOL,
-    isTall: true,
     previewFrame: 4,
+    frameWidth: 24,
     frameHeight: 30,
+    tilesetCols: 4,
+    spriteOffset: { x: 0, y: -3 },
+    floorAnchored: true,
   },
   [ASSETS.VRON_START]: {
     src: ENTITY_SOURCES.VRON,
-    isTall: true,
     previewFrame: 6,
+    frameWidth: 24,
     frameHeight: 30,
+    tilesetCols: 6,
+    spriteOffset: { x: 0, y: -3 },
+    floorAnchored: true,
+  },
+  [ASSETS.ENEMY_START]: {
+    src: ENTITY_SOURCES.ENEMY,
+    previewFrame: 0,
+    frameWidth: 24,
+    frameHeight: 24,
+    tilesetCols: 4,
+    floorAnchored: true,
   },
 };
 
@@ -82,4 +105,17 @@ export const TILE_MAPPING: Record<
   w1t: { frame: 7, frameSecond: 1, isTall: true }, //brick wall
   w2t: { frame: 8, frameSecond: 2, isTall: true }, //server wall
   f1: { frame: 6 }, //floor tile
+};
+
+export const FRAME_TO_KEY: Record<number, string> = {
+  6: "f1",
+  7: "w1t",
+  8: "w2t",
+};
+
+export const ANGLE_TO_TEXT: Record<string, string> = {
+  "0": "right",
+  "90": "down",
+  "180": "left",
+  "270": "up",
 };

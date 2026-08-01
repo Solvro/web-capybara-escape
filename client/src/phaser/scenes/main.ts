@@ -1,11 +1,12 @@
 import type { Room } from "@colyseus/sdk";
 
-import { LAYER_NAMES, TILE_SIZE } from "../../constants/global";
+import { CELL_SIZE, LAYER_NAMES, TILE_SIZE } from "../../constants/global";
 import type { LAYER_NAME } from "../../constants/global";
 import type {
   MessageCablesUpdate,
   MessageCratesUpdate,
   MessageDoorsAndButtonsUpdate,
+  MessageEnemyUpdate,
   MessageGenerateLines,
   MessageLasersUpdate,
   MessageMapInfo,
@@ -19,10 +20,12 @@ import type { Player as PlayerType } from "../../types/player";
 import { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
 import { SOL_ANIM_CONFIG } from "../animators/config/sol-animator-config";
 import { VRON_ANIM_CONFIG } from "../animators/config/vron-animator-config";
+import { EnemyEntityAnimator } from "../animators/enemy-entity-animator";
 import { StateController } from "../animators/entity-animator";
 import { PlayerEntityAnimator } from "../animators/player-entity-animator";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
+import { Enemy } from "../entities/enemy";
 import { Player } from "../entities/player";
 import { Display } from "../lib/display";
 import { Button } from "../mechanics/button";
@@ -31,14 +34,17 @@ import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
 import { Wire } from "../mechanics/wire";
+import { NameTag } from "../speech-bubbles/name-tag";
 import { SpeechBubble } from "../speech-bubbles/speech-bubble";
 
 export class Main extends Phaser.Scene {
   private room!: Room;
   displayHandler!: Display;
   private capybara: Capybara | null = null;
+  private enemies = new Map<number, Enemy>();
   private players = new Map<string, Player>();
   private crates = new Map<number, Crate>();
+
   private buttons = new Map<string, Button>();
   private doors = new Map<string, Door>();
   private lasers = new Map<string, Laser>();
@@ -46,6 +52,7 @@ export class Main extends Phaser.Scene {
   private wires = new Map<string, Wire>();
   private vents = new Map<number, Vent>();
   private speechBubbles = new Map<string, SpeechBubble>();
+  private nameTags = new Map<string, NameTag>();
   private bubbleTimer!: Phaser.Time.TimerEvent;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: {
@@ -61,6 +68,7 @@ export class Main extends Phaser.Scene {
   private playerEntityAnimators!: PlayerEntityAnimator[];
   private isPaused = false;
   private capybaraAnimator!: CapybaraEntityAnimator;
+  private enemyAnimatorTemplate!: EnemyEntityAnimator;
 
   constructor() {
     super({ key: "Main" });
@@ -112,11 +120,17 @@ export class Main extends Phaser.Scene {
     );
     this.capybaraAnimator.preload(this);
 
+    this.enemyAnimatorTemplate = new EnemyEntityAnimator(
+      "textures/enemy/evil-drone-tileset.png",
+      new StateController(),
+    );
+    this.enemyAnimatorTemplate.preload(this);
+
     // player textures
     const playerSetups = [
       {
         key: "player1",
-        path: "textures/sol/sol-tileset .png",
+        path: "textures/sol/sol-tileset.png",
         config: SOL_ANIM_CONFIG,
       },
       {
@@ -126,7 +140,7 @@ export class Main extends Phaser.Scene {
       },
       {
         key: "player3",
-        path: "textures/sol/sol-tileset .png",
+        path: "textures/sol/sol-tileset.png",
         config: SOL_ANIM_CONFIG,
       },
       {
@@ -153,6 +167,7 @@ export class Main extends Phaser.Scene {
       animator.register(this);
     }
     this.capybaraAnimator.register(this);
+    this.enemyAnimatorTemplate.register(this);
 
     // Input setup
     if (this.input.keyboard !== null) {
@@ -175,6 +190,13 @@ export class Main extends Phaser.Scene {
       room.onMessage("mapInfo", (message: MessageMapInfo) => {
         this.syncPauseState(message.isPaused);
 
+        // Resize the canvas to the full map so the whole map is rendered.
+        // The on-screen size is then multiplied by the zoom (MAP_SCALER).
+        this.scale.resize(
+          message.width * CELL_SIZE,
+          message.height * CELL_SIZE,
+        );
+
         this.displayHandler.createMap(
           message.grid,
           message.width,
@@ -188,7 +210,6 @@ export class Main extends Phaser.Scene {
         for (const crate of message.crates) {
           this.spawnEntity(this.crates, Crate, crate, LAYER_NAMES.ENTITIES);
         }
-
         for (const button of message.buttons) {
           this.spawnEntity(
             this.buttons,
@@ -199,7 +220,7 @@ export class Main extends Phaser.Scene {
         }
 
         for (const door of message.doors) {
-          this.spawnEntity(this.doors, Door, door, LAYER_NAMES.WALL_DECOYS);
+          this.spawnEntity(this.doors, Door, door, LAYER_NAMES.BACKGROUND);
         }
 
         for (const laser of message.lasers) {
@@ -216,6 +237,10 @@ export class Main extends Phaser.Scene {
         }
 
         this.addCapybara(message.capybara);
+
+        for (const enemy of message.enemies) {
+          this.addEnemy(enemy);
+        }
       });
 
       room.onMessage("onAddPlayer", (message: MessageOnAddPlayer) => {
@@ -225,16 +250,11 @@ export class Main extends Phaser.Scene {
           x: message.position.x,
           y: message.position.y,
           index: message.index,
-          isLocal: message.sessionId === this.room.sessionId,
         });
       });
 
       room.onMessage("onRemovePlayer", (message: MessageOnRemovePlayer) => {
-        const player = this.players.get(message.sessionId);
-        if (player !== undefined) {
-          player.destroy();
-          this.players.delete(message.sessionId);
-        }
+        this.removePlayer(message.sessionId);
       });
 
       room.onMessage("positionUpdate", (message: MessagePositionUpdate) => {
@@ -249,7 +269,6 @@ export class Main extends Phaser.Scene {
           this.crates.get(crateUpdate.crateId)?.syncState(crateUpdate);
         }
       });
-
       room.onMessage("lasersUpdated", (message: MessageLasersUpdate) => {
         for (const laserUpdate of message.lasers) {
           const laser = this.lasers.get(laserUpdate.laserId);
@@ -290,6 +309,10 @@ export class Main extends Phaser.Scene {
           this.capybara?.syncServerState(message);
         },
       );
+
+      room.onMessage("enemyUpdate", (message: MessageEnemyUpdate) => {
+        this.enemies.get(message.id)?.syncState(message);
+      });
 
       room.onMessage("line", (message: MessageGenerateLines) => {
         const player = this.players.get(message.sessionId);
@@ -376,6 +399,9 @@ export class Main extends Phaser.Scene {
       player.animate();
     }
     this.capybara?.animate();
+    for (const enemy of this.enemies.values()) {
+      enemy.animate();
+    }
 
     if (time - this.playerMoveDebounce < 250) {
       return;
@@ -385,6 +411,7 @@ export class Main extends Phaser.Scene {
   }
 
   private addPlayer(playerSpawnInfo: PlayerType) {
+    const isLocal = playerSpawnInfo.sessionId === this.room.sessionId;
     const index = Math.max(
       0,
       Math.min(playerSpawnInfo.index, this.playerEntityAnimators.length - 1),
@@ -397,12 +424,23 @@ export class Main extends Phaser.Scene {
       playerSpawnInfo.y,
       playerSpawnInfo.name,
       playerSpawnInfo.sessionId,
-      playerSpawnInfo.isLocal,
+      isLocal,
       animator.textureKey,
       animator,
     );
     this.players.set(playerSpawnInfo.sessionId, player);
     this.displayHandler.add(LAYER_NAMES.ENTITIES, player);
+
+    const nameTag = new NameTag(this, player, playerSpawnInfo.name);
+    this.nameTags.set(playerSpawnInfo.sessionId, nameTag);
+    this.displayHandler.add(LAYER_NAMES.EFFECTS, nameTag, true);
+  }
+
+  private removePlayer(sessionId: string) {
+    this.players.get(sessionId)?.destroy();
+    this.players.delete(sessionId);
+    this.nameTags.get(sessionId)?.destroy();
+    this.nameTags.delete(sessionId);
   }
 
   private addCapybara(capybaraInfo: { x: number; y: number }) {
@@ -417,6 +455,28 @@ export class Main extends Phaser.Scene {
       this.capybaraAnimator,
     );
     this.displayHandler.add("entities", this.capybara);
+  }
+
+  private addEnemy(enemyInfo: { id: number; x: number; y: number }) {
+    const existing = this.enemies.get(enemyInfo.id);
+    if (existing !== undefined) {
+      existing.destroy();
+    }
+
+    const animator = new EnemyEntityAnimator(
+      "textures/enemy/evil-drone-tileset.png",
+      new StateController(),
+    );
+
+    const enemy = new Enemy(
+      this,
+      enemyInfo.x,
+      enemyInfo.y,
+      enemyInfo.id,
+      animator,
+    );
+    this.enemies.set(enemyInfo.id, enemy);
+    this.displayHandler.add(LAYER_NAMES.ENTITIES, enemy);
   }
 
   handleInput(time: number) {
@@ -444,10 +504,12 @@ export class Main extends Phaser.Scene {
     const mapsToDestroy = [
       this.cables,
       this.players,
+      this.nameTags,
       this.speechBubbles,
       this.crates,
       this.doors,
       this.buttons,
+      this.enemies,
     ];
 
     for (const object of mapsToDestroy) {

@@ -19,6 +19,8 @@ export const LAYER_ITEM_KEYS = {
 
   LASER: "laser",
   CRATE: "crate",
+  STEEL_BOX: "steelBox",
+  ENEMY: "enemy",
   EMPTY_ENTITIES: "empty-entities",
 
   DOOR: "door",
@@ -28,6 +30,21 @@ export const LAYER_ITEM_KEYS = {
   SOL_START: "sol-start",
   VRON_START: "vron-start",
 } as const;
+
+export const ENTITY_LIMITS: Record<string, number> = {
+  [LAYER_ITEM_KEYS.CAPYBARA_START]: 1,
+  [LAYER_ITEM_KEYS.SOL_START]: 1,
+  [LAYER_ITEM_KEYS.VRON_START]: 1,
+  [LAYER_ITEM_KEYS.ENEMY]: 5,
+  [LAYER_ITEM_KEYS.LASER]: 5,
+};
+
+export function getEntityLimitKeyFor(tileKey: string): string | null {
+  if (tileKey in ENTITY_LIMITS) return tileKey;
+  const baseKey = tileKey.split("-")[0]!;
+  if (baseKey in ENTITY_LIMITS) return baseKey;
+  return null;
+}
 
 export const FLOOR_DECOY_ROTATION_DEGREES = [0, 90, 180, 270] as const;
 export type FloorDecoyRotationDeg =
@@ -239,6 +256,18 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
       key: LAYER_ITEM_KEYS.CRATE,
       label: "Crate",
       frame: ASSETS.CRATE,
+      layer: LAYER_NAMES.ENTITIES,
+    },
+    {
+      key: LAYER_ITEM_KEYS.STEEL_BOX,
+      label: "Steel Box",
+      frame: ASSETS.STEEL_BOX,
+      layer: LAYER_NAMES.ENTITIES,
+    },
+    {
+      key: LAYER_ITEM_KEYS.ENEMY,
+      label: "Enemy",
+      frame: ASSETS.ENEMY_START,
       layer: LAYER_NAMES.ENTITIES,
     },
     {
