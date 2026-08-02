@@ -1,26 +1,26 @@
+import type { Direction, Laser as LaserType } from "@capybara/shared";
 import * as Phaser from "phaser";
 
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
-import type { Laser as LaserType } from "../../types/laser";
 import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 
-const GHOST_IDLE_FRAMES: Record<"left" | "right" | "up" | "down", number> = {
+const GHOST_IDLE_FRAMES: Record<Direction, number> = {
   right: ASSETS.GHOST_IDLE_RIGHT,
   down: ASSETS.GHOST_IDLE_DOWN,
   up: ASSETS.GHOST_IDLE_UP,
   left: ASSETS.GHOST_IDLE_RIGHT,
 };
 
-const GHOST_ACTIVE_FRAMES: Record<"left" | "right" | "up" | "down", number> = {
+const GHOST_ACTIVE_FRAMES: Record<Direction, number> = {
   right: ASSETS.GHOST_ACTIVE_RIGHT,
   down: ASSETS.GHOST_ACTIVE_DOWN,
   up: ASSETS.GHOST_ACTIVE_UP,
   left: ASSETS.GHOST_ACTIVE_RIGHT,
 };
 
-const GHOST_COLOR_FRAMES: Record<"left" | "right" | "up" | "down", number> = {
+const GHOST_COLOR_FRAMES: Record<Direction, number> = {
   right: ASSETS.GHOST_COLOR_RIGHT,
   down: ASSETS.GHOST_COLOR_DOWN,
   up: ASSETS.GHOST_COLOR_UP,
@@ -32,7 +32,7 @@ export class Laser extends Mechanic implements INetworkInterface<LaserType> {
   public readonly networkId: string | number;
   public readonly color: string;
   private launched: boolean;
-  private direction: "left" | "right" | "up" | "down";
+  private direction: Direction;
   private range: number;
   private baseSprite: Phaser.GameObjects.Sprite;
   private beamSprites: Phaser.GameObjects.Sprite[] = [];

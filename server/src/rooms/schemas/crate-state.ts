@@ -84,7 +84,10 @@ export class CrateState extends Schema {
     this.positionToCrateId.delete(oldKey); // delete old mapping
 
     this.movedCrateIds.add(crate.id);
-    this.movedCrateDirections.set(crate.id, getDirectionFromMoveVector(dx, dy));
+    const direction = getDirectionFromMoveVector(dx, dy);
+    if (direction) {
+      this.movedCrateDirections.set(crate.id, direction);
+    }
 
     const newKey = this.getPositionKey(oldX + dx, oldY + dy);
     this.positionToCrateId.set(newKey, crate.id); // add new mapping to crate

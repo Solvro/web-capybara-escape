@@ -1,6 +1,6 @@
+import type { Capybara as CapybaraState } from "@capybara/shared";
 import * as Phaser from "phaser";
 
-import type { Capybara as CapybaraState } from "../../types/capybara";
 import type { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
 import { Entity } from "./entity";
 

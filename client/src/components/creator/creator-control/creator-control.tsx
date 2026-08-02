@@ -1,5 +1,6 @@
+import type { Direction } from "@capybara/shared";
+
 import { MAX_DIM_CREATOR, MIN_DIM_CREATOR } from "../../../constants/global";
-import { Direction, type DirectionType } from "../../../types/direction";
 import { CreatorActionButtons } from "./parts/creator-action-buttons";
 import { CreatorColumnsControl } from "./parts/creator-columns-control";
 import { CreatorRowsControl } from "./parts/creator-rows-control";
@@ -8,7 +9,7 @@ interface CreatorControlProps {
   dims: [number, number];
   setDims: (dims: [number, number]) => void;
   onReset?: () => void;
-  setDirection: (direction: DirectionType) => void;
+  setDirection: (direction: Direction) => void;
   onRoomSubmit: () => void;
 }
 
@@ -27,13 +28,13 @@ export function CreatorControl({
 
   const handleRowsChange = (delta: number) => {
     const newRows = clampDim(rows + delta);
-    setDirection(Direction.BOTTOM);
+    setDirection("down");
     setDims([newRows, cols]);
   };
 
   const handleColsChange = (delta: number) => {
     const newCols = clampDim(cols + delta);
-    setDirection(Direction.RIGHT);
+    setDirection("right");
     setDims([rows, newCols]);
   };
 

@@ -1,8 +1,9 @@
+import type { Cable as CableType } from "@capybara/shared";
+import type { Direction } from "@capybara/shared";
 import * as Phaser from "phaser";
 
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE } from "../../constants/global";
-import type { Cable as CableType } from "../../types/cable";
 import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 
@@ -13,7 +14,7 @@ export class Cable extends Mechanic implements INetworkInterface<CableType> {
   public timer: number;
   public damageDuration: number;
   public safeDuration: number;
-  public direction: "up" | "down" | "left" | "right";
+  public direction: Direction;
 
   constructor(scene: Phaser.Scene, data: CableType) {
     const posY = data.y * CELL_SIZE + CELL_SIZE / 2;

@@ -1,3 +1,4 @@
+import { ClientMessageType, ServerMessageType } from "@capybara/shared";
 import { Client, Room } from "@colyseus/core";
 import { CloseCode } from "@colyseus/shared-types";
 
@@ -18,7 +19,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.roomData = await getRoomForGame(options?.levelSlug);
     this.maxClients = this.roomData.maxClients ?? this.maxClients;
     this.state.loadRoomFromJson(this.roomData);
-    this.onMessage("move", (client, message) => {
+    this.onMessage(ClientMessageType.Move, (client, message) => {
       if (this.state.isPaused) return;
 
       const player = this.state.playerState.players.get(client.sessionId);
@@ -35,7 +36,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
         const newX = player.position.x;
         const newY = player.position.y;
 
-        this.broadcast("positionUpdate", {
+        this.broadcast(ServerMessageType.PositionUpdate, {
           sessionId: client.sessionId,
           direction: message.direction,
         });
@@ -46,16 +47,16 @@ export class GameRoom extends Room<{ state: RoomState }> {
         positionsToCheck.add(`${oldX}_${oldY}`);
         positionsToCheck.add(`${newX}_${newY}`);
 
-        this.broadcast("cratesUpdate", { crates: movedCrates });
+        this.broadcast(ServerMessageType.CratesUpdate, { crates: movedCrates });
 
         const doorsAndButtonsToUpdate = this.state.checkButtonPressed();
 
-        this.broadcast("doorsAndButtonsUpdate", {
+        this.broadcast(ServerMessageType.DoorsAndButtonsUpdate, {
           doorsAndButtons: doorsAndButtonsToUpdate,
         });
 
         if (this.state.cableState.doesDamageOrNotAt(newX, newY)) {
-          this.broadcast("playerDamaged", {
+          this.broadcast(ServerMessageType.PlayerDamaged, {
             sessionId: client.sessionId,
             x: newX,
             y: newY,
@@ -64,9 +65,9 @@ export class GameRoom extends Room<{ state: RoomState }> {
       }
     });
 
-    this.onMessage("getMapInfo", (client) => {
+    this.onMessage(ClientMessageType.GetMapInfo, (client) => {
       // console.log(this.state.getMapInfo());
-      client.send("mapInfo", this.state.getMapInfo());
+      client.send(ServerMessageType.MapInfo, this.state.getMapInfo());
     });
 
     this.setSimulationInterval((deltaTime) => {
@@ -74,31 +75,34 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
       const result = this.state.updateLasers(deltaTime);
       if (result.length > 0) {
-        this.broadcast("lasersUpdated", { lasers: result });
+        this.broadcast(ServerMessageType.LasersUpdated, { lasers: result });
       }
       this.state.cableState.timerMethod(deltaTime);
       const toggled = this.state.cableState.getAndClearToggledCables?.() ?? [];
       if (toggled.length > 0) {
-        this.broadcast("cablesUpdate", { cables: toggled });
+        this.broadcast(ServerMessageType.CablesUpdate, { cables: toggled });
       }
 
       const entityUpdates = this.state.updateCapybara(deltaTime);
       if (entityUpdates.capybara) {
-        this.broadcast("capybaraUpdate", entityUpdates.capybara);
+        this.broadcast(
+          ServerMessageType.CapybaraUpdate,
+          entityUpdates.capybara,
+        );
       }
       for (const enemy of entityUpdates.enemies) {
-        this.broadcast("enemyUpdate", enemy);
+        this.broadcast(ServerMessageType.EnemyUpdate, enemy);
       }
     });
 
-    this.onMessage("generateLine", (client) => {
-      this.broadcast("line", {
+    this.onMessage(ClientMessageType.GenerateLine, (client) => {
+      this.broadcast(ServerMessageType.Line, {
         sessionId: client.sessionId,
         text: SpeechBubble.getInstance().pickRandomLine("neutral"),
       });
     });
 
-    this.onMessage("reset", (client) => {
+    this.onMessage(ClientMessageType.Reset, (client) => {
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
 
       this.state.loadRoomFromJson(this.roomData);
@@ -115,16 +119,16 @@ export class GameRoom extends Room<{ state: RoomState }> {
         }
       });
 
-      this.broadcast("roomReset", {
+      this.broadcast(ServerMessageType.RoomReset, {
         message: "Level has been reset",
         mapInfo: this.state.getMapInfo(),
       });
     });
 
-    this.onMessage("togglePause", (client) => {
+    this.onMessage(ClientMessageType.TogglePause, (client) => {
       this.state.isPaused = !this.state.isPaused;
 
-      this.broadcast("pauseToggled", {
+      this.broadcast(ServerMessageType.PauseToggled, {
         isPaused: this.state.isPaused,
       });
     });
@@ -134,7 +138,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.state.spawnNewPlayer(client.sessionId, options.name);
     const player = this.state.playerState.players.get(client.sessionId);
 
-    this.broadcast("onAddPlayer", {
+    this.broadcast(ServerMessageType.OnAddPlayer, {
       sessionId: client.sessionId,
       playerName: player.name,
       position: player.position,
@@ -155,7 +159,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
       }
     }
 
-    this.broadcast("onRemovePlayer", {
+    this.broadcast(ServerMessageType.OnRemovePlayer, {
       sessionId: client.sessionId,
     });
     this.state.despawnPlayer(client.sessionId);

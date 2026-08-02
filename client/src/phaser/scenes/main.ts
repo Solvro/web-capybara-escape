@@ -1,14 +1,3 @@
-import type { Room } from "@colyseus/sdk";
-import * as Phaser from "phaser";
-
-import { SOL_ANIM_CONFIG } from "@/constants/animators/sol-animator-config";
-import { VRON_ANIM_CONFIG } from "@/constants/animators/vron-animator-config";
-import { NameTag } from "@/phaser/ui/name-tag";
-import { SpeechBubble } from "@/phaser/ui/speech-bubble";
-import { Display } from "@/utils/display";
-
-import { CELL_SIZE, LAYER_NAMES, TILE_SIZE } from "../../constants/global";
-import type { LAYER_NAME } from "../../constants/global";
 import type {
   MessageCablesUpdate,
   MessageCratesUpdate,
@@ -21,9 +10,20 @@ import type {
   MessageOnRemovePlayer,
   MessagePauseToggled,
   MessagePositionUpdate,
-} from "../../types/messages";
+  Player as PlayerType,
+} from "@capybara/shared";
+import type { Room } from "@colyseus/sdk";
+import * as Phaser from "phaser";
+
+import { SOL_ANIM_CONFIG } from "@/constants/animators/sol-animator-config";
+import { VRON_ANIM_CONFIG } from "@/constants/animators/vron-animator-config";
+import { NameTag } from "@/phaser/ui/name-tag";
+import { SpeechBubble } from "@/phaser/ui/speech-bubble";
+import { Display } from "@/utils/display";
+
+import { CELL_SIZE, LAYER_NAMES, TILE_SIZE } from "../../constants/global";
+import type { LAYER_NAME } from "../../constants/global";
 import type { INetworkInterface } from "../../types/network-interface";
-import type { Player as PlayerType } from "../../types/player";
 import { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
 import { EnemyEntityAnimator } from "../animators/enemy-entity-animator";
 import { StateController } from "../animators/entity-animator";

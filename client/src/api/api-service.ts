@@ -1,4 +1,5 @@
-import type { CreateLevelInput } from "../types/create-level-input";
+import type { CreateLevelInput } from "@capybara/shared";
+
 import api from "./api";
 
 const ApiService = {

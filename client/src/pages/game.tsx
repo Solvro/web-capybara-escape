@@ -1,3 +1,4 @@
+import type { MessagePauseToggled } from "@capybara/shared";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +11,6 @@ import {
   MAP_SCALER,
 } from "@/constants/global";
 import { useRoom } from "@/lib/use-room";
-import type { MessagePauseToggled } from "@/types/messages";
 
 export function Game() {
   const { room, isConnected, joinError } = useRoom();

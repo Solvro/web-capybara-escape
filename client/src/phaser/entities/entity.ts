@@ -1,9 +1,8 @@
+import type { Direction } from "@capybara/shared";
 import * as Phaser from "phaser";
 
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 import type { EntityAnimator } from "../animators/entity-animator";
-
-export type Direction = "left" | "right" | "up" | "down";
 
 export class Entity extends Phaser.GameObjects.Container {
   protected sprite: Phaser.GameObjects.Sprite;

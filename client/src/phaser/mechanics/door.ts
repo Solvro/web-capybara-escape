@@ -1,8 +1,8 @@
+import type { Door as DoorType } from "@capybara/shared";
 import * as Phaser from "phaser";
 
 import { ASSETS } from "../../constants/blocks";
 import { SIZE_MULTIPLIER } from "../../constants/global";
-import type { Door as DoorType } from "../../types/door";
 import type { INetworkInterface } from "../../types/network-interface";
 import { Mechanic } from "./mechanic";
 

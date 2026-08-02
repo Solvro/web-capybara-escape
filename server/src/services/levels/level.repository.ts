@@ -1,12 +1,12 @@
+import type {
+  CreateLevelInput,
+  ListLevelsOptions,
+  UpdateLevelInput,
+} from "@capybara/shared";
 import { MongoServerError } from "mongodb";
 
 import { getMongoDb } from "../../config/mongo";
-import {
-  CreateLevelInput,
-  LevelDocument,
-  ListLevelsOptions,
-  UpdateLevelInput,
-} from "../../types/level.types";
+import type { LevelDocument } from "../../types/level.types";
 
 const LEVELS_COLLECTION = "levels";
 

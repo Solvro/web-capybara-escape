@@ -11,7 +11,7 @@
   "author": "",
   "main": "build/index.js",
   "scripts": {
-    "build": "npm run clean && tsc && tsc-alias",
+    "build": "npm run build -w @capybara/shared && npm run clean && tsc && tsc-alias",
     "clean": "rimraf build",
     "export:levels": "tsx src/scripts/export-levels.ts",
     "export:levels:force": "tsx src/scripts/export-levels.ts --force",
@@ -20,6 +20,7 @@
     "test": "mocha -r tsx \"test/**/*.test.ts\" --exit --timeout 15000"
   },
   "dependencies": {
+    "@capybara/shared": "*",
     "@colyseus/monitor": "^0.17.8",
     "@colyseus/playground": "^0.17.12",
     "@colyseus/tools": "^0.17.19",

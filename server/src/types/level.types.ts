@@ -1,4 +1,4 @@
-export type RoomJson = Record<string, unknown>;
+import type { RoomJson } from "@capybara/shared";
 
 export type LevelDocument = {
   slug: string;
@@ -11,25 +11,4 @@ export type LevelDocument = {
   updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
-};
-
-export type CreateLevelInput = {
-  slug: string;
-  name: string;
-  description?: string;
-  data: RoomJson;
-  createdBy?: string;
-  isPublished?: boolean;
-};
-
-export type UpdateLevelInput = {
-  name?: string;
-  description?: string;
-  data?: RoomJson;
-  updatedBy?: string;
-  isPublished?: boolean;
-};
-
-export type ListLevelsOptions = {
-  publishedOnly?: boolean;
 };

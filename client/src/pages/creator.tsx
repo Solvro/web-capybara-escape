@@ -1,3 +1,4 @@
+import type { CreateLevelInput, Direction } from "@capybara/shared";
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
@@ -14,8 +15,6 @@ import { LAYER_NAMES } from "../constants/global";
 import type { LayerItem } from "../constants/layer-items";
 import { LAYER_ITEMS, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { useCreatorFloorCableRotation } from "../hooks/creator/use-creator-floor-cable-rotation";
-import type { CreateLevelInput } from "../types/create-level-input";
-import { type DirectionType } from "../types/direction";
 import {
   changeBoardSize,
   formatLevel,
@@ -25,7 +24,7 @@ import {
 export function Creator() {
   const [levelName, setLevelName] = useState<string>();
   const [dims, setDims] = useState<[number, number]>([7, 8]);
-  const [direction, setDirection] = useState<DirectionType | null>(null);
+  const [direction, setDirection] = useState<Direction | null>(null);
   const [formattedLevel, setFormattedLevel] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadStatus, setUploadStatus] =
@@ -81,9 +80,14 @@ export function Creator() {
   };
 
   const handleConfirm = async () => {
+    if (!levelName?.trim()) {
+      setUploadStatus("error");
+      return;
+    }
+
     const createLevelInput: CreateLevelInput = {
-      slug: levelName,
-      name: levelName,
+      slug: levelName.trim(),
+      name: levelName.trim(),
       isPublished: true,
       data: JSON.parse(formattedLevel),
     };
