@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useWordGuess } from "../../../hooks/minigames/word-guess/use-word-guess";
 import type { MinigameComponentProps } from "../../../types/minigames/minigame-components-props";
 import type { WordGuessWord } from "../../../types/minigames/word-guess/word-guess-word";
-import { WordGuessTile } from "./word-guess_tile";
+import { WordGuessTile } from "./word-guess-tile";
 
 const mockWords: WordGuessWord[] = [
   {
