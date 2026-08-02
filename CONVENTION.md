@@ -16,20 +16,21 @@ packages/
         package.json    # konfiguracja paczki
         tsconfig.json
         src/
-            types/      # podstawowe typy
+            types/      # podstawowe typy (wspólne dla backend i frontend)
+                api.ts
                 messages.ts
                 levels.ts
             utils/      # funkcje formatujące, obracające itd helpery
-            schemas/    # głowny json ze schematem poziomu (aktualnie jest tylko na server)
+            schemas/    # główny JSON ze schematem poziomu (aktualnie jest tylko na server)
             validators/ # walidacje przy upload
 client/
     public/
-        data/
-        fonts/
-        textures/
+        data/           # json z dymkami
+        fonts/          # czcionki
+        textures/       # pliki z tilesets dla entities i mapy
     test/               # testy jednostkowe i integracyjne
     src/
-        api/            # zapytania rest api
+        api/            # zapytania REST API
         app/            # tylko app.tsx i routes.tsx
         pages/          # zostaje tak jak było
         components/
@@ -37,7 +38,7 @@ client/
             creator/    # związane z kreatorem komponenty
             minigames/  # minigry w grze
         hooks/          # podział podobny jak wyżej creator, minigames, playgrounds
-        game/           # folder z plikami phasera + jednym komponentem game-mount.tsx do podpięcia do reacta
+        game/           # folder z plikami Phasera + jednym komponentem game-mount.tsx do podpięcia do reacta
             game-mount.tsx
             runtime/
             scenes/     # sceny gry (main.ts wypada rozdzielić na kilka plików)
@@ -57,7 +58,7 @@ client/
             tileset-render.ts
         types/          # związane tylko z frontendem
         context/        # room-provider oraz ewentualnie inne reactowe contexty
-        lib/            # stanowe zmiany, konfiguracja colyseus itp.
+        lib/            # stanowe zmiany, konfiguracja Colyseus itp.
 server/
     package.json        # postawowe pliki
     static/             # dane statyczne, które nie są jeszcze w bazie danych np. textLines.json, levels
@@ -81,21 +82,21 @@ server/
             logic/      # logika biznesowa
             schemas/    # colyseus schema bez zaawansowanej logiki (logika w service)
         scripts/        # skrypty używane przez npm run np. export-levels.ts
-        types/          # związane wyłącznie z endpointami i colyseus po stronie serwera
+        types/          # związane wyłącznie z colyseus po stronie serwera
         utils/          # funkcje pomocnicze związane wyłącznie z backendem
 test/                   # testy e2e dla całej aplikacji
 ```
 
-Powyższy schemat został opracowany na mojej wiedzy powiązanej z frameworkami backendowymi
-oraz strukturą plików dla projektów React po stronie frontend
+Powyższy schemat został opracowany w oparciu o moją wiedzę o frameworkach backendowych
+oraz o strukturze plików dla projektów React po stronie frontend
 
-Ze względu na to, że tworzymy grę multiplayer opartą na websockets, która dzieli typy i częściowo logikę, to proponuję stworzyć paczkę, która będzie zawierała typy wspólne (shared)
+Ze względu na to, że tworzymy grę multiplayer opartą na WebSockets, która dzieli typy i częściowo logikę, to proponuję stworzyć paczkę, która będzie zawierała typy wspólne (shared)
 
 # Zasady clean-code
 
 1. helpery, funkcje bezstanowe powinny znajdować się w folderach utils (ułatwi to tworzenie testów jednostkowych w przyszłości)
 2. funkcje wymagające integracji z zewnętrznymi serwisami lub dodatkowymi bibliotekami umieszczamy w config, lib (głównie testy integracyjne)
-3. typy i funkcje powiązane wyłącznie z clientem np. renderowanie obiektów, tekstury i kolory powinny znajdować się po stronie frontendu w utils i constants
+3. typy i funkcje powiązane wyłącznie z clientem np. renderowanie obiektów, tekstury i kolory powinny znajdować się po stronie frontendu w utils, constants i types
 4. typy i funkcje powiązane wyłącznie z serwerem powinny znajdować się w types i utils na serwerze
 5. typy messages, entities, mechanics etc. oraz te zależne od frontendu i backendu powinny znaleźć się w folderze shared (osobna paczka poza client i server)
 6. nazewnictwo plików w kebab-case np. (creator-tile.tsx), nazewnictwo komponentów i klas w PascalCase, nazewnictwo funkcji utils, helpers, zmiennych camelCase, stałe nazywamy dużymi literami i podkreślniki np. LAYER_MASK
