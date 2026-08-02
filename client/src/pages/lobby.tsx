@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 
 import { useRoom } from "../lib/use-room";
+import type { RoomState } from "../types/room-state";
 
 export function Lobby() {
   const { room, isConnected } = useRoom();
@@ -11,7 +12,7 @@ export function Lobby() {
   useEffect(() => {
     if (!room) return;
 
-    const handleStateChange = (state: any) => {
+    const handleStateChange = (state: RoomState) => {
       if (state.playerState?.players) {
         setPlayers(Array.from(state.playerState.players.values()));
       }
