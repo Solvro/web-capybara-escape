@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Button } from "../components/button";
-import { CustomInput } from "../components/custom-input";
-import { ErrorContainer } from "../components/error-container";
 import { IntroContainer } from "../components/intro-container";
-import { TitleHeader } from "../components/title-header";
+import { Button } from "../components/ui/button";
+import { CustomInput } from "../components/ui/custom-input";
+import { ErrorContainer } from "../components/ui/error-container";
+import { TitleHeader } from "../components/ui/title-header";
 import { useRoom } from "../lib/use-room";
 
 export function Intro() {

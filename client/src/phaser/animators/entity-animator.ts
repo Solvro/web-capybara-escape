@@ -1,5 +1,8 @@
+import * as Phaser from "phaser";
+
+import type { SpriteOffset } from "@/types/animators/sprite-animator";
+
 import type { Direction } from "../entities/entity";
-import type { SpriteOffset } from "./sprite-animator";
 
 export interface EntityController {
   getDirection(): Direction | null;

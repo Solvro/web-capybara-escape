@@ -1,22 +1,6 @@
-export interface AnimationDefinition {
-  name: string;
-  startFrame: number;
-  endFrame: number;
-  frameRate?: number;
-  loop?: boolean;
-}
+import * as Phaser from "phaser";
 
-export interface SpriteOffset {
-  x: number;
-  y: number;
-}
-
-export interface SpriteAnimatorConfig {
-  frameWidth: number;
-  frameHeight: number;
-  spriteOffset?: SpriteOffset;
-  animations: AnimationDefinition[];
-}
+import type { SpriteAnimatorConfig } from "@/types/animators/sprite-animator";
 
 export class SpriteAnimator {
   public readonly textureKey: string;

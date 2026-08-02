@@ -1,3 +1,5 @@
+import * as Phaser from "phaser";
+
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 import type { EntityAnimator } from "../animators/entity-animator";
 

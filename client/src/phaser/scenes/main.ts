@@ -1,4 +1,11 @@
 import type { Room } from "@colyseus/sdk";
+import * as Phaser from "phaser";
+
+import { SOL_ANIM_CONFIG } from "@/constants/animators/sol-animator-config";
+import { VRON_ANIM_CONFIG } from "@/constants/animators/vron-animator-config";
+import { NameTag } from "@/phaser/ui/name-tag";
+import { SpeechBubble } from "@/phaser/ui/speech-bubble";
+import { Display } from "@/utils/display";
 
 import { CELL_SIZE, LAYER_NAMES, TILE_SIZE } from "../../constants/global";
 import type { LAYER_NAME } from "../../constants/global";
@@ -18,8 +25,6 @@ import type {
 import type { INetworkInterface } from "../../types/network-interface";
 import type { Player as PlayerType } from "../../types/player";
 import { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
-import { SOL_ANIM_CONFIG } from "../animators/config/sol-animator-config";
-import { VRON_ANIM_CONFIG } from "../animators/config/vron-animator-config";
 import { EnemyEntityAnimator } from "../animators/enemy-entity-animator";
 import { StateController } from "../animators/entity-animator";
 import { PlayerEntityAnimator } from "../animators/player-entity-animator";
@@ -27,15 +32,12 @@ import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Enemy } from "../entities/enemy";
 import { Player } from "../entities/player";
-import { Display } from "../lib/display";
 import { Button } from "../mechanics/button";
 import { Cable } from "../mechanics/cable";
 import { Door } from "../mechanics/door";
 import { Laser } from "../mechanics/laser";
 import { Vent } from "../mechanics/vent";
 import { Wire } from "../mechanics/wire";
-import { NameTag } from "../speech-bubbles/name-tag";
-import { SpeechBubble } from "../speech-bubbles/speech-bubble";
 
 export class Main extends Phaser.Scene {
   private room!: Room;

@@ -1,3 +1,5 @@
+import * as Phaser from "phaser";
+
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE, SIZE_MULTIPLIER } from "../../constants/global";
 import type { Laser as LaserType } from "../../types/laser";

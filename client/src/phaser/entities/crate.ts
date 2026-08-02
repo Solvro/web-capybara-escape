@@ -1,3 +1,5 @@
+import * as Phaser from "phaser";
+
 import { ASSETS } from "../../constants/blocks";
 import type { Crate as CrateType } from "../../types/crate";
 import type { INetworkInterface } from "../../types/network-interface";

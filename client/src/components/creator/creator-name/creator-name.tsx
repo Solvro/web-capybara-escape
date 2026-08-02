@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { colorVariants } from "../../../constants/color-variants";
-import { CustomInput } from "../../custom-input";
+import { CustomInput } from "../../ui/custom-input";
 
 interface CreatorNameProps {
   levelName?: string;

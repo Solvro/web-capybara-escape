@@ -1,3 +1,5 @@
+import * as Phaser from "phaser";
+
 import { ASSETS } from "../../constants/blocks";
 import type { INetworkInterface } from "../../types/network-interface";
 import type { Vent as VentType } from "../../types/vent";

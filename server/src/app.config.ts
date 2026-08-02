@@ -1,16 +1,16 @@
 import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
 import config from "@colyseus/tools";
-import cors from "cors";
 import express from "express";
 
-import { closeMongoConnection, connectMongo } from "./db/mongo";
-import { levelRepository } from "./levels/level.repository";
+import { createLevelsRouter } from "@/api/routes/levels/levels";
+
+import { closeMongoConnection, connectMongo } from "./config/mongo";
 /**
  * Import your Room files
  */
-import { GameRoom } from "./rooms/GameRoom";
-import { createLevelsRouter } from "./routes/levels";
+import { GameRoom } from "./rooms/game-room";
+import { levelRepository } from "./services/levels/level.repository";
 
 async function gracefulShutdown(signal: string) {
   console.log(`[Server] Received ${signal}. Closing MongoDB connection...`);

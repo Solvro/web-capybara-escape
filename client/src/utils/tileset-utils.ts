@@ -9,7 +9,7 @@ import {
 } from "../constants/global";
 import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { Direction, type DirectionType } from "../types/direction";
-import type { FormattedLevelType } from "../types/formattedLevel";
+import type { FormattedLevelType } from "../types/formatted-level";
 
 export function countEntityOccurrences(
   tileData: (string | null)[][],

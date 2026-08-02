@@ -1,7 +1,13 @@
+import * as Phaser from "phaser";
+
+import type {
+  SpriteAnimatorConfig,
+  SpriteOffset,
+} from "@/types/animators/sprite-animator";
+
 import { EntityAnimator } from "./entity-animator";
 import type { EntityController } from "./entity-animator";
 import { SpriteAnimator } from "./sprite-animator";
-import type { SpriteAnimatorConfig, SpriteOffset } from "./sprite-animator";
 
 export class PlayerEntityAnimator extends EntityAnimator {
   private readonly spriteAnimator: SpriteAnimator;

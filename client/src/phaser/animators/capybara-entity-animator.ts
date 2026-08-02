@@ -1,8 +1,11 @@
-import { CAPYBARA_ANIM_CONFIG } from "./config/capybara-animator-config";
+import * as Phaser from "phaser";
+
+import { CAPYBARA_ANIM_CONFIG } from "@/constants/animators/capybara-animator-config";
+import type { SpriteOffset } from "@/types/animators/sprite-animator";
+
 import { EntityAnimator } from "./entity-animator";
 import type { EntityController } from "./entity-animator";
 import { SpriteAnimator } from "./sprite-animator";
-import type { SpriteOffset } from "./sprite-animator";
 
 const CAPYBARA_TEXTURE_KEY = "capybara";
 

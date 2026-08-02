@@ -1,3 +1,5 @@
+import * as Phaser from "phaser";
+
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE } from "../../constants/global";
 import type { INetworkInterface } from "../../types/network-interface";

@@ -1,3 +1,5 @@
+import * as Phaser from "phaser";
+
 import { ASSETS } from "../../constants/blocks";
 import { SIZE_MULTIPLIER } from "../../constants/global";
 import type { Button as ButtonType } from "../../types/button";

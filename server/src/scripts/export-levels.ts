@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { closeMongoConnection, connectMongo } from "../db/mongo";
-import { levelRepository } from "../levels/level.repository";
+import { closeMongoConnection, connectMongo } from "../config/mongo";
+import { levelRepository } from "../services/levels/level.repository";
 
 dotenv.config({ path: ".env.development" });
 

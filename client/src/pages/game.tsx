@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Button } from "../components/button";
-import { PauseModal } from "../components/pause-modal";
+import { PauseModal } from "@/components/pause-modal";
+import { PhaserContainer } from "@/components/phaser-container";
+import { Button } from "@/components/ui/button";
 import {
   GAME_VIEW_HEIGHT,
   GAME_VIEW_WIDTH,
   MAP_SCALER,
-} from "../constants/global";
-import { useRoom } from "../lib/use-room";
-import { PhaserGame } from "../phaser/game";
-import type { MessagePauseToggled } from "../types/messages";
+} from "@/constants/global";
+import { useRoom } from "@/lib/use-room";
+import type { MessagePauseToggled } from "@/types/messages";
 
 export function Game() {
   const { room, isConnected, joinError } = useRoom();
@@ -85,7 +85,7 @@ export function Game() {
           maxHeight: "95vh",
         }}
       >
-        <PhaserGame room={room} />
+        <PhaserContainer room={room} />
       </div>
 
       {isPaused && <PauseModal />}

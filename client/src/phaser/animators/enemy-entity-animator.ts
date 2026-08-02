@@ -1,8 +1,11 @@
-import { ENEMY_ANIM_CONFIG } from "./config/enemy-animator-config";
+import * as Phaser from "phaser";
+
+import { ENEMY_ANIM_CONFIG } from "@/constants/animators/enemy-animator-config";
+import type { SpriteOffset } from "@/types/animators/sprite-animator";
+
 import { EntityAnimator } from "./entity-animator";
 import type { EntityController } from "./entity-animator";
 import { SpriteAnimator } from "./sprite-animator";
-import type { SpriteOffset } from "./sprite-animator";
 
 const ENEMY_TEXTURE_KEY = "enemy";
 

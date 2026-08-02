@@ -1,3 +1,5 @@
+import * as Phaser from "phaser";
+
 import type { EntityAnimator } from "../animators/entity-animator";
 import { Entity } from "./entity";
 import type { Direction } from "./entity";

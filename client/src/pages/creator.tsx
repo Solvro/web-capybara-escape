@@ -1,7 +1,7 @@
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
-import api from "../api/apiService";
+import api from "../api/api-service";
 import { CreatorBoard } from "../components/creator/creator-board/creator-board";
 import { CreatorControl } from "../components/creator/creator-control/creator-control";
 import {
@@ -14,7 +14,7 @@ import { LAYER_NAMES } from "../constants/global";
 import type { LayerItem } from "../constants/layer-items";
 import { LAYER_ITEMS, LAYER_ITEM_KEYS } from "../constants/layer-items";
 import { useCreatorFloorCableRotation } from "../hooks/creator/use-creator-floor-cable-rotation";
-import type { CreateLevelInput } from "../types/createLevelInput";
+import type { CreateLevelInput } from "../types/create-level-input";
 import { type DirectionType } from "../types/direction";
 import {
   changeBoardSize,
