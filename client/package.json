@@ -21,7 +21,6 @@
     "tailwindcss": "^4.2.4"
   },
   "devDependencies": {
-    "@rolldown/binding-win32-x64-msvc": "^1.2.0",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
