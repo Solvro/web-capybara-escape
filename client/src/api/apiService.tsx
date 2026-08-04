@@ -26,7 +26,7 @@ const ApiService = {
       });
   },
   updateRoom: async (slug: string, levelData: CreateLevelInput) => {
-    const response = await api.put(`/rooms/${slug}`, levelData);
+    const response = await api.put(`/api/admi/levels/${slug}`, levelData);
     return response.data;
   },
 };
