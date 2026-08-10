@@ -12,18 +12,10 @@ export class Stopwatch {
     this.emit();
   }
 
-  start() {
-    this.running = true;
-  }
-
-  reset() {
-    this.running = false;
-    this.elapsedMs = 0;
+  sync(elapsedMs: number, running: boolean) {
+    this.elapsedMs = elapsedMs;
+    this.running = running;
     this.emit();
-  }
-
-  get elapsed() {
-    return this.elapsedMs;
   }
 
   tick(delta: number) {
@@ -32,6 +24,10 @@ export class Stopwatch {
     }
     this.elapsedMs += delta;
     this.emit();
+  }
+
+  get elapsed() {
+    return this.elapsedMs;
   }
 
   static format(elapsedMs: number) {

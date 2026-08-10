@@ -10,11 +10,29 @@ import { RoomState } from "./schema/RoomState";
 // import room from "./json/examples/room2.json";
 // import room from "./json/examples/room3.json";
 
+const TIMER_BROADCAST_INTERVAL_MS = 5000;
+
 export class GameRoom extends Room<{ state: RoomState }> {
   maxClients = 4;
   state = new RoomState();
 
   private roomData: any = fallbackRoom;
+
+  private timerElapsedMs = 0;
+  private timerRunning = true;
+  private timerBroadcastAccumulator = 0;
+
+  private get timerUpdatePayload() {
+    return {
+      elapsedMs: Math.floor(this.timerElapsedMs),
+      running: this.timerRunning,
+    };
+  }
+
+  private broadcastTimer() {
+    this.timerBroadcastAccumulator = 0;
+    this.broadcast("timerUpdate", this.timerUpdatePayload);
+  }
 
   async onCreate(options: any) {
     this.roomData = await getRoomForGame(options?.levelSlug);
@@ -70,6 +88,14 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.setSimulationInterval((deltaTime) => {
+      if (this.timerRunning) {
+        this.timerElapsedMs += deltaTime;
+      }
+      this.timerBroadcastAccumulator += deltaTime;
+      if (this.timerBroadcastAccumulator >= TIMER_BROADCAST_INTERVAL_MS) {
+        this.broadcastTimer();
+      }
+
       const result = this.state.updateLasers(deltaTime);
       if (result.length > 0) {
         this.broadcast("lasersUpdated", { lasers: result });
@@ -97,8 +123,20 @@ export class GameRoom extends Room<{ state: RoomState }> {
       });
     });
 
+    this.onMessage("toggleTimer", (client) => {
+      this.timerRunning = !this.timerRunning;
+      console.log(
+        `[TIMER] ${this.timerRunning ? "Resumed" : "Paused"} by ${client.sessionId}`,
+      );
+      this.broadcastTimer();
+    });
+
     this.onMessage("reset", (client) => {
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
+
+      this.timerElapsedMs = 0;
+      this.timerRunning = true;
+      this.broadcastTimer();
 
       this.state.loadRoomFromJson(this.roomData);
 
@@ -122,6 +160,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   onJoin(client: Client, options: any) {
+    client.send("timerUpdate", this.timerUpdatePayload);
+
     this.state.spawnNewPlayer(client.sessionId, options.name);
     const player = this.state.playerState.players.get(client.sessionId);
 

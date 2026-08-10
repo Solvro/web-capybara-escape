@@ -69,3 +69,8 @@ export interface MessageRoomReset {
   message: string;
   timestamp: number;
 }
+
+export interface MessageTimerUpdate {
+  elapsedMs: number;
+  running: boolean;
+}

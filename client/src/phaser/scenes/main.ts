@@ -12,6 +12,7 @@ import type {
   MessageOnAddPlayer,
   MessageOnRemovePlayer,
   MessagePositionUpdate,
+  MessageTimerUpdate,
 } from "../../types/messages";
 import type { INetworkInterface } from "../../types/network-interface";
 import type { Player as PlayerType } from "../../types/player";
@@ -56,6 +57,7 @@ export class Main extends Phaser.Scene {
   };
   private speakInput!: Phaser.Input.Keyboard.Key;
   private resetInput!: Phaser.Input.Keyboard.Key;
+  private pauseTimerInput!: Phaser.Input.Keyboard.Key;
   private stopwatch!: Stopwatch;
   private playerMoveDebounce = 0;
   private playerEntityAnimators!: PlayerEntityAnimator[];
@@ -164,12 +166,12 @@ export class Main extends Phaser.Scene {
       };
       this.speakInput = this.input.keyboard.addKey("L");
       this.resetInput = this.input.keyboard.addKey("R");
+      this.pauseTimerInput = this.input.keyboard.addKey("P");
     }
 
     this.stopwatch = new Stopwatch((display) => {
       this.game.events.emit(STOPWATCH_EVENT, display);
     });
-    this.stopwatch.start();
 
     // Colyseus message handlers
     try {
@@ -316,6 +318,10 @@ export class Main extends Phaser.Scene {
         }
       });
 
+      room.onMessage("timerUpdate", (message: MessageTimerUpdate) => {
+        this.stopwatch.sync(message.elapsedMs, message.running);
+      });
+
       this.room.send("getMapInfo");
     } catch (error) {
       console.error("Error setting up Colyseus message handlers:", error);
@@ -349,6 +355,9 @@ export class Main extends Phaser.Scene {
     }
     if (Phaser.Input.Keyboard.JustDown(this.speakInput)) {
       this.room.send("generateLine");
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.pauseTimerInput)) {
+      this.room.send("toggleTimer");
     }
 
     this.stopwatch.tick(delta);
@@ -440,7 +449,6 @@ export class Main extends Phaser.Scene {
 
     this.children.removeAll();
 
-    this.stopwatch.reset();
-    this.stopwatch.start();
+    this.displayHandler = new Display(this);
   }
 }
