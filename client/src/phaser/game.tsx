@@ -31,7 +31,9 @@ export function PhaserGame({ room }: PhaserGameProps) {
     };
   }, [room]);
 
-  return <div id="game-container" ref={containerRef}></div>;
+  return (
+    <div id="game-container" ref={containerRef} className="h-full w-full" />
+  );
 }
 
 PhaserGame.displayName = "PhaserGame";

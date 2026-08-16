@@ -1,5 +1,5 @@
 import { levelRepository } from "../../levels/level.repository";
-import fallbackRoom from "../json/examples/room1.json";
+import fallbackRoom from "../json/examples/default.json";
 
 type LoadedRoom = typeof fallbackRoom;
 

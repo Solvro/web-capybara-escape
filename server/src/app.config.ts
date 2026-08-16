@@ -1,6 +1,7 @@
 import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
 import config from "@colyseus/tools";
+import cors from "cors";
 import express from "express";
 
 import { closeMongoConnection, connectMongo } from "./db/mongo";

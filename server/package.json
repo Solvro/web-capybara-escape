@@ -25,19 +25,21 @@
     "@colyseus/tools": "^0.17.19",
     "@colyseus/ws-transport": "^0.17.13",
     "colyseus": "^0.17.10",
+    "cors": "^2.8.6",
     "express": "^5.2.1",
     "mongodb": "^7.2.0"
   },
   "devDependencies": {
     "@colyseus/testing": "^0.17.11",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^24.6.1",
+    "@types/node": "^26.1.1",
     "colyseus.js": "^0.16.22",
     "mocha": "^11.7.5",
     "rimraf": "^6.1.3",
     "tsx": "^4.21.0",
-    "typescript": "6.0.3"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=22.0.0"

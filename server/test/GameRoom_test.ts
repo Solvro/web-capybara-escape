@@ -116,4 +116,22 @@ describe("GameRoom (room1)", () => {
       { x: 1, y: 3 },
     );
   });
+
+  it("toggles pause after a togglePause message", async () => {
+    const room = await colyseus.createRoom<RoomState>("game_room", {});
+    const client = await colyseus.connectTo(room, { name: "Pauser" });
+    registerNoopMessageHandlers(client);
+
+    assert.strictEqual(room.state.isPaused, false);
+
+    client.send("togglePause");
+    await room.waitForNextPatch();
+
+    assert.strictEqual(room.state.isPaused, true);
+
+    client.send("togglePause");
+    await room.waitForNextPatch();
+
+    assert.strictEqual(room.state.isPaused, false);
+  });
 });

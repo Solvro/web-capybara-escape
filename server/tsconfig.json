@@ -4,7 +4,7 @@
     "target": "ESNext",
     "module": "CommonJS",
     "resolveJsonModule": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "ignoreDeprecations": "6.0",
     "strict": true,
     "allowJs": true,

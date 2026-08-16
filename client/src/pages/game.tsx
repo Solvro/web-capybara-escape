@@ -2,12 +2,20 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../components/button";
+import { PauseModal } from "../components/pause-modal";
+import {
+  GAME_VIEW_HEIGHT,
+  GAME_VIEW_WIDTH,
+  MAP_SCALER,
+} from "../constants/global";
 import { useRoom } from "../lib/use-room";
 import { PhaserGame } from "../phaser/game";
+import type { MessagePauseToggled } from "../types/messages";
 
 export function Game() {
   const { room, isConnected, joinError } = useRoom();
   const [showTimeoutError, setShowTimeoutError] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +34,19 @@ export function Game() {
       clearTimeout(timer);
     };
   }, [room, isConnected, joinError]);
+
+  useEffect(() => {
+    const handlePauseToggled = (event: Event) => {
+      const pauseEvent = event as CustomEvent<MessagePauseToggled>;
+      setIsPaused(pauseEvent.detail.isPaused);
+    };
+
+    window.addEventListener("game:pauseToggled", handlePauseToggled);
+
+    return () => {
+      window.removeEventListener("game:pauseToggled", handlePauseToggled);
+    };
+  }, []);
 
   if (joinError || showTimeoutError) {
     return (
@@ -52,8 +73,22 @@ export function Game() {
   }
 
   return (
-    <div className="flex h-[560px] w-[800px] items-center justify-center overflow-hidden rounded-2xl bg-violet-950">
-      <PhaserGame room={room} />
-    </div>
+    <>
+      <div
+        className="flex items-center justify-center overflow-hidden rounded-2xl bg-violet-950"
+        style={{
+          width: GAME_VIEW_WIDTH * MAP_SCALER,
+          height: GAME_VIEW_HEIGHT * MAP_SCALER,
+          // Never let the view spill outside the window; the map stays fully
+          // visible because Phaser FIT scales it down to whatever fits.
+          maxWidth: "95vw",
+          maxHeight: "95vh",
+        }}
+      >
+        <PhaserGame room={room} />
+      </div>
+
+      {isPaused && <PauseModal />}
+    </>
   );
 }

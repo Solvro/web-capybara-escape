@@ -1,5 +1,10 @@
 export const SIZE_MULTIPLIER = 5;
 
+export const MAP_SCALER = 2;
+
+export const GAME_VIEW_WIDTH = 720;
+export const GAME_VIEW_HEIGHT = 480;
+
 export const TILE_SIZE = 24;
 export const CELL_SIZE = TILE_SIZE * SIZE_MULTIPLIER;
 

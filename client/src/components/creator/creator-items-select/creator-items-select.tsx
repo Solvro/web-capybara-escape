@@ -26,6 +26,7 @@ interface CreatorItemsSelectProps {
   setActiveBlock: (block: LayerItem | null) => void;
   floorCableRotationByBase: Record<string, FloorDecoyRotationDeg>;
   rotateCableAtBase: (baseKey: string) => void;
+  tileData: (string | null)[][];
 }
 
 export function CreatorItemsSelect({
@@ -33,6 +34,7 @@ export function CreatorItemsSelect({
   setActiveBlock,
   floorCableRotationByBase,
   rotateCableAtBase,
+  tileData,
 }: CreatorItemsSelectProps) {
   const [selectedLayer, setSelectedLayer] = useState<string>(LAYER_TABS[0].key);
 
@@ -88,6 +90,7 @@ export function CreatorItemsSelect({
           setActiveBlock={setActiveBlock}
           floorCableRotationByBase={floorCableRotationByBase}
           rotateCableAtBase={rotateCableAtBase}
+          tileData={tileData}
         />
       </div>
     </div>
