@@ -5,6 +5,7 @@ import express from "express";
 
 import { closeMongoConnection, connectMongo } from "./db/mongo";
 import { levelRepository } from "./levels/level.repository";
+import { questionRepository } from "./questions/question.repository";
 /**
  * Import your Room files
  */
@@ -35,6 +36,7 @@ export default config({
      * Bind your custom express routes here:
      * Read more: https://expressjs.com/en/starter/basic-routing.html
      */
+
     app.use(express.json({ limit: "1mb" }));
     app.use("/api", createLevelsRouter());
     app.use("/api", createQuestionsRouter());
@@ -65,5 +67,6 @@ export default config({
      */
     await connectMongo();
     await levelRepository.ensureIndexes();
+    await questionRepository.ensureIndexes();
   },
 });
