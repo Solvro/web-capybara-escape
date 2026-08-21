@@ -31,6 +31,21 @@ export const LAYER_ITEM_KEYS = {
   VRON_START: "vron-start",
 } as const;
 
+export const ENTITY_LIMITS: Record<string, number> = {
+  [LAYER_ITEM_KEYS.CAPYBARA_START]: 1,
+  [LAYER_ITEM_KEYS.SOL_START]: 1,
+  [LAYER_ITEM_KEYS.VRON_START]: 1,
+  [LAYER_ITEM_KEYS.ENEMY]: 5,
+  [LAYER_ITEM_KEYS.LASER]: 5,
+};
+
+export function getEntityLimitKeyFor(tileKey: string): string | null {
+  if (tileKey in ENTITY_LIMITS) return tileKey;
+  const baseKey = tileKey.split("-")[0]!;
+  if (baseKey in ENTITY_LIMITS) return baseKey;
+  return null;
+}
+
 export const FLOOR_DECOY_ROTATION_DEGREES = [0, 90, 180, 270] as const;
 export type FloorDecoyRotationDeg =
   (typeof FLOOR_DECOY_ROTATION_DEGREES)[number];

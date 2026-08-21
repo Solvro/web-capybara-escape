@@ -3,8 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import { ASSETS } from "../../../constants/blocks";
 import { layerNameToIndex } from "../../../constants/global";
 import { MAX_DIM_CREATOR, MIN_DIM_CREATOR } from "../../../constants/global";
-import type { LayerItem } from "../../../constants/layer-items";
+import {
+  ENTITY_LIMITS,
+  type LayerItem,
+  getEntityLimitKeyFor,
+} from "../../../constants/layer-items";
 import { Direction, type DirectionType } from "../../../types/direction";
+import { countEntityOccurrences } from "../../../utils/tileset-utils";
 import { clampDim } from "../creator-control/creator-control";
 import { CreatorDimensionButtons } from "./creator-dimension-buttons";
 import { CreatorTile } from "./creator-tile";
@@ -112,6 +117,22 @@ export function CreatorBoard({
         activeBlock.frame === ASSETS.EMPTY ? null : activeBlock.key;
 
       if (layerIdx === undefined) return;
+
+      if (valueToSet !== null) {
+        const limitKey = getEntityLimitKeyFor(valueToSet);
+        if (limitKey) {
+          const limit = ENTITY_LIMITS[limitKey]!;
+          const currentCount = countEntityOccurrences(
+            tileData,
+            limitKey,
+            tileIdx,
+          );
+          if (currentCount >= limit) {
+            return;
+          }
+        }
+      }
+
       setTileData((prev) => {
         const next = prev.map((arr) => [...arr]);
         next[tileIdx][layerIdx] = valueToSet;

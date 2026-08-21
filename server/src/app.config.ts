@@ -6,11 +6,13 @@ import express from "express";
 
 import { closeMongoConnection, connectMongo } from "./db/mongo";
 import { levelRepository } from "./levels/level.repository";
+import { questionRepository } from "./questions/question.repository";
 /**
  * Import your Room files
  */
 import { GameRoom } from "./rooms/GameRoom";
 import { createLevelsRouter } from "./routes/levels";
+import { createQuestionsRouter } from "./routes/questions";
 
 async function gracefulShutdown(signal: string) {
   console.log(`[Server] Received ${signal}. Closing MongoDB connection...`);
@@ -38,6 +40,7 @@ export default config({
 
     app.use(express.json({ limit: "1mb" }));
     app.use("/api", createLevelsRouter());
+    app.use("/api", createQuestionsRouter());
 
     app.get("/hello_world", (req, res) => {
       res.send("It's time to kick ass and chew bubblegum!");
@@ -65,5 +68,6 @@ export default config({
      */
     await connectMongo();
     await levelRepository.ensureIndexes();
+    await questionRepository.ensureIndexes();
   },
 });
