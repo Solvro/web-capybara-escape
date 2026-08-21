@@ -25,6 +25,18 @@ const ApiService = {
         return response;
       });
   },
+  async updateRoom(slug: string, levelData: CreateLevelInput) {
+    return await api.put(
+      this.URL + `/api/admin/levels/${slug}`,
+      {
+        slug: levelData.slug,
+        name: levelData.name,
+        data: levelData.data,
+        isPublished: levelData.isPublished,
+      },
+      { headers: this.headerWithAuth },
+    );
+  },
 };
 
 export default ApiService;
