@@ -48,7 +48,7 @@ export function CreatorOverwriteModal({
             onClick={onConfirm}
             disabled={uploadStatus === "loading"}
           >
-            {uploadStatus === "loading" ? "Overwritting..." : "Overwrite"}
+            {uploadStatus === "loading" ? "Overwriting..." : "Overwrite"}
           </button>
         </div>
       </div>
