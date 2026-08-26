@@ -23,7 +23,7 @@
     "@colyseus/monitor": "^0.17.8",
     "@colyseus/playground": "^0.17.12",
     "@colyseus/tools": "^0.17.19",
-    "@colyseus/ws-transport": "^0.17.13",
+    "@colyseus/ws-transport": "^0.18.1",
     "colyseus": "^0.17.10",
     "cors": "^2.8.6",
     "express": "^5.2.1",
