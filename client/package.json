@@ -13,6 +13,7 @@
     "@colyseus/sdk": "^0.17.42",
     "@headlessui/react": "^2.2.9",
     "@tailwindcss/vite": "^4.2.4",
+    "axios": "^1.18.1",
     "lucide-react": "^1.16.0",
     "phaser": "^4.0.0",
     "react": "^19.2.0",
@@ -21,12 +22,12 @@
     "tailwindcss": "^4.2.4"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.1.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "baseline-browser-mapping": "^2.10.23",
-    "typescript": "~6.0.3",
+    "typescript": "^7.0.2",
     "vite": "^8.0.10"
   }
 }

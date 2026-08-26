@@ -3,10 +3,12 @@ import { useRef, useState } from "react";
 
 import {
   COLORABLE_BASE_ITEMS,
+  ENTITY_LIMITS,
   type FloorDecoyRotationDeg,
   type LayerItem,
   creatorPaletteKeyForLookup,
   getColoredVariant,
+  getEntityLimitKeyFor,
   getGridItems,
   getRotatedFloorPlacementItem,
   isRotatableFloorBaseKey,
@@ -14,6 +16,7 @@ import {
   parseRotatableFloorKey,
 } from "../../../../constants/layer-items";
 import {
+  countEntityOccurrences,
   getEntityRenderData,
   getUIBlockBackgroundData,
 } from "../../../../utils/tileset-utils";
@@ -27,6 +30,7 @@ interface CreatorLayerOptionsGridProps {
   setActiveBlock: (block: LayerItem | null) => void;
   floorCableRotationByBase: Record<string, FloorDecoyRotationDeg>;
   rotateCableAtBase: (baseKey: string) => void;
+  tileData: (string | null)[][];
 }
 
 export function CreatorLayerOptionsGrid({
@@ -35,6 +39,7 @@ export function CreatorLayerOptionsGrid({
   setActiveBlock,
   floorCableRotationByBase,
   rotateCableAtBase,
+  tileData,
 }: CreatorLayerOptionsGridProps) {
   const items = getGridItems(layerKey);
 
@@ -141,6 +146,15 @@ export function CreatorLayerOptionsGrid({
 
         const paletteName = paletteDisplayLabel(displayItem);
         const rotatedKey = parseRotatableFloorKey(displayItem.key);
+
+        const limitKey = getEntityLimitKeyFor(displayItem.key);
+        const entityLimit = limitKey ? ENTITY_LIMITS[limitKey] : undefined;
+        const entityCount = limitKey
+          ? countEntityOccurrences(tileData, limitKey)
+          : 0;
+        const isLimitReached =
+          entityLimit !== undefined && entityCount >= entityLimit;
+
         const tileHoverTitle =
           rotatedKey !== null &&
           rotatedKey.rotationDeg % 360 !== 0 &&
@@ -159,19 +173,28 @@ export function CreatorLayerOptionsGrid({
             <div
               role="button"
               tabIndex={0}
+              aria-disabled={isLimitReached}
               onClick={() => {
+                if (isLimitReached) return;
                 handleItemClick(item);
               }}
               onKeyDown={(e) => {
+                if (isLimitReached) return;
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   handleItemClick(item);
                 }
               }}
-              className={`flex cursor-pointer flex-col items-center gap-2 rounded-md p-2 transition-colors ${
+              className={`flex flex-col items-center gap-2 rounded-md p-2 transition-colors ${
+                isLimitReached
+                  ? "cursor-not-allowed opacity-40"
+                  : "cursor-pointer"
+              } ${
                 isActive
                   ? "bg-amber-400/30 ring-2 ring-amber-400"
-                  : "hover:bg-violet-500/40"
+                  : isLimitReached
+                    ? ""
+                    : "hover:bg-violet-500/40"
               }`}
               title={tileHoverTitle}
             >
@@ -268,6 +291,15 @@ export function CreatorLayerOptionsGrid({
               <span className="block w-full text-balance break-words px-0.5 text-center text-[10px] leading-tight font-medium text-violet-200 hyphens-auto">
                 {paletteName}
               </span>
+              {entityLimit !== undefined && (
+                <span
+                  className={`block text-center text-[9px] leading-tight ${
+                    isLimitReached ? "text-red-400" : "text-violet-300"
+                  }`}
+                >
+                  {entityCount}/{entityLimit}
+                </span>
+              )}
             </div>
 
             {openPickerBaseKey === item.baseKey && hasVariants && (
