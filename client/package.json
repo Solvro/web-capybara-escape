@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@colyseus/sdk": "^0.17.42",
+    "@colyseus/sdk": "^0.18.2",
     "@headlessui/react": "^2.2.9",
     "@tailwindcss/vite": "^4.2.4",
     "axios": "^1.18.1",
