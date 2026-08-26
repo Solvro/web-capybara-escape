@@ -319,7 +319,7 @@ export const formatLevel = (
     doorCount = 0;
 
   const doorIdsByColor: Record<string, string[]> = {};
-  const buttonsToLink: { color: string; doorIds: string[] }[] = [];
+  const buttonsToLink: { id: string; color: string; doorIds: string[] }[] = [];
 
   tileIndices.forEach((element, index) => {
     const frame =
@@ -459,6 +459,32 @@ export const formatLevel = (
 
   for (const button of buttonsToLink) {
     button.doorIds = doorIdsByColor[button.color] ?? [];
+  }
+
+  const buttonsWithoutDoors = buttonsToLink.filter(
+    (button) => button.doorIds.length === 0,
+  );
+  const controlledDoorIds = new Set(
+    buttonsToLink.flatMap((button) => button.doorIds),
+  );
+  const allDoorIds = Object.values(doorIdsByColor).flat();
+  const doorsWithoutButton = allDoorIds.filter(
+    (doorId) => !controlledDoorIds.has(doorId),
+  );
+
+  const errors: string[] = [];
+
+  if (buttonsWithoutDoors.length > 0) {
+    const ids = buttonsWithoutDoors.map((b) => b.id).join(", ");
+    errors.push(`button(s) without doors assigned to them: ${ids}`);
+  }
+  if (doorsWithoutButton.length > 0) {
+    errors.push(
+      `doors without button assigned to them: ${doorsWithoutButton.join(", ")}`,
+    );
+  }
+  if (errors.length > 0) {
+    throw new Error(`Cannot export level - ${errors.join(", ")}`);
   }
 
   return formattedLevel;

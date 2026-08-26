@@ -19,14 +19,14 @@ export class ButtonState extends Schema {
     color: string,
     x: number,
     y: number,
-    doorId: string[],
+    doorIds: string[],
   ): Button {
     const button = new Button();
     button.id = id;
     button.color = color;
     button.position.x = x;
     button.position.y = y;
-    button.doorIds.push(...doorId);
+    button.doorIds.push(...doorIds);
     button.pressed = false;
     this.buttons.set(id, button);
     this.positionMap.set(`${x}_${y}`, id);
