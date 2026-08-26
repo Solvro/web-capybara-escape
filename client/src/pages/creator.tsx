@@ -28,6 +28,7 @@ export function Creator() {
   const [direction, setDirection] = useState<DirectionType | null>(null);
   const [formattedLevel, setFormattedLevel] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] =
     useState<CreatorExportUploadStatus>("idle");
 
@@ -74,10 +75,16 @@ export function Creator() {
   };
 
   const onRoomSubmit = () => {
-    const newFormattedLevel = formatLevel(tileData, dims);
-    setFormattedLevel(JSON.stringify(newFormattedLevel, null, 2));
-    setUploadStatus("idle");
-    setIsModalOpen(true);
+    try {
+      const newFormattedLevel = formatLevel(tileData, dims);
+      setFormattedLevel(JSON.stringify(newFormattedLevel, null, 2));
+      setUploadStatus("idle");
+      setIsModalOpen(true);
+      setExportError(null);
+    } catch (error) {
+      console.error("Failed to format level: ", error);
+      setExportError(error instanceof Error ? error.message : "Unknown error");
+    }
   };
 
   const handleConfirm = async () => {
@@ -123,6 +130,7 @@ export function Creator() {
               onReset={handleReset}
               setDirection={setDirection}
               onRoomSubmit={onRoomSubmit}
+              exportError={exportError}
             />
           </div>
         </div>
