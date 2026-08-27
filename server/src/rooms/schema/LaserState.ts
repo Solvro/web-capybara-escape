@@ -94,6 +94,41 @@ export class LaserState extends Schema {
     }
   }
 
+  public isPointInLaserBeam(x: number, y: number): boolean {
+    for (const laser of this.lasers.values()) {
+      if (!laser.active) continue;
+
+      let dx = 0;
+      let dy = 0;
+
+      switch (laser.direction) {
+        case "up":
+          dy = -1;
+          break;
+        case "down":
+          dy = 1;
+          break;
+        case "left":
+          dx = -1;
+          break;
+        case "right":
+          dx = 1;
+          break;
+      }
+
+      for (let i = 1; i <= laser.currentRange; i++) {
+        const beamX = laser.position.x + dx * i;
+        const beamY = laser.position.y + dy * i;
+
+        if (beamX === x && beamY === y) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   onRoomDispose() {
     this.lasers.clear();
     this.positionMap.clear();

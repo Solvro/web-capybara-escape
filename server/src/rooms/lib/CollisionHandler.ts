@@ -1,3 +1,4 @@
+import { Laser } from "../schema/LaserState.js";
 import { RoomState } from "../schema/RoomState.js";
 
 export class CollisionHandler {
@@ -7,8 +8,8 @@ export class CollisionHandler {
   ): boolean {
     const { x, y } = playerPos;
 
-    const hitEnemy = [...roomState.enemyState.enemies.values()].some(
-      (enemy) => enemy.position.x === x && enemy.position.y === y,
+    const hitEnemy = [...roomState.enemyState.enemies.values()].some((enemy) =>
+      enemy.isAtPosition(x, y),
     );
     if (hitEnemy) return true;
 
@@ -16,42 +17,8 @@ export class CollisionHandler {
       return true;
     }
 
-    const hitLaser = [...roomState.laserState.lasers.values()].some((laser) => {
-      if (!laser.active) return false;
-
-      return this.isPointInLaserBeam(laser, x, y);
-    });
-    if (hitLaser) return true;
-
-    return false;
-  }
-
-  private isPointInLaserBeam(laser: any, x: number, y: number): boolean {
-    let dx = 0;
-    let dy = 0;
-
-    switch (laser.direction) {
-      case "up":
-        dy = -1;
-        break;
-      case "down":
-        dy = 1;
-        break;
-      case "left":
-        dx = -1;
-        break;
-      case "right":
-        dx = 1;
-        break;
-    }
-
-    for (let i = 1; i <= laser.currentRange; i++) {
-      const beamX = laser.position.x + dx * i;
-      const beamY = laser.position.y + dy * i;
-
-      if (beamX === x && beamY === y) {
-        return true;
-      }
+    if (roomState.laserState.isPointInLaserBeam(x, y)) {
+      return true;
     }
 
     return false;

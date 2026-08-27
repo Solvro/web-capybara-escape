@@ -15,4 +15,8 @@ export class Enemy extends Schema {
     this.position.y = y;
     this.state = state;
   }
+
+  public isAtPosition(x: number, y: number): boolean {
+    return this.position.x === x && this.position.y === y;
+  }
 }
