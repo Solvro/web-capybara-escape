@@ -501,6 +501,9 @@ export class Main extends Phaser.Scene {
   }
 
   private resetGraphics() {
+    this.capybara?.destroy();
+    this.capybara = null;
+
     const mapsToDestroy = [
       this.cables,
       this.players,
@@ -510,22 +513,14 @@ export class Main extends Phaser.Scene {
       this.doors,
       this.buttons,
       this.enemies,
-const mapsToDestroy = [
-this.cables,
-this.players,
-this.nameTags,
-this.speechBubbles,
-this.crates,
-this.doors,
-this.buttons,
-this.enemies,
-this.lasers,
-this.vents,
-this.wires,
-this.capybara
-];
+      this.lasers,
+      this.vents,
+      this.wires,
+    ];
 
     for (const object of mapsToDestroy) {
+      if (!object) continue;
+
       for (const entity of object.values()) {
         entity.destroy();
       }
