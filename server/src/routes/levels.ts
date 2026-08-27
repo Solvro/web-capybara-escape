@@ -95,7 +95,10 @@ export function createLevelsRouter() {
 
         return res.status(201).json({ level });
       } catch (error: unknown) {
-        return res.status(400).json({ error: toErrorMessage(error) });
+        const message = toErrorMessage(error);
+        const isDuplicate =
+          typeof message === "string" && message.includes("already exists");
+        return res.status(isDuplicate ? 409 : 400).json({ error: message });
       }
     },
   );
