@@ -510,7 +510,20 @@ export class Main extends Phaser.Scene {
       this.doors,
       this.buttons,
       this.enemies,
-    ];
+const mapsToDestroy = [
+this.cables,
+this.players,
+this.nameTags,
+this.speechBubbles,
+this.crates,
+this.doors,
+this.buttons,
+this.enemies,
+this.lasers,
+this.vents,
+this.wires,
+this.capybara
+];
 
     for (const object of mapsToDestroy) {
       for (const entity of object.values()) {
