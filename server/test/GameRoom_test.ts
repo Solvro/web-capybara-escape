@@ -50,22 +50,25 @@ describe("GameRoom (room1)", () => {
 
   it("connects a client and syncs room1 state (size, player spawn)", async () => {
     const room = await colyseus.createRoom<RoomState>("game_room", {});
-    const client = await colyseus.connectTo(room, { name: "TestPlayer" });
-    registerNoopMessageHandlers(client);
+    const c1 = await colyseus.connectTo(room, { name: "TestPlayer" });
+    const c2 = await colyseus.connectTo(room, { name: "Bot" });
+    registerNoopMessageHandlers(c1);
 
     assert.strictEqual(
-      client.sessionId,
+      c1.sessionId,
       room.clients[0].sessionId,
       "Client sessionId matches the first connected client in the room",
     );
 
+    c1.send("toggle_ready");
+    c2.send("toggle_ready");
     await room.waitForNextPatch();
 
     const s = room.state;
     assert.strictEqual(s.width, 10);
     assert.strictEqual(s.height, 8);
 
-    const player = s.playerState.players.get(client.sessionId);
+    const player = s.playerState.players.get(c1.sessionId);
     assert.ok(player, "Player exists after join");
     assert.strictEqual(player.position.x, 1);
     assert.strictEqual(player.position.y, 2);
@@ -77,6 +80,9 @@ describe("GameRoom (room1)", () => {
     registerNoopMessageHandlers(c1);
     const c2 = await colyseus.connectTo(room, { name: "Bravo" });
     registerNoopMessageHandlers(c2);
+
+    c1.send("toggle_ready");
+    c2.send("toggle_ready");
 
     await room.waitForNextPatch();
 
@@ -97,20 +103,24 @@ describe("GameRoom (room1)", () => {
 
   it("moves the player after a move message (down from spawn)", async () => {
     const room = await colyseus.createRoom<RoomState>("game_room", {});
-    const client = await colyseus.connectTo(room, { name: "Mover" });
-    registerNoopMessageHandlers(client);
+    const c1 = await colyseus.connectTo(room, { name: "Mover" });
+    const c2 = await colyseus.connectTo(room, { name: "Bot" });
+    registerNoopMessageHandlers(c1);
+
+    c1.send("toggle_ready");
+    c2.send("toggle_ready");
     await room.waitForNextPatch();
 
-    const before = room.state.playerState.players.get(client.sessionId);
+    const before = room.state.playerState.players.get(c1.sessionId);
     assert.deepStrictEqual(
       { x: before.position.x, y: before.position.y },
       { x: 1, y: 2 },
     );
 
-    client.send("move", { direction: "down" });
+    c1.send("move", { direction: "down" });
     await room.waitForNextPatch();
 
-    const after = room.state.playerState.players.get(client.sessionId);
+    const after = room.state.playerState.players.get(c1.sessionId);
     assert.deepStrictEqual(
       { x: after.position.x, y: after.position.y },
       { x: 1, y: 3 },

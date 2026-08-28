@@ -1,11 +1,18 @@
 import type { Room } from "@colyseus/sdk";
 import { createContext, useContext } from "react";
 
+export interface ConnectOptions {
+  playerName: string;
+  mode: "join" | "create" | "random";
+  roomCode?: string;
+  isPrivate?: boolean;
+}
+
 interface RoomContextType {
   room: Room | null;
   isConnected: boolean;
   joinError: boolean;
-  connect: (playerName: string) => Promise<void>;
+  connect: (options: ConnectOptions) => Promise<void>;
   disconnect: () => Promise<void>;
 }
 

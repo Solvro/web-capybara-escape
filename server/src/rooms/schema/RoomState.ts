@@ -16,6 +16,7 @@ export class RoomState extends Schema {
   @type(["string"]) grid = new ArraySchema<string>();
   @type("number") width: number = 10;
   @type("number") height: number = 7;
+  @type("boolean") gameStarted: boolean = false;
   @type("boolean") isPaused: boolean = false;
 
   @type([Position]) startingPositions = new ArraySchema<Position>();
@@ -519,10 +520,14 @@ export class RoomState extends Schema {
   spawnNewPlayer(sessionId: string, name: string = null) {
     this.playerState.createPlayer(sessionId, name);
     const player = this.playerState.players.get(sessionId);
-    const startingPos =
-      this.startingPositions[player.index % this.startingPositions.length];
-    player.position.x = startingPos.x;
-    player.position.y = startingPos.y;
+    if (this.startingPositions && this.startingPositions.length > 0) {
+      const startingPos =
+        this.startingPositions[player.index % this.startingPositions.length];
+      if (startingPos) {
+        player.position.x = startingPos.x;
+        player.position.y = startingPos.y;
+      }
+    }
   }
 
   despawnPlayer(sessionId: string) {

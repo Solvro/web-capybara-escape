@@ -67,4 +67,9 @@ export class PlayerState extends Schema {
   getSessionIdByName(name: string): string | null {
     return this.playerSessionIds.get(name) || null;
   }
+
+  toggleReady(sessionId: string) {
+    const player = this.players.get(sessionId);
+    player.ready = !player.ready;
+  }
 }

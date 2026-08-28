@@ -3,6 +3,7 @@ import type { Room } from "@colyseus/sdk";
 import React, { useEffect, useState } from "react";
 
 import { RoomContext } from "./use-room";
+import type { ConnectOptions } from "./use-room";
 
 const host = window.location.hostname;
 
@@ -23,20 +24,48 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [joinError, setJoinError] = useState(false);
 
-  const connect = async (playerName: string) => {
+  const connect = async ({
+    playerName,
+    mode,
+    roomCode,
+    isPrivate,
+  }: ConnectOptions) => {
     try {
-      const newRoom = await client.joinOrCreate("game_room", {
-        name: playerName,
-      });
-      setRoom(newRoom);
+      setJoinError(false);
+      let joinedRoom: Room;
+
+      if (mode === "create") {
+        joinedRoom = await client.create("game_room", {
+          name: playerName,
+          isPrivate,
+        });
+      } else if (
+        mode === "join" &&
+        roomCode !== undefined &&
+        roomCode.length > 0
+      ) {
+        joinedRoom = await client.joinById(roomCode, {
+          name: playerName,
+        });
+      } else {
+        joinedRoom = await client.joinOrCreate("game_room", {
+          name: playerName,
+          isPrivate: false,
+        });
+      }
+
+      if (joinedRoom && joinedRoom.reconnectionToken) {
+        localStorage.setItem(
+          "reconnection",
+          JSON.stringify({
+            token: joinedRoom.reconnectionToken,
+            playerName,
+          }),
+        );
+      }
+
+      setRoom(joinedRoom);
       setIsConnected(true);
-      localStorage.setItem(
-        "reconnection",
-        JSON.stringify({
-          token: newRoom.reconnectionToken,
-          playerName,
-        }),
-      );
     } catch (error) {
       console.error("Join error", error);
       setJoinError(true);
@@ -66,7 +95,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(cached) as CachedReconnection;
           const { token } = parsed;
 
-          const reconnected = await client.reconnect(token, "game_room");
+          const reconnected = await client.reconnect(token);
 
           setRoom(reconnected);
           setIsConnected(true);

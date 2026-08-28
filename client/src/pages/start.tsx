@@ -8,7 +8,7 @@ import { IntroContainer } from "../components/intro-container";
 import { TitleHeader } from "../components/title-header";
 import { useRoom } from "../lib/use-room";
 
-export function Intro() {
+export function Start() {
   const navigate = useNavigate();
   const { connect, disconnect } = useRoom();
 
@@ -21,9 +21,12 @@ export function Intro() {
   });
 
   const [name, setName] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [mode, setMode] = useState<"join" | "create">("create");
+  const [roomCode, setRoomCode] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const [countdown, setCountdown] = useState(3);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handlePlay = useCallback(async () => {
     if (name.trim() === "") {
@@ -36,14 +39,16 @@ export function Intro() {
     try {
       await connect({
         playerName: name.trim(),
-        mode: "create",
+        mode,
+        roomCode: mode === "join" ? roomCode.trim() : undefined,
+        isPrivate: mode === "create" ? isPrivate : undefined,
       });
-      await navigate("/game");
+      await navigate("/lobby");
     } catch {
-      setErrorMessage("Nie udało się dołączyć do gry. Spróbuj ponownie.");
+      setErrorMessage("Nie udało się dołaczyć do gry. Spróbuj ponownie.");
       setStatus("error");
     }
-  }, [connect, name, navigate]);
+  }, [connect, isPrivate, mode, name, navigate, roomCode]);
 
   useEffect(() => {
     if (status !== "reconnecting") {
@@ -67,7 +72,7 @@ export function Intro() {
       if (cachedReconnection === null) {
         setStatus("idle");
       } else {
-        void navigate("/game");
+        void navigate("/lobby");
       }
     }, 1000);
 
@@ -117,6 +122,24 @@ export function Intro() {
         </div>
       ) : (
         <>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setMode("join");
+              }}
+              className={`flex-1 rounded p-2 ${mode === "join" ? "bg-violet-600" : "bg-violet-800"}`}
+            >
+              Join
+            </button>
+            <button
+              onClick={() => {
+                setMode("create");
+              }}
+              className={`flex-1 rounded p-2 ${mode === "create" ? "bg-violet-600" : "bg-violet-800"}`}
+            >
+              Create
+            </button>
+          </div>
           <CustomInput
             value={name}
             placeholder="Elek..."
@@ -124,14 +147,36 @@ export function Intro() {
               setName(value.toUpperCase());
             }}
             disabled={status === "loading"}
-            className="my-4"
           />
+          {mode === "join" ? (
+            <input
+              type="text"
+              placeholder="KOD POKOJU"
+              className="rounded border border-violet-700 bg-violet-950 p-2 text-white outline-none placeholder:text-violet-400 focus:border-amber-400"
+              value={roomCode}
+              onChange={(error) => {
+                setRoomCode(error.target.value);
+              }}
+            />
+          ) : (
+            <label className="flex cursor-pointer items-center gap-2 text-white">
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-violet-600"
+                checked={isPrivate}
+                onChange={(error) => {
+                  setIsPrivate(error.target.checked);
+                }}
+              />
+              Pokój prywatny
+            </label>
+          )}
 
           <Button
             onClick={handlePlay}
             disabled={status === "loading" || name.trim() === ""}
           >
-            {status === "loading" ? "Ładowanie..." : "Graj"}
+            {status === "loading" ? "Ładowanie..." : "Start"}
           </Button>
         </>
       )}

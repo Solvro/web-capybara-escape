@@ -59,7 +59,7 @@ export function Game() {
         <Button
           disabled={false}
           onClick={async () => {
-            await navigate("/");
+            await navigate("/start");
           }}
         >
           Powrót do menu
@@ -75,7 +75,7 @@ export function Game() {
   return (
     <>
       <div
-        className="flex items-center justify-center overflow-hidden rounded-2xl bg-violet-950"
+        className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-violet-950"
         style={{
           width: GAME_VIEW_WIDTH * MAP_SCALER,
           height: GAME_VIEW_HEIGHT * MAP_SCALER,
@@ -86,6 +86,10 @@ export function Game() {
         }}
       >
         <PhaserGame room={room} />
+        <div className="absolute top-4 left-4 rounded bg-black/50 p-2 text-white z-10">
+          KOD POKOJU:{" "}
+          <span className="font-bold text-amber-400">{room.roomId}</span>
+        </div>
       </div>
 
       {isPaused && <PauseModal />}

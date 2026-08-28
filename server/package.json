@@ -20,6 +20,7 @@
     "test": "mocha -r tsx test/MyRoom_test.ts --exit --timeout 15000"
   },
   "dependencies": {
+    "@colyseus/core": "^0.17.43",
     "@colyseus/monitor": "^0.17.8",
     "@colyseus/playground": "^0.17.12",
     "@colyseus/tools": "^0.17.19",
