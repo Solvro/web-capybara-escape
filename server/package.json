@@ -24,7 +24,7 @@
     "@colyseus/playground": "^0.17.12",
     "@colyseus/tools": "^0.17.19",
     "@colyseus/ws-transport": "^0.17.13",
-    "colyseus": "^0.17.10",
+    "colyseus": "^0.18.3",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "mongodb": "^7.2.0"
