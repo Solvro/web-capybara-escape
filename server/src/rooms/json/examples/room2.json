@@ -65,7 +65,7 @@
       "x": 8,
       "y": 3,
       "color": "#FF3B30",
-      "doorId": "door-red-1"
+      "doorIds": ["door-red-1"]
     },
     {
       "type": "button",
@@ -73,7 +73,7 @@
       "x": 3,
       "y": 3,
       "color": "#33cc33",
-      "doorId": "door-green-1"
+      "doorIds": ["door-green-1"]
     },
     {
       "type": "spikes",

@@ -289,10 +289,17 @@ export class Main extends Phaser.Scene {
         "doorsAndButtonsUpdate",
         (message: MessageDoorsAndButtonsUpdate) => {
           for (const element of message.doorsAndButtons) {
-            const door = this.doors.get(element.doorId);
-            const button = this.buttons.get(element.buttonId);
-            door?.syncState({ open: element.open });
-            button?.syncState({ pressed: element.open });
+            if (element.doorId !== undefined && element.open !== undefined) {
+              this.doors.get(element.doorId)?.syncState({ open: element.open });
+            }
+            if (
+              element.buttonId !== undefined &&
+              element.pressed !== undefined
+            ) {
+              this.buttons
+                .get(element.buttonId)
+                ?.syncState({ pressed: element.pressed });
+            }
           }
         },
       );

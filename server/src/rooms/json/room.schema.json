@@ -93,9 +93,13 @@
             "type": { "const": "button" },
             "id": { "type": "string", "minLength": 1 },
             "color": { "$ref": "#/$defs/hexColor" },
-            "doorId": { "type": "string", "minLength": 1 }
+            "doorIds": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1
+            }
           },
-          "required": ["type", "id", "color", "doorId"]
+          "required": ["type", "id", "color", "doorIds"]
         }
       ]
     },

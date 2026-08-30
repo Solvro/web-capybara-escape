@@ -336,7 +336,11 @@ export const formatLevel = (
   let x = 0,
     y = 0;
   let cableCount = 0,
-    laserCount = 0;
+    laserCount = 0,
+    doorCount = 0;
+
+  const doorIdsByColor: Record<string, string[]> = {};
+  const buttonsToLink: { id: string; color: string; doorIds: string[] }[] = [];
 
   tileIndices.forEach((element, index) => {
     const frame =
@@ -383,14 +387,19 @@ export const formatLevel = (
     if (wallDecoyLayer && wallDecoyLayer[0] === LAYER_ITEM_KEYS.DOOR) {
       const colorIndex = Number.parseInt(wallDecoyLayer[1]);
       const color = COLOR_LIST[colorIndex];
+      const doorId = `door-${color}-${doorCount}`;
+      doorCount++;
+
       formattedLevel.mechanics.push({
-        id: `door-${color}-${colorIndex}`,
+        id: doorId,
         type: "door",
         color,
         x,
         y,
         active: false,
       });
+
+      (doorIdsByColor[color] ??= []).push(doorId);
     }
 
     if (floorDecoyLayer) {
@@ -440,14 +449,16 @@ export const formatLevel = (
       } else if (floorDecoyLayer[0] === LAYER_ITEM_KEYS.BUTTON) {
         const colorIndex = Number.parseInt(floorDecoyLayer[1]);
         const color = COLOR_LIST[colorIndex];
-        formattedLevel.mechanics.push({
-          id: `button-${color}-${colorIndex}`,
-          type: "button",
+        const button = {
+          id: `button-${color}-${colorIndex}-${x}-${y}`,
+          type: "button" as const,
           color,
           x,
           y,
-          doorId: `door-${color}-${colorIndex}`,
-        });
+          doorIds: [] as string[],
+        };
+        formattedLevel.mechanics.push(button);
+        buttonsToLink.push(button);
       } else if (
         floorDecoyLayer[0] === LAYER_ITEM_KEYS.VENT_CLOSED ||
         floorDecoyLayer[0] === LAYER_ITEM_KEYS.VENT_OPEN
@@ -466,6 +477,36 @@ export const formatLevel = (
       formattedLevel.layout.push([]);
     }
   });
+
+  for (const button of buttonsToLink) {
+    button.doorIds = doorIdsByColor[button.color] ?? [];
+  }
+
+  const buttonsWithoutDoors = buttonsToLink.filter(
+    (button) => button.doorIds.length === 0,
+  );
+  const controlledDoorIds = new Set(
+    buttonsToLink.flatMap((button) => button.doorIds),
+  );
+  const allDoorIds = Object.values(doorIdsByColor).flat();
+  const doorsWithoutButton = allDoorIds.filter(
+    (doorId) => !controlledDoorIds.has(doorId),
+  );
+
+  const errors: string[] = [];
+
+  if (buttonsWithoutDoors.length > 0) {
+    const ids = buttonsWithoutDoors.map((b) => b.id).join(", ");
+    errors.push(`button(s) without doors assigned to them: ${ids}`);
+  }
+  if (doorsWithoutButton.length > 0) {
+    errors.push(
+      `doors without button assigned to them: ${doorsWithoutButton.join(", ")}`,
+    );
+  }
+  if (errors.length > 0) {
+    throw new Error(`Cannot export level - ${errors.join(", ")}`);
+  }
 
   return formattedLevel;
 };
