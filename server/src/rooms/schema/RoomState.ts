@@ -17,6 +17,7 @@ export class RoomState extends Schema {
   @type("number") width: number = 10;
   @type("number") height: number = 7;
   @type("boolean") isPaused: boolean = false;
+  @type("boolean") isGameOver: boolean = false;
 
   @type([Position]) startingPositions = new ArraySchema<Position>();
 

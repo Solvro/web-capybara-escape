@@ -21,6 +21,12 @@ export class Display {
     }
   }
 
+  clear() {
+    for (const layer of this.layerMap.values()) {
+      layer.removeAll(true);
+    }
+  }
+
   add(
     layer: LAYER_NAME,
     object: Phaser.GameObjects.GameObject,

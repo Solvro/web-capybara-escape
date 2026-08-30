@@ -12,7 +12,7 @@ export class Laser extends Schema {
   @type("number") activeDuration: number = 1000;
   @type("number") inactiveDuration: number = 1000;
   @type("number") delay: number = 0;
-  public currentRange: number = 0;
+  @type("number") currentRange: number = 0;
 
   private timeSinceStateChange: number = 0;
   private isWaitingDelay: boolean = true;
@@ -21,18 +21,25 @@ export class Laser extends Schema {
     this.timeSinceStateChange += deltaTime;
 
     if (this.isWaitingDelay) {
-      if (this.timeSinceStateChange >= this.delay) {
+      if (this.delay > 0) {
+        if (this.timeSinceStateChange >= this.delay) {
+          this.isWaitingDelay = false;
+          this.active = true;
+          this.timeSinceStateChange = 0;
+          this.currentRange = this.maxRange;
+        }
+        return;
+      } else {
         this.isWaitingDelay = false;
-        this.active = true;
         this.timeSinceStateChange = 0;
       }
-      return;
     }
 
     const duration = this.active ? this.activeDuration : this.inactiveDuration;
 
     if (this.timeSinceStateChange >= duration) {
       this.active = !this.active;
+      this.currentRange = this.active ? this.maxRange : 0;
       this.timeSinceStateChange = 0;
     }
   }
@@ -61,6 +68,7 @@ export class LaserState extends Schema {
     laser.direction = direction;
     laser.maxRange = range;
     laser.active = false;
+    laser.currentRange = 0;
     laser.activeDuration = activeDuration;
     laser.inactiveDuration = inactiveDuration;
     laser.delay = delay;
@@ -86,7 +94,47 @@ export class LaserState extends Schema {
     }
   }
 
+  public isPointInLaserBeam(x: number, y: number): boolean {
+    for (const laser of this.lasers.values()) {
+      if (!laser.active) continue;
+
+      let dx = 0;
+      let dy = 0;
+
+      switch (laser.direction) {
+        case "up":
+          dy = -1;
+          break;
+        case "down":
+          dy = 1;
+          break;
+        case "left":
+          dx = -1;
+          break;
+        case "right":
+          dx = 1;
+          break;
+      }
+
+      for (let i = 1; i <= laser.currentRange; i++) {
+        const beamX = laser.position.x + dx * i;
+        const beamY = laser.position.y + dy * i;
+
+        if (beamX === x && beamY === y) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   onRoomDispose() {
+    this.lasers.clear();
+    this.positionMap.clear();
+  }
+
+  clear() {
     this.lasers.clear();
     this.positionMap.clear();
   }

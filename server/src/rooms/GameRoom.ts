@@ -4,6 +4,7 @@ import { CloseCode } from "@colyseus/shared-types";
 import { getMoveVectorFromDirection } from "../shared/utils/vectorUtils";
 import { SpeechBubble } from "../speech-bubbles/SpeechBubble";
 import fallbackRoom from "./json/examples/default.json";
+import { CollisionHandler } from "./lib/CollisionHandler";
 import { getRoomForGame } from "./lib/roomLoader";
 import { RoomState } from "./schema/RoomState";
 
@@ -13,15 +14,17 @@ import { RoomState } from "./schema/RoomState";
 export class GameRoom extends Room<{ state: RoomState }> {
   maxClients = 4;
   state = new RoomState();
-
+  private collisionHandler: CollisionHandler;
   private roomData: any = fallbackRoom;
 
   async onCreate(options: any) {
+    this.collisionHandler = new CollisionHandler();
+
     this.roomData = await getRoomForGame(options?.levelSlug);
     this.maxClients = this.roomData.maxClients ?? this.maxClients;
     this.state.loadRoomFromJson(this.roomData);
     this.onMessage("move", (client, message) => {
-      if (this.state.isPaused) return;
+      if (this.state.isPaused || this.state.isGameOver) return;
 
       const player = this.state.playerState.players.get(client.sessionId);
       if (!player) return;
@@ -67,7 +70,6 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage("getMapInfo", (client) => {
-      // console.log(this.state.getMapInfo());
       client.send("mapInfo", this.state.getMapInfo());
     });
 
@@ -91,6 +93,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
       for (const enemy of entityUpdates.enemies) {
         this.broadcast("enemyUpdate", enemy);
       }
+
+      this.checkAllCollisions();
     });
 
     this.onMessage("generateLine", (client) => {
@@ -102,6 +106,9 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.onMessage("reset", (client) => {
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
+
+      this.state.isPaused = false;
+      this.state.isGameOver = false;
 
       this.state.loadRoomFromJson(this.roomData);
 
@@ -116,6 +123,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
           player.position.y = startPos.y;
         }
       });
+
+      this.broadcast("lasersUpdated", { lasers: [] });
 
       this.broadcast("roomReset", {
         message: "Level has been reset",
@@ -166,5 +175,33 @@ export class GameRoom extends Room<{ state: RoomState }> {
   onDispose() {
     this.state.onRoomDispose();
     console.log("room", this.roomId, "disposing...");
+  }
+
+  private handleGameOver() {
+    this.state.isGameOver = true;
+    this.state.isPaused = true;
+
+    this.broadcast("gameOver", {
+      message: "Solvroviczu, Koniec Gry",
+    });
+  }
+
+  private checkAllCollisions() {
+    if (this.state.isGameOver) return;
+
+    for (const [
+      sessionId,
+      player,
+    ] of this.state.playerState.players.entries()) {
+      const hasCollided = this.collisionHandler.checkPlayerCollision(
+        { x: player.position.x, y: player.position.y },
+        this.state,
+      );
+
+      if (hasCollided) {
+        this.handleGameOver();
+        break;
+      }
+    }
   }
 }
