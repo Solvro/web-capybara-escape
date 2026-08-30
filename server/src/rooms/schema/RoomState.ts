@@ -820,13 +820,13 @@ export class RoomState extends Schema {
 
   checkButtonPressed() {
     const doorsAndButtonsToUpdate: {
-      doorId: string;
-      buttonId: string;
-      open: boolean;
+      doorId?: string;
+      buttonId?: string;
+      open?: boolean;
+      pressed?: boolean;
     }[] = [];
 
     const desiredDoorState = new Map<string, boolean>();
-    const buttonsByDoor = new Map<string, string[]>(); // doorId -> buttonIds that control it
 
     for (const button of this.buttonState.buttons.values()) {
       const playerOnButton = [...this.playerState.players.values()].some(
@@ -840,16 +840,21 @@ export class RoomState extends Schema {
         button.position.y,
       );
 
-      const shouldOpen = playerOnButton || boxOnButton;
-      button.pressed = shouldOpen;
+      const shouldPress = playerOnButton || boxOnButton;
+
+      if (button.pressed !== shouldPress) {
+        button.pressed = shouldPress;
+        doorsAndButtonsToUpdate.push({
+          buttonId: button.id,
+          pressed: shouldPress,
+        });
+      }
 
       for (const doorId of button.doorIds) {
         desiredDoorState.set(
           doorId,
-          (desiredDoorState.get(doorId) ?? false) || shouldOpen,
+          (desiredDoorState.get(doorId) ?? false) || shouldPress,
         );
-        if (!buttonsByDoor.has(doorId)) buttonsByDoor.set(doorId, []);
-        buttonsByDoor.get(doorId)!.push(button.id);
       }
     }
 
@@ -859,9 +864,7 @@ export class RoomState extends Schema {
 
       if (door.open !== shouldOpen) {
         door.open = shouldOpen;
-        for (const buttonId of buttonsByDoor.get(doorId) ?? []) {
-          doorsAndButtonsToUpdate.push({ doorId, buttonId, open: shouldOpen });
-        }
+        doorsAndButtonsToUpdate.push({ doorId, open: shouldOpen });
       }
     }
 

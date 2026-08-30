@@ -50,8 +50,15 @@ export interface MessageLasersUpdate {
   }[];
 }
 
+export interface DoorsAndButtonsUpdateItem {
+  doorId?: string;
+  buttonId?: string;
+  open?: boolean;
+  pressed?: boolean;
+}
+
 export interface MessageDoorsAndButtonsUpdate {
-  doorsAndButtons: { doorId: string; buttonId: string; open: boolean }[];
+  doorsAndButtons: DoorsAndButtonsUpdateItem[];
 }
 
 export interface MessagePositionUpdate {
