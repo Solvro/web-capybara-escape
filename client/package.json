@@ -28,6 +28,6 @@
     "@vitejs/plugin-react": "6.0.1",
     "baseline-browser-mapping": "2.10.23",
     "typescript": "7.0.2",
-    "vite": "8.0.10"
+    "vite": "8.2.2"
   }
 }
