@@ -16,6 +16,7 @@ export function Game() {
   const { room, isConnected, joinError } = useRoom();
   const [showTimeoutError, setShowTimeoutError] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [gameOverText, setGameOverText] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,6 +48,35 @@ export function Game() {
       window.removeEventListener("game:pauseToggled", handlePauseToggled);
     };
   }, []);
+  useEffect(() => {
+    if (!room) return;
+
+    const unoffGameOver = room.onMessage(
+      "gameOver",
+      (data: { message: string }) => {
+        setIsPaused(true);
+        setGameOverText(data.message); // "Solvroviczu, Koniec Gry"
+      },
+    );
+
+    const unoffReset = room.onMessage("roomReset", () => {
+      setIsPaused(false);
+      setGameOverText(null);
+    });
+
+    return () => {
+      unoffGameOver();
+      unoffReset();
+    };
+  }, [room]);
+
+  const handleRestart = () => {
+    if (room) {
+      setGameOverText(null);
+      setIsPaused(false);
+      room.send("reset");
+    }
+  };
 
   if (joinError || showTimeoutError) {
     return (
@@ -88,7 +118,17 @@ export function Game() {
         <PhaserContainer room={room} />
       </div>
 
-      {isPaused && <PauseModal />}
+      {isPaused && (
+        <PauseModal
+          title={gameOverText ?? "GRA ZATRZYMANA"}
+          subtitle={
+            gameOverText
+              ? "Niestety napotkano przeszkodę!"
+              : "Naciśnij P, aby wznowić..."
+          }
+          onRestart={gameOverText ? handleRestart : undefined}
+        />
+      )}
     </>
   );
 }

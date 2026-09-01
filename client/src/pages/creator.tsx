@@ -11,6 +11,7 @@ import {
 } from "../components/creator/creator-export-modal/creator-export-modal";
 import { CreatorItemsSelect } from "../components/creator/creator-items-select/creator-items-select";
 import { CreatorName } from "../components/creator/creator-name/creator-name";
+import { CreatorOverwriteModal } from "../components/creator/creator-overwrite-modal/creator-overwrite-modal";
 import { LAYER_NAMES } from "../constants/global";
 import type { LayerItem } from "../constants/layer-items";
 import { LAYER_ITEMS, LAYER_ITEM_KEYS } from "../constants/layer-items";
@@ -27,6 +28,8 @@ export function Creator() {
   const [direction, setDirection] = useState<Direction | null>(null);
   const [formattedLevel, setFormattedLevel] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [isOverwriteModalOpen, setIsOverwriteModalOpen] = useState(false);
   const [uploadStatus, setUploadStatus] =
     useState<CreatorExportUploadStatus>("idle");
 
@@ -73,10 +76,16 @@ export function Creator() {
   };
 
   const onRoomSubmit = () => {
-    const newFormattedLevel = formatLevel(tileData, dims);
-    setFormattedLevel(JSON.stringify(newFormattedLevel, null, 2));
-    setUploadStatus("idle");
-    setIsModalOpen(true);
+    try {
+      const newFormattedLevel = formatLevel(tileData, dims);
+      setFormattedLevel(JSON.stringify(newFormattedLevel, null, 2));
+      setUploadStatus("idle");
+      setIsModalOpen(true);
+      setExportError(null);
+    } catch (error) {
+      console.error("Failed to format level: ", error);
+      setExportError(error instanceof Error ? error.message : "Unknown error");
+    }
   };
 
   const handleConfirm = async () => {
@@ -98,14 +107,46 @@ export function Creator() {
       await api.sendRoom(createLevelInput);
       setUploadStatus("success");
     } catch (error) {
-      console.error("Failed to upload level:", error);
       if (error instanceof Error && "response" in error) {
         const axiosError = error as AxiosError;
-        console.error("Upload response:", axiosError.response?.data);
-        console.error("Upload status:", axiosError.response?.status);
+        if (axiosError.response?.status === 409) {
+          setUploadStatus("idle");
+          setIsOverwriteModalOpen(true);
+          return;
+        }
       }
       setUploadStatus("error");
     }
+  };
+
+  const handleOverwriteConfirm = async () => {
+    if (!levelName?.trim()) {
+      setUploadStatus("error");
+      return;
+    }
+
+    const trimmedLevelName = levelName.trim();
+    const createLevelInput: CreateLevelInput = {
+      slug: trimmedLevelName,
+      name: trimmedLevelName,
+      isPublished: true,
+      data: JSON.parse(formattedLevel),
+    };
+
+    setUploadStatus("loading");
+
+    try {
+      await api.updateRoom(trimmedLevelName, createLevelInput);
+      setUploadStatus("success");
+      setIsOverwriteModalOpen(false);
+    } catch (error) {
+      setUploadStatus("error");
+    }
+  };
+
+  const handleCloseOverwriteModal = () => {
+    setIsOverwriteModalOpen(false);
+    setUploadStatus("idle");
   };
 
   const handleCloseModal = () => {
@@ -127,6 +168,7 @@ export function Creator() {
               onReset={handleReset}
               setDirection={setDirection}
               onRoomSubmit={onRoomSubmit}
+              exportError={exportError}
             />
           </div>
         </div>
@@ -160,6 +202,14 @@ export function Creator() {
         onFormattedLevelChange={setFormattedLevel}
         onClose={handleCloseModal}
         onConfirm={handleConfirm}
+      />
+
+      <CreatorOverwriteModal
+        isOpen={isOverwriteModalOpen}
+        levelName={levelName}
+        uploadStatus={uploadStatus}
+        onClose={handleCloseOverwriteModal}
+        onConfirm={handleOverwriteConfirm}
       />
     </>
   );

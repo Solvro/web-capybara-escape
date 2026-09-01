@@ -38,6 +38,7 @@ export const ServerMessageType = {
   Line: "line",
   RoomReset: "roomReset",
   PauseToggled: "pauseToggled",
+  GameOver: "gameOver",
 } as const;
 
 export type ServerMessageType =
@@ -85,7 +86,12 @@ export interface MessageLasersUpdate {
 }
 
 export interface MessageDoorsAndButtonsUpdate {
-  doorsAndButtons: { doorId: string; buttonId: string; open: boolean }[];
+  doorsAndButtons: {
+    doorId?: string;
+    buttonId?: string;
+    open?: boolean;
+    pressed?: boolean;
+  }[];
 }
 
 export interface MessagePositionUpdate {
