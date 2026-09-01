@@ -31,7 +31,7 @@
     "mongodb": "^7.2.0"
   },
   "devDependencies": {
-    "@colyseus/testing": "0.17.11",
+    "@colyseus/testing": "0.18.5",
     "@types/cors": "2.8.19",
     "@types/express": "5.0.6",
     "@types/mocha": "10.0.1",
