@@ -2,11 +2,13 @@ import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
 import config from "@colyseus/tools";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 
 import { createLevelsRouter } from "@/api/routes/levels/levels";
 import { createQuestionsRouter } from "@/api/routes/questions/questions";
 
 import { closeMongoConnection, connectMongo } from "./config/mongo";
+import { swaggerSpec } from "./config/swagger";
 /**
  * Import your Room files
  */
