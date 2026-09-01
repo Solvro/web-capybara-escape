@@ -22,7 +22,7 @@
   "dependencies": {
     "@capybara/shared": "*",
     "@colyseus/monitor": "^0.17.8",
-    "@colyseus/playground": "^0.17.12",
+    "@colyseus/playground": "^0.18.4",
     "@colyseus/tools": "^0.17.19",
     "@colyseus/ws-transport": "^0.17.13",
     "colyseus": "^0.17.10",
