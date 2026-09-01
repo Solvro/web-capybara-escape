@@ -48,6 +48,8 @@ export default config({
       res.send("It's time to kick ass and chew bubblegum!");
     });
 
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
     /**
      * Use @colyseus/playground
      * (It is not recommended to expose this route in a production environment)
