@@ -1,3 +1,5 @@
+import type { Direction, FormattedLevelType } from "@capybara/shared";
+
 import { ANGLE_TO_TEXT, ENTITY_MAPPING } from "../constants/blocks";
 import {
   COLOR_LIST,
@@ -8,8 +10,6 @@ import {
   layerNameToIndex,
 } from "../constants/global";
 import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";
-import { Direction, type DirectionType } from "../types/direction";
-import type { FormattedLevelType } from "../types/formattedLevel";
 
 export function countEntityOccurrences(
   tileData: (string | null)[][],
@@ -112,13 +112,13 @@ const createWallRow = (cols: number): Tile[] => {
 
 export function changeBoardSize(
   dims: [number, number],
-  direction: DirectionType | null,
+  direction: Direction | null,
   tileData: Tile[],
 ): Tile[] {
   const [rows, cols] = dims;
   const bigger = rows * cols > tileData.length;
   let nextBoard: Tile[] = [];
-  if (direction == Direction.TOP) {
+  if (direction == "up") {
     const walls = createWallRow(cols);
     if (bigger) {
       nextBoard = [...tileData];
@@ -131,7 +131,7 @@ export function changeBoardSize(
     }
   }
 
-  if (direction == Direction.BOTTOM) {
+  if (direction == "down") {
     const walls = createWallRow(cols);
     if (bigger) {
       nextBoard = [...tileData];
@@ -145,7 +145,7 @@ export function changeBoardSize(
     }
   }
 
-  if (direction == Direction.LEFT) {
+  if (direction == "left") {
     const oldCols = bigger ? cols - 1 : cols + 1;
 
     for (let i = 0; i < tileData.length; i++) {
@@ -171,7 +171,7 @@ export function changeBoardSize(
     return nextBoard;
   }
 
-  if (direction == Direction.RIGHT) {
+  if (direction == "right") {
     const oldCols = bigger ? cols - 1 : cols + 1;
 
     for (let i = 0; i < tileData.length; i++) {

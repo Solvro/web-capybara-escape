@@ -11,15 +11,16 @@
   "author": "",
   "main": "build/index.js",
   "scripts": {
-    "build": "npm run clean && tsc",
+    "build": "npm run build -w @capybara/shared && npm run clean && tsc && tsc-alias",
     "clean": "rimraf build",
     "export:levels": "tsx src/scripts/export-levels.ts",
     "export:levels:force": "tsx src/scripts/export-levels.ts --force",
     "loadtest": "tsx loadtest/example.ts --room game_room --numClients 2",
     "start": "tsx watch src/index.ts",
-    "test": "mocha -r tsx test/MyRoom_test.ts --exit --timeout 15000"
+    "test": "mocha -r tsx \"test/**/*.test.ts\" --exit --timeout 15000"
   },
   "dependencies": {
+    "@capybara/shared": "*",
     "@colyseus/monitor": "^0.17.8",
     "@colyseus/playground": "^0.17.12",
     "@colyseus/tools": "^0.17.19",
@@ -38,6 +39,7 @@
     "colyseus.js": "0.16.22",
     "mocha": "11.7.5",
     "rimraf": "6.1.3",
+    "tsc-alias": "1.9.1",
     "tsx": "4.21.0",
     "typescript": "7.0.2"
   },

@@ -1,5 +1,7 @@
-import type { Direction } from "../entities/entity";
-import type { SpriteOffset } from "./sprite-animator";
+import type { Direction } from "@capybara/shared";
+import * as Phaser from "phaser";
+
+import type { SpriteOffset } from "@/types/animators/sprite-animator";
 
 export interface EntityController {
   getDirection(): Direction | null;

@@ -1,5 +1,7 @@
+import type { Crate as CrateType, Direction } from "@capybara/shared";
+import * as Phaser from "phaser";
+
 import { ASSETS } from "../../constants/blocks";
-import type { Crate as CrateType } from "../../types/crate";
 import type { INetworkInterface } from "../../types/network-interface";
 import { Entity } from "./entity";
 
@@ -21,7 +23,7 @@ export class Crate extends Entity implements INetworkInterface<CrateType> {
   public syncState(
     data: Partial<{
       crateId: number;
-      direction: "left" | "right" | "up" | "down";
+      direction: Direction;
     }>,
   ): void {
     if (data.direction) {

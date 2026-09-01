@@ -1,4 +1,6 @@
-import type { Enemy as EnemyState } from "../../types/enemy";
+import type { Enemy as EnemyState } from "@capybara/shared";
+import * as Phaser from "phaser";
+
 import type { INetworkInterface } from "../../types/network-interface";
 import type { EnemyEntityAnimator } from "../animators/enemy-entity-animator";
 import { Entity } from "./entity";

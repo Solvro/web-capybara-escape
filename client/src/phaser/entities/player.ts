@@ -1,6 +1,8 @@
+import type { Direction } from "@capybara/shared";
+import * as Phaser from "phaser";
+
 import type { EntityAnimator } from "../animators/entity-animator";
 import { Entity } from "./entity";
-import type { Direction } from "./entity";
 
 export class Player extends Entity {
   public readonly name: string;

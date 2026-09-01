@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b && vite build",
+    "build": "npm run build -w @capybara/shared && tsc -b && vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "npm run build -w @capybara/shared && tsc --noEmit"
   },
   "dependencies": {
+    "@capybara/shared": "*",
     "@colyseus/sdk": "^0.17.42",
     "@headlessui/react": "^2.2.9",
     "@tailwindcss/vite": "^4.2.4",
@@ -29,5 +30,9 @@
     "baseline-browser-mapping": "2.10.23",
     "typescript": "7.0.2",
     "vite": "8.0.10"
+  },
+  "optionalDependencies": {
+    "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.17",
+    "@rolldown/binding-win32-x64-msvc": "1.0.0-rc.17"
   }
 }

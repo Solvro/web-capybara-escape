@@ -1,3 +1,4 @@
+import type { Direction } from "@capybara/shared";
 import { useEffect, useRef, useState } from "react";
 
 import { ASSETS } from "../../../constants/blocks";
@@ -8,7 +9,6 @@ import {
   type LayerItem,
   getEntityLimitKeyFor,
 } from "../../../constants/layer-items";
-import { Direction, type DirectionType } from "../../../types/direction";
 import { countEntityOccurrences } from "../../../utils/tileset-utils";
 import { clampDim } from "../creator-control/creator-control";
 import { CreatorDimensionButtons } from "./creator-dimension-buttons";
@@ -20,7 +20,7 @@ interface CreatorBoardProps {
   tileData: (string | null)[][];
   setTileData: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
   setDims: (dims: [number, number]) => void;
-  setDirection: (direction: DirectionType) => void;
+  setDirection: (direction: Direction) => void;
 }
 
 export function CreatorBoard({
@@ -189,7 +189,7 @@ export function CreatorBoard({
         dimension={rows}
         onChange={(e) => {
           handleRowsChange(e);
-          setDirection(Direction.TOP);
+          setDirection("up");
         }}
         isDimensionMax={isRowsMax}
         isDimensionMin={isRowsMin}
@@ -201,7 +201,7 @@ export function CreatorBoard({
           dimension={cols}
           onChange={(e) => {
             handleColsChange(e);
-            setDirection(Direction.LEFT);
+            setDirection("left");
           }}
           isDimensionMax={isColsMax}
           isDimensionMin={isColsMin}
@@ -245,7 +245,7 @@ export function CreatorBoard({
           dimension={cols}
           onChange={(e) => {
             handleColsChange(e);
-            setDirection(Direction.RIGHT);
+            setDirection("right");
           }}
           isDimensionMax={isColsMax}
           isDimensionMin={isColsMin}
@@ -256,7 +256,7 @@ export function CreatorBoard({
         dimension={rows}
         onChange={(e) => {
           handleRowsChange(e);
-          setDirection(Direction.BOTTOM);
+          setDirection("down");
         }}
         isDimensionMax={isRowsMax}
         isDimensionMin={isRowsMin}

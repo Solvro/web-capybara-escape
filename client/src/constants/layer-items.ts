@@ -1,3 +1,5 @@
+import type { Direction } from "@capybara/shared";
+
 import { ASSETS, TILE_MAPPING } from "./blocks";
 import { COLOR_LIST, LAYER_NAMES } from "./global";
 
@@ -107,7 +109,7 @@ export interface LayerItem {
   layer: string;
   color?: string;
   baseFrame?: number;
-  direction?: "up" | "down" | "left" | "right";
+  direction?: Direction;
   colorable?: boolean;
   baseKey?: string;
   rotationDeg?: FloorDecoyRotationDeg;

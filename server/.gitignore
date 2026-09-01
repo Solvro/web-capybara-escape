@@ -2,8 +2,8 @@ node_modules
 build
 .colyseus-cloud.json
 .devmode.json
-src/rooms/json/examples/*
-!src/rooms/json/examples/default.json
+static/levels/*
+!static/levels/default.json
 
 # Logs
 logs

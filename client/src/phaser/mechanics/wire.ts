@@ -1,22 +1,16 @@
+import type { Wire as WireType } from "@capybara/shared";
+import type { WireDirection } from "@capybara/shared";
+import * as Phaser from "phaser";
+
 import { ASSETS } from "../../constants/blocks";
 import { CELL_SIZE } from "../../constants/global";
 import type { INetworkInterface } from "../../types/network-interface";
-import type { Wire as WireType } from "../../types/wire";
 import { Mechanic } from "./mechanic";
 
 export class Wire extends Mechanic implements INetworkInterface<WireType> {
   public wireId: string;
   public networkId: string;
-  private direction:
-    | "up"
-    | "down"
-    | "left"
-    | "right"
-    | "down-right"
-    | "down-left"
-    | "up-right"
-    | "up-left"
-    | "socket";
+  private direction: WireDirection;
 
   constructor(scene: Phaser.Scene, data: WireType) {
     const { x, y, wireId, direction } = data;

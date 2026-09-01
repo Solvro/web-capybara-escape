@@ -1,0 +1,77 @@
+import * as Phaser from "phaser";
+
+import { TILE_MAPPING } from "@/constants/blocks";
+import {
+  CELL_SIZE,
+  LAYERS,
+  LAYER_NAMES,
+  SIZE_MULTIPLIER,
+} from "@/constants/global";
+import type { LAYER_NAME } from "@/constants/global";
+
+export class Display {
+  private scene: Phaser.Scene;
+  private layerMap: Map<string, Phaser.GameObjects.Layer>;
+
+  constructor(scene: Phaser.Scene) {
+    this.scene = scene;
+    this.layerMap = new Map();
+    for (const layerName of LAYERS) {
+      const layer = this.scene.add.layer();
+      layer.setDepth(LAYERS.indexOf(layerName));
+      this.layerMap.set(layerName, layer);
+    }
+  }
+
+  clear() {
+    for (const layer of this.layerMap.values()) {
+      layer.removeAll(true);
+    }
+  }
+
+  add(
+    layer: LAYER_NAME,
+    object: Phaser.GameObjects.GameObject,
+    isUsingPreUpdate?: boolean,
+  ) {
+    this.layerMap.get(layer)?.add(object);
+    if (isUsingPreUpdate ?? false) {
+      this.scene.sys.updateList.add(object); //żeby się updatowało (inaczej PreUpdate sie wywala)
+    }
+  }
+
+  remove(layer: LAYER_NAME, object: Phaser.GameObjects.GameObject) {
+    this.layerMap.get(layer)?.remove(object);
+  }
+
+  createMap(grid: string[][], width: number, height: number) {
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const tileType = grid[y][x];
+        const posX = x * CELL_SIZE + CELL_SIZE / 2;
+        const posY = y * CELL_SIZE + CELL_SIZE / 2;
+
+        const config = TILE_MAPPING[tileType];
+
+        if (tileType !== "") {
+          this.layerMap
+            .get(LAYER_NAMES.BACKGROUND)
+            ?.add(
+              this.scene.add
+                .image(posX, posY, "tileset", config.frame)
+                .setScale(SIZE_MULTIPLIER),
+            );
+          if (config.isTall ?? false) {
+            this.layerMap
+              .get(LAYER_NAMES.WALL_DECOYS)
+              ?.add(
+                this.scene.add
+                  .image(posX, posY - CELL_SIZE, "tileset", config.frameSecond)
+                  .setScale(SIZE_MULTIPLIER),
+              );
+          }
+        }
+      }
+    }
+  }
+}

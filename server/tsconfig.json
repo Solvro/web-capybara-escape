@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "build",
+    "rootDir": "src",
     "target": "ESNext",
     "module": "CommonJS",
     "resolveJsonModule": true,
@@ -13,7 +14,11 @@
     "experimentalDecorators": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "paths": {
+      "@/static/*": ["./static/*"],
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src", "test"]
+  "include": ["src"]
 }
