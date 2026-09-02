@@ -28,7 +28,9 @@
     "colyseus": "^0.17.10",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "mongodb": "^7.2.0"
+    "mongodb": "^7.2.0",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@colyseus/testing": "0.17.11",
@@ -36,6 +38,8 @@
     "@types/express": "5.0.6",
     "@types/mocha": "10.0.1",
     "@types/node": "26.1.1",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "colyseus.js": "0.16.22",
     "mocha": "11.7.5",
     "rimraf": "6.1.3",
