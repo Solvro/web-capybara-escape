@@ -70,6 +70,8 @@ export function createQuestionsRouter() {
    *   post:
    *     summary: Dodaj nowe pytanie
    *     tags: [Admin Questions]
+   *     security:
+   *       - AdminToken: []
    *     requestBody:
    *       required: true
    *       content:
@@ -113,6 +115,8 @@ export function createQuestionsRouter() {
    *   put:
    *     summary: Zaktualizuj istniejące pytanie
    *     tags: [Admin Questions]
+   *     security:
+   *       - AdminToken: []
    *     parameters:
    *       - in: path
    *         name: id
@@ -161,6 +165,8 @@ export function createQuestionsRouter() {
    *   delete:
    *     summary: Usuń pytanie
    *     tags: [Admin Questions]
+   *     security:
+   *       - AdminToken: []
    *     parameters:
    *       - in: path
    *         name: id

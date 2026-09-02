@@ -3,6 +3,17 @@ import { Request, Response, Router } from "express";
 import { requireAdminAuth } from "@/api/middlewares/admin-auth";
 import { levelRepository } from "@/services/levels/level.repository";
 
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     AdminToken:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *       description: Wklej swój ADMIN_API_TOKEN z pliku .env
+ */
+
 type ApiError = {
   message?: string;
 };
@@ -119,6 +130,8 @@ export function createLevelsRouter() {
    *   post:
    *     summary: Dodaj nowy poziom
    *     tags: [Admin Levels]
+   *     security:
+   *       - AdminToken: []
    *     parameters:
    *       - in: header
    *         name: x-admin-user
@@ -172,6 +185,8 @@ export function createLevelsRouter() {
    *   put:
    *     summary: Nadpisz istniejący poziom
    *     tags: [Admin Levels]
+   *     security:
+   *       - AdminToken: []
    *     parameters:
    *       - in: path
    *         name: slug
@@ -233,6 +248,8 @@ export function createLevelsRouter() {
    *   post:
    *     summary: Opublikuj poziom
    *     tags: [Admin Levels]
+   *     security:
+   *       - AdminToken: []
    *     parameters:
    *       - in: path
    *         name: slug
