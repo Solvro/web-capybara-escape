@@ -16,10 +16,42 @@ function idFromParams(
 export function createQuestionsRouter() {
   const router = Router();
 
+  /**
+   * @swagger
+   * /api/questions:
+   *   get:
+   *     summary: Pobierz listę pytań
+   *     tags: [Questions]
+   *     responses:
+   *       200:
+   *         description: Lista wszystkich pytań.
+   */
+
   router.get("/questions", async (req: Request, res: Response) => {
     const questions = await questionRepository.listQuestions();
     return res.json({ questions });
   });
+
+  /**
+   * @swagger
+   * /api/questions/{id}:
+   *   get:
+   *     summary: Pobierz szczegóły konkretnego pytania
+   *     tags: [Questions]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Dane pytania
+   *       400:
+   *         description: Nieprawidłowe ID
+   *       404:
+   *         description: Nie znaleziono pytania
+   */
 
   router.get("/questions/:id", async (req: Request, res: Response) => {
     const id = idFromParams(req.params.id);
@@ -31,6 +63,34 @@ export function createQuestionsRouter() {
     }
     return res.json({ question });
   });
+
+  /**
+   * @swagger
+   * /api/admin/questions:
+   *   post:
+   *     summary: Dodaj nowe pytanie
+   *     tags: [Admin Questions]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               content:
+   *                 type: string
+   *               options:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *               correctAnswer:
+   *                 type: number
+   *     responses:
+   *       201:
+   *         description: Pytanie utworzone pomyślnie
+   *       400:
+   *         description: Błąd walidacji
+   */
 
   router.post(
     "/admin/questions",
@@ -46,6 +106,33 @@ export function createQuestionsRouter() {
       }
     },
   );
+
+  /**
+   * @swagger
+   * /api/admin/questions/{id}:
+   *   put:
+   *     summary: Zaktualizuj istniejące pytanie
+   *     tags: [Admin Questions]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *     responses:
+   *       200:
+   *         description: Pytanie zaktualizowane
+   *       400:
+   *         description: Błąd walidacji lub nieprawidłowe ID
+   *       404:
+   *         description: Nie znaleziono pytania
+   */
 
   router.put(
     "/admin/questions/:id",
@@ -67,6 +154,27 @@ export function createQuestionsRouter() {
       }
     },
   );
+
+  /**
+   * @swagger
+   * /api/admin/questions/{id}:
+   *   delete:
+   *     summary: Usuń pytanie
+   *     tags: [Admin Questions]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       204:
+   *         description: Pytanie usunięte pomyślnie
+   *       400:
+   *         description: Nieprawidłowe ID
+   *       404:
+   *         description: Nie znaleziono pytania
+   */
 
   router.delete(
     "/admin/questions/:id",
