@@ -11,6 +11,10 @@ import {
 } from "../../../constants/layer-items";
 import { countEntityOccurrences } from "../../../utils/tileset-utils";
 import { clampDim } from "../creator-control/creator-control";
+import {
+  type DelayConfig,
+  EntityDelayModal,
+} from "../creator-delay-modal/entity-delay-modal";
 import { CreatorDimensionButtons } from "./creator-dimension-buttons";
 import { CreatorTile } from "./creator-tile";
 
@@ -21,6 +25,9 @@ interface CreatorBoardProps {
   setTileData: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
   setDims: (dims: [number, number]) => void;
   setDirection: (direction: Direction) => void;
+  setEntityConfigs: React.Dispatch<
+    React.SetStateAction<Record<number, DelayConfig>>
+  >;
 }
 
 export function CreatorBoard({
@@ -43,6 +50,14 @@ export function CreatorBoard({
   });
 
   const [tileSize, setTileSize] = useState<number>(0);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingEntity, setPendingEntity] = useState<{
+    type: "laser" | "cable";
+    tileIdx: number;
+    layerIdx: number;
+    valueToSet: string;
+  } | null>(null);
 
   useEffect(() => {
     const el = boardRef.current;
@@ -131,6 +146,17 @@ export function CreatorBoard({
             return;
           }
         }
+
+        if (valueToSet.includes("laser") || valueToSet.includes("cable")) {
+          setPendingEntity({
+            type: valueToSet.includes("laser") ? "laser" : "cable",
+            tileIdx,
+            layerIdx,
+            valueToSet,
+          });
+          setIsModalOpen(true);
+          return;
+        }
       }
 
       setTileData((prev) => {
@@ -139,6 +165,22 @@ export function CreatorBoard({
         return next;
       });
     }
+  };
+
+  const handleModalSave = (config: DelayConfig) => {
+    if (!pendingEntity) return;
+
+    setTileData((prev) => {
+      const next = prev.map((arr) => [...arr]);
+      next[pendingEntity.tileIdx][pendingEntity.layerIdx] =
+        pendingEntity.valueToSet;
+      return next;
+    });
+
+    console.log("Zapisano config dla tileIdx:", pendingEntity.tileIdx, config);
+
+    setIsModalOpen(false);
+    setPendingEntity(null);
   };
 
   const handleRowsChange = (delta: number) => {
@@ -260,6 +302,16 @@ export function CreatorBoard({
         }}
         isDimensionMax={isRowsMax}
         isDimensionMin={isRowsMin}
+      />
+
+      <EntityDelayModal
+        isOpen={isModalOpen}
+        entityType={pendingEntity?.type || null}
+        onSave={handleModalSave}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setPendingEntity(null);
+        }}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import api from "../api/api-service";
 import { CreatorBoard } from "../components/creator/creator-board/creator-board";
 import { CreatorControl } from "../components/creator/creator-control/creator-control";
+import type { DelayConfig } from "../components/creator/creator-delay-modal/entity-delay-modal";
 import {
   CreatorExportModal,
   type CreatorExportUploadStatus,
@@ -32,6 +33,10 @@ export function Creator() {
   const [isOverwriteModalOpen, setIsOverwriteModalOpen] = useState(false);
   const [uploadStatus, setUploadStatus] =
     useState<CreatorExportUploadStatus>("idle");
+
+  const [entityConfigs, setEntityConfigs] = useState<
+    Record<number, DelayConfig>
+  >({});
 
   const [activeBlock, setActiveBlock] = useState<LayerItem | null>(() => {
     return (
@@ -73,11 +78,12 @@ export function Creator() {
     setTileData(
       generateInitialTiles([rows, cols], floorDecoys, entities, wallDecoys),
     );
+    setEntityConfigs({});
   };
 
   const onRoomSubmit = () => {
     try {
-      const newFormattedLevel = formatLevel(tileData, dims);
+      const newFormattedLevel = formatLevel(tileData, dims, entityConfigs);
       setFormattedLevel(JSON.stringify(newFormattedLevel, null, 2));
       setUploadStatus("idle");
       setIsModalOpen(true);
@@ -190,6 +196,7 @@ export function Creator() {
               activeBlock={activeBlock}
               tileData={tileData}
               setTileData={setTileData}
+              setEntityConfigs={setEntityConfigs}
             />
           </div>
         </div>
