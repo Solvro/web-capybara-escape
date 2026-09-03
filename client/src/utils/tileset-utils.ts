@@ -1,5 +1,6 @@
 import type { Direction, FormattedLevelType } from "@capybara/shared";
 
+import type { DelayConfig } from "../components/creator/creator-delay-modal/entity-delay-modal";
 import { ANGLE_TO_TEXT, ENTITY_MAPPING } from "../constants/blocks";
 import {
   COLOR_LIST,
@@ -316,6 +317,7 @@ export const getUIBlockBackgroundData = (
 export const formatLevel = (
   tileIndices: (string | null)[][],
   dims: [number, number],
+  entityConfigs: Record<number, DelayConfig> = {},
 ) => {
   const formattedLevel: FormattedLevelType = {
     maxClients: 2,
@@ -367,6 +369,8 @@ export const formatLevel = (
         formattedLevel.entities.crates.push({ x, y });
       } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.LASER) {
         const color = COLOR_LIST[Number.parseInt(entityLayer[1])];
+        const config = entityConfigs[index] || {};
+
         formattedLevel.mechanics.push({
           type: "laser",
           x,
@@ -376,9 +380,9 @@ export const formatLevel = (
           range: 4,
           color,
           active: true,
-          activeDuration: 2000,
-          inactiveDuration: 2000,
-          delay: 2000,
+          activeDuration: config.activeDuration ?? 2000,
+          inactiveDuration: config.inactiveDuration ?? 2000,
+          delay: config.delay ?? 2000,
         });
         laserCount++;
       }
@@ -436,14 +440,17 @@ export const formatLevel = (
         floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_INACTIVE
       ) {
         cableCount++;
+        const config = entityConfigs[index] || {};
+
         formattedLevel.mechanics.push({
           type: "cable",
           x,
           y,
           id: `cable-${cableCount}`,
           direction: ANGLE_TO_TEXT[floorDecoyLayer[1]],
-          damageMs: 1000,
-          safeMs: 1000,
+          damageMs: config.damageMs ?? 3000,
+          safeMs: config.safeMs ?? 2000,
+          delay: config.delay ?? 2000,
           startDamaging: floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_ACTIVE,
         });
       } else if (floorDecoyLayer[0] === LAYER_ITEM_KEYS.BUTTON) {
