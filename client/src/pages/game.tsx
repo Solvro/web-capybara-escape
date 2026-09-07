@@ -1,4 +1,8 @@
-import type { MessagePauseToggled } from "@capybara/shared";
+import type {
+  MessageGameOver,
+  MessageLevelComplete,
+  MessagePauseToggled,
+} from "@capybara/shared";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,11 +16,16 @@ import {
 } from "@/constants/global";
 import { useRoom } from "@/lib/use-room";
 
+type EndGameState =
+  | { kind: "gameOver"; message: string }
+  | { kind: "levelComplete"; message: string }
+  | null;
+
 export function Game() {
   const { room, isConnected, joinError } = useRoom();
   const [showTimeoutError, setShowTimeoutError] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [gameOverText, setGameOverText] = useState<string | null>(null);
+  const [endGame, setEndGame] = useState<EndGameState>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,26 +62,35 @@ export function Game() {
 
     const unoffGameOver = room.onMessage(
       "gameOver",
-      (data: { message: string }) => {
+      (data: MessageGameOver) => {
         setIsPaused(true);
-        setGameOverText(data.message); // "Solvroviczu, Koniec Gry"
+        setEndGame({ kind: "gameOver", message: data.message });
+      },
+    );
+
+    const unoffLevelComplete = room.onMessage(
+      "levelComplete",
+      (data: MessageLevelComplete) => {
+        setIsPaused(true);
+        setEndGame({ kind: "levelComplete", message: data.message });
       },
     );
 
     const unoffReset = room.onMessage("roomReset", () => {
       setIsPaused(false);
-      setGameOverText(null);
+      setEndGame(null);
     });
 
     return () => {
       unoffGameOver();
+      unoffLevelComplete();
       unoffReset();
     };
   }, [room]);
 
   const handleRestart = () => {
     if (room) {
-      setGameOverText(null);
+      setEndGame(null);
       setIsPaused(false);
       room.send("reset");
     }
@@ -120,13 +138,20 @@ export function Game() {
 
       {isPaused && (
         <PauseModal
-          title={gameOverText ?? "GRA ZATRZYMANA"}
+          title={endGame?.message ?? "GRA ZATRZYMANA"}
           subtitle={
-            gameOverText
-              ? "Niestety napotkano przeszkodę!"
-              : "Naciśnij P, aby wznowić..."
+            endGame?.kind === "levelComplete"
+              ? "Mozesz przejsc do nastepnego poziomu!"
+              : endGame?.kind === "gameOver"
+                ? "Niestety napotkano przeszkodę!"
+                : "Nacisnij P, aby wznowic..."
           }
-          onRestart={gameOverText ? handleRestart : undefined}
+          actionLabel={
+            endGame?.kind === "levelComplete"
+              ? "Nastepny poziom"
+              : "Zagraj od poczatku"
+          }
+          onRestart={endGame ? handleRestart : undefined}
         />
       )}
     </>

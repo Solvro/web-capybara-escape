@@ -96,6 +96,11 @@ export class GameRoom extends Room<{ state: RoomState }> {
           ServerMessageType.CapybaraUpdate,
           entityUpdates.capybara,
         );
+
+        if (entityUpdates.capybara.state === "jump") {
+          this.handleLevelComplete();
+          return;
+        }
       }
       for (const enemy of entityUpdates.enemies) {
         this.broadcast(ServerMessageType.EnemyUpdate, enemy);
@@ -189,6 +194,15 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.broadcast(ServerMessageType.GameOver, {
       message: "Solvroviczu, Koniec Gry",
+    });
+  }
+
+  private handleLevelComplete() {
+    this.state.isGameOver = true;
+    this.state.isPaused = true;
+
+    this.broadcast(ServerMessageType.LevelComplete, {
+      message: "Solvroviczu, Ukonczyles poziom",
     });
   }
 

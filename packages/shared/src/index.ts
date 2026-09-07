@@ -31,6 +31,8 @@ export {
   type MessagePlayerDamaged,
   type MessageRoomReset,
   type MessagePauseToggled,
+  type MessageGameOver,
+  type MessageLevelComplete,
   type MessageMove,
 } from "./types/messages.js";
 

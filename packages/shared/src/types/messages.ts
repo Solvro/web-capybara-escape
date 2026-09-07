@@ -39,6 +39,7 @@ export const ServerMessageType = {
   RoomReset: "roomReset",
   PauseToggled: "pauseToggled",
   GameOver: "gameOver",
+  LevelComplete: "levelComplete",
 } as const;
 
 export type ServerMessageType =
@@ -132,6 +133,14 @@ export interface MessageRoomReset {
 
 export interface MessagePauseToggled {
   isPaused: boolean;
+}
+
+export interface MessageGameOver {
+  message: string;
+}
+
+export interface MessageLevelComplete {
+  message: string;
 }
 
 export interface MessageMove {
