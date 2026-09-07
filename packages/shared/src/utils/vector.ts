@@ -1,4 +1,4 @@
-import type { Direction } from "../types/direction";
+import type { Direction } from "../types/direction.js";
 
 export const getMoveVectorFromDirection = (direction: Direction) => {
   const vectors: Record<Direction, { dx: number; dy: number }> = {

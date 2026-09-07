@@ -1,4 +1,4 @@
-import type { Direction } from "./direction";
+import type { Direction } from "./direction.js";
 import type {
   Button,
   Cable,
@@ -18,6 +18,8 @@ export const ClientMessageType = {
   GenerateLine: "generateLine",
   Reset: "reset",
   TogglePause: "togglePause",
+  NextScreen: "nextScreen",
+  EndDemo: "endDemo",
 } as const;
 
 export type ClientMessageType =
@@ -40,6 +42,8 @@ export const ServerMessageType = {
   PauseToggled: "pauseToggled",
   GameOver: "gameOver",
   LevelComplete: "levelComplete",
+  DemoCompleted: "demoCompleted",
+  DemoEnded: "demoEnded",
 } as const;
 
 export type ServerMessageType =
@@ -140,6 +144,16 @@ export interface MessageGameOver {
 }
 
 export interface MessageLevelComplete {
+  message: string;
+  screenIndex?: number;
+  totalScreens?: number;
+}
+
+export interface MessageDemoCompleted {
+  message: string;
+}
+
+export interface MessageDemoEnded {
   message: string;
 }
 

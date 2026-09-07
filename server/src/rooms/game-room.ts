@@ -11,7 +11,8 @@ import fallbackRoom from "@/static/levels/default.json";
 import { SpeechBubble } from "../utils/speech-bubble";
 import { getMoveVectorFromDirection } from "../utils/vector-utils";
 import { CollisionHandler } from "./logic/collision-handler";
-import { getRoomForGame } from "./logic/room-loader";
+import { LoadedRoom, getRoomForGame } from "./logic/room-loader";
+import { getSequenceLevels } from "./logic/sequence-loader";
 import { RoomState } from "./schemas/room-state";
 
 export class GameRoom extends Room<{ state: RoomState }> {
@@ -20,10 +21,19 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private collisionHandler: CollisionHandler;
   private roomData: any = fallbackRoom;
 
+  private levels: LoadedRoom[] | null = null;
+  private currentScreenIndex = 0;
+
   async onCreate(options: any) {
     this.collisionHandler = new CollisionHandler();
 
-    this.roomData = await getRoomForGame(options?.levelSlug);
+    this.levels = await getSequenceLevels(options?.screenSequenceSlug);
+    this.currentScreenIndex = 0;
+
+    this.roomData = this.levels
+      ? this.levels[0]
+      : await getRoomForGame(options?.levelSlug);
+
     this.maxClients = this.roomData.maxClients ?? this.maxClients;
     this.state.loadRoomFromJson(this.roomData);
     this.onMessage(ClientMessageType.Move, (client, message: MessageMove) => {
@@ -118,29 +128,41 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.onMessage(ClientMessageType.Reset, (client) => {
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
+      this.loadLevel(this.roomData);
+    });
 
-      this.state.isPaused = false;
-      this.state.isGameOver = false;
+    this.onMessage(ClientMessageType.NextScreen, (client) => {
+      if (!this.levels) {
+        console.log(
+          `[NEXT_SCREEN] No sequence configured, resetting level (requested by ${client.sessionId})`,
+        );
+        this.loadLevel(this.roomData);
+        return;
+      }
 
-      this.state.loadRoomFromJson(this.roomData);
+      if (this.currentScreenIndex >= this.levels.length - 1) {
+        return;
+      }
 
-      this.clients.forEach((c) => {
-        const player = this.state.playerState.players.get(c.sessionId);
-        if (player) {
-          const startPos =
-            this.state.startingPositions[
-              player.index % this.state.startingPositions.length
-            ];
-          player.position.x = startPos.x;
-          player.position.y = startPos.y;
-        }
+      this.currentScreenIndex += 1;
+      console.log(
+        `[NEXT_SCREEN] Advancing to level ${this.currentScreenIndex + 1}/${
+          this.levels.length
+        }, requested by ${client.sessionId}`,
+      );
+      this.loadLevel(this.levels[this.currentScreenIndex]);
+    });
+
+    this.onMessage(ClientMessageType.EndDemo, (client) => {
+      console.log(`[END_DEMO] Demo end requested by ${client.sessionId}`);
+
+      this.broadcast(ServerMessageType.DemoEnded, {
+        message: "Pokoj zostal zamkniety. Dziekujemy za gre!",
       });
 
-      this.broadcast(ServerMessageType.LasersUpdated, { lasers: [] });
-      this.broadcast(ServerMessageType.RoomReset, {
-        message: "Level has been reset",
-        mapInfo: this.state.getMapInfo(),
-      });
+      this.clock.setTimeout(() => {
+        void this.disconnect();
+      }, 300);
     });
 
     this.onMessage(ClientMessageType.TogglePause, (client) => {
@@ -149,6 +171,34 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.broadcast(ServerMessageType.PauseToggled, {
         isPaused: this.state.isPaused,
       });
+    });
+  }
+
+  private loadLevel(roomData: LoadedRoom) {
+    this.roomData = roomData;
+    this.maxClients = this.roomData.maxClients ?? this.maxClients;
+
+    this.state.isPaused = false;
+    this.state.isGameOver = false;
+
+    this.state.loadRoomFromJson(this.roomData);
+
+    this.clients.forEach((c) => {
+      const player = this.state.playerState.players.get(c.sessionId);
+      if (player) {
+        const startPos =
+          this.state.startingPositions[
+            player.index % this.state.startingPositions.length
+          ];
+        player.position.x = startPos.x;
+        player.position.y = startPos.y;
+      }
+    });
+
+    this.broadcast(ServerMessageType.LasersUpdated, { lasers: [] });
+    this.broadcast(ServerMessageType.RoomReset, {
+      message: "Level has been reset",
+      mapInfo: this.state.getMapInfo(),
     });
   }
 
@@ -200,6 +250,24 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private handleLevelComplete() {
     this.state.isGameOver = true;
     this.state.isPaused = true;
+
+    if (this.levels) {
+      const isLastScreen = this.currentScreenIndex >= this.levels.length - 1;
+
+      if (isLastScreen) {
+        this.broadcast(ServerMessageType.DemoCompleted, {
+          message: "Solvroviczu, Ukonczyles Demo!",
+        });
+        return;
+      }
+
+      this.broadcast(ServerMessageType.LevelComplete, {
+        message: "Solvroviczu, Ukonczyles poziom",
+        screenIndex: this.currentScreenIndex,
+        totalScreens: this.levels.length,
+      });
+      return;
+    }
 
     this.broadcast(ServerMessageType.LevelComplete, {
       message: "Solvroviczu, Ukonczyles poziom",

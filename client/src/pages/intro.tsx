@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { IntroContainer } from "../components/intro-container";
 import { Button } from "../components/ui/button";
@@ -11,6 +11,8 @@ import { useRoom } from "../lib/use-room";
 export function Intro() {
   const navigate = useNavigate();
   const { connect, disconnect } = useRoom();
+  const [searchParams] = useSearchParams();
+  const screenSequenceSlug = searchParams.get("sequence") ?? undefined;
 
   const [status, setStatus] = useState<
     "idle" | "loading" | "error" | "success" | "reconnecting"
@@ -34,13 +36,13 @@ export function Intro() {
 
     setStatus("loading");
     try {
-      await connect(name.trim());
+      await connect(name.trim(), screenSequenceSlug);
       await navigate("/game");
     } catch {
       setErrorMessage("Nie udało się dołaczyć do gry. Spróbuj ponownie.");
       setStatus("error");
     }
-  }, [connect, name, navigate]);
+  }, [connect, name, navigate, screenSequenceSlug]);
 
   useEffect(() => {
     if (status !== "reconnecting") {

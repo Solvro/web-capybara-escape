@@ -33,6 +33,8 @@ export {
   type MessagePauseToggled,
   type MessageGameOver,
   type MessageLevelComplete,
+  type MessageDemoCompleted,
+  type MessageDemoEnded,
   type MessageMove,
 } from "./types/messages.js";
 

@@ -1,8 +1,10 @@
 import type {
+  MessageDemoCompleted,
   MessageGameOver,
   MessageLevelComplete,
   MessagePauseToggled,
 } from "@capybara/shared";
+import { ClientMessageType } from "@capybara/shared";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +21,7 @@ import { useRoom } from "@/lib/use-room";
 type EndGameState =
   | { kind: "gameOver"; message: string }
   | { kind: "levelComplete"; message: string }
+  | { kind: "demoCompleted"; message: string }
   | null;
 
 export function Game() {
@@ -76,6 +79,19 @@ export function Game() {
       },
     );
 
+    const unoffDemoCompleted = room.onMessage(
+      "demoCompleted",
+      (data: MessageDemoCompleted) => {
+        setIsPaused(true);
+        setEndGame({ kind: "demoCompleted", message: data.message });
+      },
+    );
+
+    const unoffDemoEnded = room.onMessage("demoEnded", () => {
+      localStorage.removeItem("reconnection");
+      void navigate("/");
+    });
+
     const unoffReset = room.onMessage("roomReset", () => {
       setIsPaused(false);
       setEndGame(null);
@@ -84,16 +100,33 @@ export function Game() {
     return () => {
       unoffGameOver();
       unoffLevelComplete();
+      unoffDemoCompleted();
+      unoffDemoEnded();
       unoffReset();
     };
-  }, [room]);
+  }, [room, navigate]);
 
   const handleRestart = () => {
-    if (room) {
-      setEndGame(null);
-      setIsPaused(false);
-      room.send("reset");
+    if (!room) return;
+
+    setEndGame(null);
+    setIsPaused(false);
+
+    if (endGame?.kind === "levelComplete") {
+      // Server decides whether this advances to the next screen of a
+      // sequence, or just reloads the same level (legacy single-level mode).
+      room.send(ClientMessageType.NextScreen);
+    } else {
+      room.send(ClientMessageType.Reset);
     }
+  };
+
+  const handleEndDemo = () => {
+    if (!room) return;
+
+    // Don't clear `endGame`/navigate here — wait for the server's
+    // `demoEnded` broadcast so every player in the room leaves in sync.
+    room.send(ClientMessageType.EndDemo);
   };
 
   if (joinError || showTimeoutError) {
@@ -136,7 +169,16 @@ export function Game() {
         <PhaserContainer room={room} />
       </div>
 
-      {isPaused && (
+      {isPaused && endGame?.kind === "demoCompleted" && (
+        <PauseModal
+          title="Ukonczono Demo"
+          subtitle={endGame.message}
+          actionLabel="Powrot do menu"
+          onRestart={handleEndDemo}
+        />
+      )}
+
+      {isPaused && endGame?.kind !== "demoCompleted" && (
         <PauseModal
           title={endGame?.message ?? "GRA ZATRZYMANA"}
           subtitle={

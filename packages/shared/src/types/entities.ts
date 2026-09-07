@@ -1,4 +1,4 @@
-import type { Direction, WireDirection } from "./direction";
+import type { Direction, WireDirection } from "./direction.js";
 
 export type Position = {
   x: number;
