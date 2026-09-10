@@ -25,6 +25,24 @@ export function createQuestionsRouter() {
    *     responses:
    *       200:
    *         description: List of all the questions
+   *         content:
+   *           application/json:
+   *             example:
+   *               questions:
+   *                 - id: "q-123"
+   *                   question:
+   *                     title: "Do you like capybaras?"
+   *                     options:
+   *                       - text: "Yes"
+   *                         endResult: "friend"
+   *                       - text: "No"
+   *                         nextQuestion:
+   *                           title: "Are you sure?"
+   *                           options:
+   *                             - text: "Yes, I'm sure"
+   *                               endResult: "enemy"
+   *                   createdAt: "2026-09-10T21:42:00.000Z"
+   *                   updatedAt: "2026-09-10T21:46:00.000Z"
    */
 
   router.get("/questions", async (req: Request, res: Response) => {
@@ -47,10 +65,30 @@ export function createQuestionsRouter() {
    *     responses:
    *       200:
    *         description: Question details
+   *         content:
+   *           application/json:
+   *             example:
+   *               question:
+   *                 id: "q-123"
+   *                 question:
+   *                   title: "Do you like capybaras?"
+   *                   options:
+   *                     - text: "Yes"
+   *                       endResult: "friend"
+   *                 createdAt: "2026-09-10T20:00:00.000Z"
+   *                 updatedAt: "2026-09-10T21:00:00.000Z"
    *       400:
    *         description: Invalid ID
+   *         content:
+   *           application/json:
+   *             example:
+   *               error: "Invalid ID."
    *       404:
    *         description: No question found
+   *         content:
+   *           application/json:
+   *             example:
+   *               error: "Question not found."
    */
 
   router.get("/questions/:id", async (req: Request, res: Response) => {
@@ -90,8 +128,24 @@ export function createQuestionsRouter() {
    *     responses:
    *       201:
    *         description: Question created successfully
+   *         content:
+   *           application/json:
+   *             example:
+   *               question:
+   *                 id: "q-456"
+   *                 question:
+   *                   title: "Is this a new node?"
+   *                   options:
+   *                     - text: "Yes"
+   *                       endResult: "win"
+   *                 createdAt: "2026-09-10T21:44:00.000Z"
+   *                 updatedAt: "2026-09-10T21:45:00.000Z"
    *       400:
    *         description: Validation error
+   *         content:
+   *           application/json:
+   *             example:
+   *               error: "Unknown error."
    */
 
   router.post(
@@ -132,10 +186,30 @@ export function createQuestionsRouter() {
    *     responses:
    *       200:
    *         description: Question updated
+   *         content:
+   *           application/json:
+   *             example:
+   *               question:
+   *                 id: "q-123"
+   *                 question:
+   *                   title: "Updated question title?"
+   *                   options:
+   *                     - text: "Updated option"
+   *                       endResult: "loss"
+   *                 createdAt: "2026-09-10T20:00:00.000Z"
+   *                 updatedAt: "2026-09-10T21:45:00.000Z"
    *       400:
    *         description: Validation error or Invalid ID
+   *         content:
+   *           application/json:
+   *             example:
+   *               error: "Invalid ID."
    *       404:
    *         description: No question found
+   *         content:
+   *           application/json:
+   *             example:
+   *               error: "Question not found."
    */
 
   router.put(
@@ -178,8 +252,16 @@ export function createQuestionsRouter() {
    *         description: Question deleted successfully
    *       400:
    *         description: Invalid ID
+   *         content:
+   *           application/json:
+   *             example:
+   *               error: "Invalid ID."
    *       404:
    *         description: No question found
+   *         content:
+   *           application/json:
+   *             example:
+   *               error: "Question not found."
    */
 
   router.delete(
