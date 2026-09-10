@@ -10,7 +10,9 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:2567",
+        url:
+          process.env.PUBLIC_API_URL ??
+          `http://localhost:${process.env.PORT ?? 2567}`,
         description: "Development server",
       },
     ],
