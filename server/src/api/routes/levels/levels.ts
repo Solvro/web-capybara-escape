@@ -3,6 +3,10 @@ import { Request, Response, Router } from "express";
 import { requireAdminAuth } from "@/api/middlewares/admin-auth";
 import { levelRepository } from "@/services/levels/level.repository";
 
+//TODO change lang to eng
+// add responses
+//add the rest of the fields of model
+
 /**
  * @swagger
  * components:
@@ -11,7 +15,8 @@ import { levelRepository } from "@/services/levels/level.repository";
  *       type: http
  *       scheme: bearer
  *       bearerFormat: JWT
- *       description: Wklej swój ADMIN_API_TOKEN z pliku .env
+ *       description: Paste here your ADMIN_API_TOKEN from .env
+ *
  */
 
 type ApiError = {
@@ -74,11 +79,11 @@ export function createLevelsRouter() {
    * @swagger
    * /api/levels:
    *   get:
-   *     summary: Pobierz listę poziomów
+   *     summary: Get list of levels
    *     tags: [Levels]
    *     responses:
    *       200:
-   *         description: Lista poziomów (zwraca wszystkie dla admina, lub tylko opublikowane dla graczy).
+   *         description: List of levels ( returns all for admin, only published for the players)
    */
 
   router.get("/levels", async (req: Request, res: Response) => {
@@ -92,7 +97,7 @@ export function createLevelsRouter() {
    * @swagger
    * /api/levels/{slug}:
    *   get:
-   *     summary: Pobierz szczegóły konkretnego poziomu
+   *     summary: Get details of the given level
    *     tags: [Levels]
    *     parameters:
    *       - in: path
@@ -102,9 +107,9 @@ export function createLevelsRouter() {
    *           type: string
    *     responses:
    *       200:
-   *         description: Pełne dane poziomu
+   *         description: Full level details
    *       404:
-   *         description: Nie znaleziono poziomu
+   *         description: No level found
    */
 
   router.get("/levels/:slug", async (req: Request, res: Response) => {
@@ -128,7 +133,7 @@ export function createLevelsRouter() {
    * @swagger
    * /api/admin/levels:
    *   post:
-   *     summary: Dodaj nowy poziom
+   *     summary: Add new level
    *     tags: [Admin Levels]
    *     security:
    *       - AdminToken: []
@@ -152,11 +157,11 @@ export function createLevelsRouter() {
    *                 type: string
    *     responses:
    *       201:
-   *         description: Poziom utworzony pomyślnie
+   *         description: Level created successfully
    *       400:
-   *         description: Błąd walidacji
+   *         description: Validation error
    *       409:
-   *         description: Poziom o tym slug-u już istnieje
+   *         description: A level with this slug already exists
    */
 
   router.post(
@@ -183,7 +188,7 @@ export function createLevelsRouter() {
    * @swagger
    * /api/admin/levels/{slug}:
    *   put:
-   *     summary: Nadpisz istniejący poziom
+   *     summary: Overwrite a pre-existing level
    *     tags: [Admin Levels]
    *     security:
    *       - AdminToken: []
@@ -210,11 +215,11 @@ export function createLevelsRouter() {
    *                 type: string
    *     responses:
    *       200:
-   *         description: Poziom zaktualizowany
+   *         description: Level updated
    *       400:
-   *         description: Nieprawidłowe dane
+   *         description: Invalid data
    *       404:
-   *         description: Nie znaleziono poziomu
+   *         description: Level not found
    */
 
   router.put(
@@ -246,7 +251,7 @@ export function createLevelsRouter() {
    * @swagger
    * /api/admin/levels/{slug}/publish:
    *   post:
-   *     summary: Opublikuj poziom
+   *     summary: Publish the level
    *     tags: [Admin Levels]
    *     security:
    *       - AdminToken: []
@@ -262,11 +267,11 @@ export function createLevelsRouter() {
    *           type: string
    *     responses:
    *       200:
-   *         description: Poziom opublikowany
+   *         description: Level published
    *       400:
-   *         description: Nieprawidłowy slug
+   *         description: Invalid slug
    *       404:
-   *         description: Nie znaleziono poziomu
+   *         description: Level not found
    */
 
   router.post(

@@ -20,11 +20,11 @@ export function createQuestionsRouter() {
    * @swagger
    * /api/questions:
    *   get:
-   *     summary: Pobierz listę pytań
+   *     summary: Get question list
    *     tags: [Questions]
    *     responses:
    *       200:
-   *         description: Lista wszystkich pytań.
+   *         description: List of all the questions
    */
 
   router.get("/questions", async (req: Request, res: Response) => {
@@ -36,7 +36,7 @@ export function createQuestionsRouter() {
    * @swagger
    * /api/questions/{id}:
    *   get:
-   *     summary: Pobierz szczegóły konkretnego pytania
+   *     summary: Get details of a given question
    *     tags: [Questions]
    *     parameters:
    *       - in: path
@@ -46,11 +46,11 @@ export function createQuestionsRouter() {
    *           type: string
    *     responses:
    *       200:
-   *         description: Dane pytania
+   *         description: Question details
    *       400:
-   *         description: Nieprawidłowe ID
+   *         description: Invalid ID
    *       404:
-   *         description: Nie znaleziono pytania
+   *         description: No question found
    */
 
   router.get("/questions/:id", async (req: Request, res: Response) => {
@@ -68,7 +68,7 @@ export function createQuestionsRouter() {
    * @swagger
    * /api/admin/questions:
    *   post:
-   *     summary: Dodaj nowe pytanie
+   *     summary: Add new question
    *     tags: [Admin Questions]
    *     security:
    *       - AdminToken: []
@@ -89,9 +89,9 @@ export function createQuestionsRouter() {
    *                 type: number
    *     responses:
    *       201:
-   *         description: Pytanie utworzone pomyślnie
+   *         description: Question created successfully
    *       400:
-   *         description: Błąd walidacji
+   *         description: Validation error
    */
 
   router.post(
@@ -113,7 +113,7 @@ export function createQuestionsRouter() {
    * @swagger
    * /api/admin/questions/{id}:
    *   put:
-   *     summary: Zaktualizuj istniejące pytanie
+   *     summary: Update a pre-existing question
    *     tags: [Admin Questions]
    *     security:
    *       - AdminToken: []
@@ -131,11 +131,11 @@ export function createQuestionsRouter() {
    *             type: object
    *     responses:
    *       200:
-   *         description: Pytanie zaktualizowane
+   *         description: Question updated
    *       400:
-   *         description: Błąd walidacji lub nieprawidłowe ID
+   *         description: Validation error or Invalid ID
    *       404:
-   *         description: Nie znaleziono pytania
+   *         description: No question found
    */
 
   router.put(
@@ -163,7 +163,7 @@ export function createQuestionsRouter() {
    * @swagger
    * /api/admin/questions/{id}:
    *   delete:
-   *     summary: Usuń pytanie
+   *     summary: Delete question
    *     tags: [Admin Questions]
    *     security:
    *       - AdminToken: []
@@ -175,11 +175,11 @@ export function createQuestionsRouter() {
    *           type: string
    *     responses:
    *       204:
-   *         description: Pytanie usunięte pomyślnie
+   *         description: Question deleted successfully
    *       400:
-   *         description: Nieprawidłowe ID
+   *         description: Invalid ID
    *       404:
-   *         description: Nie znaleziono pytania
+   *         description: No question found
    */
 
   router.delete(
