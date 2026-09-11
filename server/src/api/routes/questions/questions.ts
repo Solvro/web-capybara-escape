@@ -117,14 +117,22 @@ export function createQuestionsRouter() {
    *           schema:
    *             type: object
    *             properties:
-   *               content:
-   *                 type: string
-   *               options:
-   *                 type: array
-   *                 items:
-   *                   type: string
-   *               correctAnswer:
-   *                 type: number
+   *               question:
+   *                 type: object
+   *                 properties:
+   *                   title:
+   *                     type: string
+   *                   options:
+   *                     type: array
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         text:
+   *                           type: string
+   *                         endResult:
+   *                           type: string
+   *                         nextQuestion:
+   *                           type: object
    *     responses:
    *       201:
    *         description: Question created successfully
@@ -183,6 +191,23 @@ export function createQuestionsRouter() {
    *         application/json:
    *           schema:
    *             type: object
+   *             properties:
+   *               question:
+   *                 type: object
+   *                 properties:
+   *                   title:
+   *                     type: string
+   *                   options:
+   *                     type: array
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         text:
+   *                           type: string
+   *                         endResult:
+   *                           type: string
+   *                         nextQuestion:
+   *                           type: object
    *     responses:
    *       200:
    *         description: Question updated

@@ -2,6 +2,12 @@ import path from "path";
 import swaggerJsdoc from "swagger-jsdoc";
 import { fileURLToPath } from "url";
 
+// @ts-ignore
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const routesPath =
+  path.join(__dirname, "../api/routes").replace(/\\/g, "/") + "/**/*.{ts,js}";
+
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -19,7 +25,7 @@ const options = {
       },
     ],
   },
-  apis: [path.join(__dirname, "../api/routes/**/*.ts")],
+  apis: [routesPath],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
