@@ -204,6 +204,12 @@ export function createLevelsRouter() {
    *                 type: string
    *               description:
    *                 type: string
+   *               data:
+   *                 type: object
+   *               isPublished:
+   *                 type: boolean
+   *               createdBy:
+   *                 type: string
    *     responses:
    *       201:
    *         description: Level created successfully
@@ -297,6 +303,10 @@ export function createLevelsRouter() {
    *                 type: string
    *               description:
    *                 type: string
+   *               data:
+   *                 type: object
+   *               isPublished:
+   *                 type: boolean
    *     responses:
    *       200:
    *         description: Level updated
