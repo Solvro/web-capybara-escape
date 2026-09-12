@@ -72,8 +72,6 @@ export interface Cable {
   direction: Direction;
   damageDuration: number;
   safeDuration: number;
-  damageMs: number;
-  safeMs: number;
 }
 
 export interface Wire {

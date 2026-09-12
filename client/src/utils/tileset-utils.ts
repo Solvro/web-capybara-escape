@@ -369,7 +369,8 @@ export const formatLevel = (
         formattedLevel.entities.crates.push({ x, y });
       } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.LASER) {
         const color = COLOR_LIST[Number.parseInt(entityLayer[1])];
-        const config = entityConfigs[index] || {};
+
+        const config = entityConfigs[index] || entityConfigs[-1] || {};
 
         formattedLevel.mechanics.push({
           type: "laser",
@@ -440,7 +441,8 @@ export const formatLevel = (
         floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_INACTIVE
       ) {
         cableCount++;
-        const config = entityConfigs[index] || {};
+
+        const config = entityConfigs[index] || entityConfigs[-2] || {};
 
         formattedLevel.mechanics.push({
           type: "cable",
@@ -448,8 +450,8 @@ export const formatLevel = (
           y,
           id: `cable-${cableCount}`,
           direction: ANGLE_TO_TEXT[floorDecoyLayer[1]],
-          damageMs: config.damageMs ?? 3000,
-          safeMs: config.safeMs ?? 2000,
+          damageDuration: config.damageDuration ?? 3000,
+          safeDuration: config.safeDuration ?? 2000,
           delay: config.delay ?? 2000,
           startDamaging: floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_ACTIVE,
         });

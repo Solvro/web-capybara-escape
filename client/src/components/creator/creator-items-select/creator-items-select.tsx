@@ -9,6 +9,7 @@ import {
   LAYER_ITEMS,
   creatorPaletteKeyForLookup,
 } from "../../../constants/layer-items";
+import type { DelayConfig } from "../creator-delay-modal/entity-delay-modal";
 import { CreatorLayerOptionsGrid } from "./parts/creator-layer-options-grid";
 import { CreatorLayerTabs } from "./parts/creator-layer-tabs";
 import { CreatorSelectedBlock } from "./parts/creator-selected-block";
@@ -27,6 +28,9 @@ interface CreatorItemsSelectProps {
   floorCableRotationByBase: Record<string, FloorDecoyRotationDeg>;
   rotateCableAtBase: (baseKey: string) => void;
   tileData: (string | null)[][];
+  setEntityConfigs: React.Dispatch<
+    React.SetStateAction<Record<number, DelayConfig>>
+  >;
 }
 
 export function CreatorItemsSelect({
@@ -35,6 +39,7 @@ export function CreatorItemsSelect({
   floorCableRotationByBase,
   rotateCableAtBase,
   tileData,
+  setEntityConfigs,
 }: CreatorItemsSelectProps) {
   const [selectedLayer, setSelectedLayer] = useState<string>(LAYER_TABS[0].key);
 
@@ -91,6 +96,7 @@ export function CreatorItemsSelect({
           floorCableRotationByBase={floorCableRotationByBase}
           rotateCableAtBase={rotateCableAtBase}
           tileData={tileData}
+          setEntityConfigs={setEntityConfigs}
         />
       </div>
     </div>

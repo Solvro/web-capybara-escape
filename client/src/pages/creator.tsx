@@ -80,7 +80,7 @@ export function Creator() {
     );
     setEntityConfigs({});
   };
-
+  console.log("AKTUALNY STAN entityConfigs:", entityConfigs);
   const onRoomSubmit = () => {
     try {
       const newFormattedLevel = formatLevel(tileData, dims, entityConfigs);
@@ -186,6 +186,7 @@ export function Creator() {
               floorCableRotationByBase={floorCableRotationByBase}
               rotateCableAtBase={rotateCableAtBase}
               tileData={tileData}
+              setEntityConfigs={setEntityConfigs}
             />
           </div>
           <div className="w-[64dvw]">

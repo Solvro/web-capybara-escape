@@ -4,8 +4,8 @@ export type DelayConfig = {
   delay?: number;
   activeDuration?: number;
   inactiveDuration?: number;
-  damageMs?: number;
-  safeMs?: number;
+  damageDuration?: number;
+  safeDuration?: number;
 };
 
 interface EntityDelayModalProps {
@@ -24,16 +24,23 @@ export function EntityDelayModal({
   const [delay, setDelay] = useState(2000);
   const [activeDuration, setActiveDuration] = useState(2000);
   const [inactiveDuration, setInactiveDuration] = useState(2000);
-  const [damageMs, setDamageMs] = useState(3000);
-  const [safeMs, setSafeMs] = useState(2000);
+  const [damageDuration, setDamageDuration] = useState(3000);
+  const [safeDuration, setSafeDuration] = useState(2000);
 
   if (!isOpen || !entityType) return null;
 
-  const handleSave = () => {
-    if (entityType === "laser") {
-      onSave({ delay, activeDuration, inactiveDuration });
-    } else if (entityType === "cable") {
-      onSave({ delay, damageMs, safeMs });
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      if (entityType === "laser") {
+        onSave({ delay, activeDuration, inactiveDuration });
+      } else if (entityType === "cable") {
+        onSave({ delay, damageDuration, safeDuration });
+      }
+    } catch (error) {
+      console.error("Błąd zapisu w modalu:", error);
+    } finally {
+      onCancel();
     }
   };
 
@@ -51,9 +58,10 @@ export function EntityDelayModal({
             Delay [ms]:
             <input
               type="number"
+              min="0"
               className="border-2 border-gray-300 rounded p-1 mt-1 text-center font-normal"
               value={delay}
-              onChange={(e) => setDelay(Number(e.target.value))}
+              onChange={(e) => setDelay(Math.max(0, Number(e.target.value)))}
             />
           </label>
 
@@ -63,18 +71,24 @@ export function EntityDelayModal({
                 Active duration [ms]:
                 <input
                   type="number"
+                  min="0"
                   className="border-2 border-gray-300 rounded p-1 mt-1 text-center font-normal"
                   value={activeDuration}
-                  onChange={(e) => setActiveDuration(Number(e.target.value))}
+                  onChange={(e) =>
+                    setActiveDuration(Math.max(0, Number(e.target.value)))
+                  }
                 />
               </label>
               <label className="flex flex-col text-sm font-semibold">
                 Inactive duration [ms]:
                 <input
                   type="number"
+                  min="0"
                   className="border-2 border-gray-300 rounded p-1 mt-1 text-center font-normal"
                   value={inactiveDuration}
-                  onChange={(e) => setInactiveDuration(Number(e.target.value))}
+                  onChange={(e) =>
+                    setInactiveDuration(Math.max(0, Number(e.target.value)))
+                  }
                 />
               </label>
             </>
@@ -83,21 +97,27 @@ export function EntityDelayModal({
           {entityType === "cable" && (
             <>
               <label className="flex flex-col text-sm font-semibold">
-                Damage time (damageMs) [ms]:
+                Damage time [ms]:
                 <input
                   type="number"
+                  min="0"
                   className="border-2 border-gray-300 rounded p-1 mt-1 text-center font-normal"
-                  value={damageMs}
-                  onChange={(e) => setDamageMs(Number(e.target.value))}
+                  value={damageDuration}
+                  onChange={(e) =>
+                    setDamageDuration(Math.max(0, Number(e.target.value)))
+                  }
                 />
               </label>
               <label className="flex flex-col text-sm font-semibold">
-                Safe time (safeMs) [ms]:
+                Safe time [ms]:
                 <input
                   type="number"
+                  min="0"
                   className="border-2 border-gray-300 rounded p-1 mt-1 text-center font-normal"
-                  value={safeMs}
-                  onChange={(e) => setSafeMs(Number(e.target.value))}
+                  value={safeDuration}
+                  onChange={(e) =>
+                    setSafeDuration(Math.max(0, Number(e.target.value)))
+                  }
                 />
               </label>
             </>
