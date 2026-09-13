@@ -67,14 +67,10 @@ export function CreatorLayerOptionsGrid({
     if (!modalEntity) return;
     const typeKey = modalEntity === "laser" ? -1 : -2;
 
-    if (typeof setEntityConfigs === "function") {
-      setEntityConfigs((prev) => ({
-        ...prev,
-        [typeKey]: config,
-      }));
-    } else {
-      console.error("NO SAVING FUNCTION!!!");
-    }
+    setEntityConfigs((prev) => ({
+      ...prev,
+      [typeKey]: config,
+    }));
 
     setModalEntity(null);
   };

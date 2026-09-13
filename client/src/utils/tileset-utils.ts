@@ -450,8 +450,8 @@ export const formatLevel = (
           y,
           id: `cable-${cableCount}`,
           direction: ANGLE_TO_TEXT[floorDecoyLayer[1]],
-          damageDuration: config.damageDuration ?? 3000,
-          safeDuration: config.safeDuration ?? 2000,
+          damageMs: config.damageDuration ?? 3000,
+          safeMs: config.safeDuration ?? 2000,
           delay: config.delay ?? 2000,
           startDamaging: floorDecoyLayer[0] === LAYER_ITEM_KEYS.CABLE_ACTIVE,
         });
