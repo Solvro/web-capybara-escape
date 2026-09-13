@@ -23,12 +23,16 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   private levels: LoadedRoom[] | null = null;
   private currentScreenIndex = 0;
+  private awaitingNextScreen = false;
+  private awaitingEndDemo = false;
 
   async onCreate(options: any) {
     this.collisionHandler = new CollisionHandler();
 
     this.levels = await getSequenceLevels(options?.screenSequenceSlug);
     this.currentScreenIndex = 0;
+    this.awaitingNextScreen = false;
+    this.awaitingEndDemo = false;
 
     this.roomData = this.levels
       ? this.levels[0]
@@ -140,10 +144,19 @@ export class GameRoom extends Room<{ state: RoomState }> {
         return;
       }
 
-      if (this.currentScreenIndex >= this.levels.length - 1) {
+      if (!this.awaitingNextScreen) {
+        console.log(
+          `[NEXT_SCREEN] Ignored from ${client.sessionId} (no pending advance)`,
+        );
         return;
       }
 
+      if (this.currentScreenIndex >= this.levels.length - 1) {
+        this.awaitingNextScreen = false;
+        return;
+      }
+
+      this.awaitingNextScreen = false;
       this.currentScreenIndex += 1;
       console.log(
         `[NEXT_SCREEN] Advancing to level ${this.currentScreenIndex + 1}/${
@@ -154,6 +167,14 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage(ClientMessageType.EndDemo, (client) => {
+      if (!this.awaitingEndDemo) {
+        console.log(
+          `[END_DEMO] Ignored from ${client.sessionId} (demo not completed)`,
+        );
+        return;
+      }
+
+      this.awaitingEndDemo = false;
       console.log(`[END_DEMO] Demo end requested by ${client.sessionId}`);
 
       this.broadcast(ServerMessageType.DemoEnded, {
@@ -178,6 +199,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.roomData = roomData;
     this.maxClients = this.roomData.maxClients ?? this.maxClients;
 
+    this.awaitingNextScreen = false;
+    this.awaitingEndDemo = false;
     this.state.isPaused = false;
     this.state.isGameOver = false;
 
@@ -255,12 +278,14 @@ export class GameRoom extends Room<{ state: RoomState }> {
       const isLastScreen = this.currentScreenIndex >= this.levels.length - 1;
 
       if (isLastScreen) {
+        this.awaitingEndDemo = true;
         this.broadcast(ServerMessageType.DemoCompleted, {
           message: "Solvroviczu, Ukonczyles Demo!",
         });
         return;
       }
 
+      this.awaitingNextScreen = true;
       this.broadcast(ServerMessageType.LevelComplete, {
         message: "Solvroviczu, Ukonczyles poziom",
         screenIndex: this.currentScreenIndex,

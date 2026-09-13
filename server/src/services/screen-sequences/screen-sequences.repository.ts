@@ -110,7 +110,9 @@ async function hydrateScreen(
     if (!screen.levelSlug) {
       throw new Error("Screen is missing levelSlug.");
     }
-    const level = await levelRepository.getBySlug(screen.levelSlug);
+    const level = await levelRepository.getBySlug(screen.levelSlug, {
+      publishedOnly: true,
+    });
     if (!level) {
       throw new Error(`Level not found: ${screen.levelSlug}.`);
     }

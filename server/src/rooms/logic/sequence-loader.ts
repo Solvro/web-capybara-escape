@@ -20,9 +20,27 @@ export async function getSequenceLevels(
       return null;
     }
 
-    const levelScreens = plan.screens
-      .filter((screen) => screen.type === "level" && screen.levelSlug)
-      .sort((a, b) => a.sequence - b.sequence);
+    const sortedScreens = [...plan.screens].sort(
+      (a, b) => a.sequence - b.sequence,
+    );
+
+    const questionScreens = sortedScreens.filter(
+      (screen) => screen.type === "question",
+    );
+    if (questionScreens.length > 0) {
+      console.warn(
+        `[SequenceLoader] Screen sequence "${requestedSlug}" contains question screens (sequences: ${questionScreens
+          .map((s) => s.sequence)
+          .join(
+            ", ",
+          )}). Level-only gameplay path does not support questions yet. Falling back to single-level mode.`,
+      );
+      return null;
+    }
+
+    const levelScreens = sortedScreens.filter(
+      (screen) => screen.type === "level" && screen.levelSlug,
+    );
 
     if (levelScreens.length === 0) {
       console.warn(
