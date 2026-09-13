@@ -113,8 +113,6 @@ export function Game() {
     setIsPaused(false);
 
     if (endGame?.kind === "levelComplete") {
-      // Server decides whether this advances to the next screen of a
-      // sequence, or just reloads the same level (legacy single-level mode).
       room.send(ClientMessageType.NextScreen);
     } else {
       room.send(ClientMessageType.Reset);
@@ -124,8 +122,6 @@ export function Game() {
   const handleEndDemo = () => {
     if (!room) return;
 
-    // Don't clear `endGame`/navigate here — wait for the server's
-    // `demoEnded` broadcast so every player in the room leaves in sync.
     room.send(ClientMessageType.EndDemo);
   };
 
