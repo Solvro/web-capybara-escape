@@ -1,4 +1,4 @@
-import { Palette, RotateCw } from "lucide-react";
+import { Palette, RotateCw, Settings } from "lucide-react";
 import { useRef, useState } from "react";
 
 import {
@@ -20,6 +20,10 @@ import {
   getEntityRenderData,
   getUIBlockBackgroundData,
 } from "../../../../utils/tileset-utils";
+import {
+  type DelayConfig,
+  EntityDelayModal,
+} from "../../creator-delay-modal/entity-delay-modal";
 import { CreatorEntityPreview } from "../../shared/creator-entity-preview";
 import { renderTilesetLayer } from "../../shared/render-tileset-layer";
 import { CreatorColorPicker } from "./creator-color-picker";
@@ -31,6 +35,9 @@ interface CreatorLayerOptionsGridProps {
   floorCableRotationByBase: Record<string, FloorDecoyRotationDeg>;
   rotateCableAtBase: (baseKey: string) => void;
   tileData: (string | null)[][];
+  setEntityConfigs: React.Dispatch<
+    React.SetStateAction<Record<number, DelayConfig>>
+  >;
 }
 
 export function CreatorLayerOptionsGrid({
@@ -40,18 +47,33 @@ export function CreatorLayerOptionsGrid({
   floorCableRotationByBase,
   rotateCableAtBase,
   tileData,
+  setEntityConfigs,
 }: CreatorLayerOptionsGridProps) {
   const items = getGridItems(layerKey);
 
   const [openPickerBaseKey, setOpenPickerBaseKey] = useState<string | null>(
     null,
   );
-
   const [selectedColors, setSelectedColors] = useState<Record<string, number>>(
     {},
   );
+  const [modalEntity, setModalEntity] = useState<"laser" | "cable" | null>(
+    null,
+  );
 
   const pickerAnchorRef = useRef<HTMLDivElement | null>(null);
+
+  const handleModalSave = (config: DelayConfig) => {
+    if (!modalEntity) return;
+    const typeKey = modalEntity === "laser" ? -1 : -2;
+
+    setEntityConfigs((prev) => ({
+      ...prev,
+      [typeKey]: config,
+    }));
+
+    setModalEntity(null);
+  };
 
   const getDisplayItem = (item: LayerItem): LayerItem => {
     let out = item;
@@ -117,6 +139,8 @@ export function CreatorLayerOptionsGrid({
           isColorable && (COLORABLE_BASE_ITEMS[item.baseKey!]?.length ?? 0) > 1;
         const canRotate =
           Boolean(item.supportsRotation) && isRotatableFloorBaseKey(item.key);
+        const isConfigurable =
+          item.key.includes("laser") || item.key.includes("cable");
 
         const paletteRowKey = creatorPaletteKeyForLookup(
           paletteRowKeyForItem(item),
@@ -124,7 +148,6 @@ export function CreatorLayerOptionsGrid({
 
         const useCompositeBlend =
           displayItem.baseFrame !== undefined || Boolean(displayItem.color);
-
         const needsRotatePreview =
           displayItem.rotationDeg != null &&
           displayItem.rotationDeg % 360 !== 0;
@@ -134,7 +157,6 @@ export function CreatorLayerOptionsGrid({
           24,
           import.meta.env.BASE_URL,
         );
-
         const previewUsesTilesetLayers =
           useCompositeBlend || needsRotatePreview;
 
@@ -177,13 +199,6 @@ export function CreatorLayerOptionsGrid({
               onClick={() => {
                 if (isLimitReached) return;
                 handleItemClick(item);
-              }}
-              onKeyDown={(e) => {
-                if (isLimitReached) return;
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleItemClick(item);
-                }
               }}
               className={`flex flex-col items-center gap-2 rounded-md p-2 transition-colors ${
                 isLimitReached
@@ -242,16 +257,13 @@ export function CreatorLayerOptionsGrid({
                   </div>
                 )}
 
-                {(canRotate || hasVariants) && (
+                {(canRotate || hasVariants || isConfigurable) && (
                   <div className="absolute bottom-0.5 right-0.5 flex flex-row-reverse items-center gap-0.5">
                     {hasVariants && (
                       <button
                         type="button"
-                        onClick={(e) => {
-                          handleExpandClick(e, item.baseKey!);
-                        }}
+                        onClick={(e) => handleExpandClick(e, item.baseKey!)}
                         className="flex h-5 w-5 cursor-pointer items-center justify-center rounded bg-violet-900/80 text-violet-200 transition-colors hover:bg-violet-700/90 hover:text-white"
-                        aria-label="Choose palette color"
                         title="Choose color"
                       >
                         <Palette
@@ -264,14 +276,30 @@ export function CreatorLayerOptionsGrid({
                     {canRotate && (
                       <button
                         type="button"
-                        onClick={(e) => {
-                          handleRotateClick(e, item.key);
-                        }}
+                        onClick={(e) => handleRotateClick(e, item.key)}
                         className="flex h-5 w-5 cursor-pointer items-center justify-center rounded bg-violet-900/80 text-violet-200 transition-colors hover:bg-violet-700/90 hover:text-white"
-                        aria-label="Rotate cable (R)"
                         title="Rotate (R)"
                       >
                         <RotateCw
+                          className="h-4 w-4"
+                          aria-hidden
+                          strokeWidth={2}
+                        />
+                      </button>
+                    )}
+                    {isConfigurable && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModalEntity(
+                            item.key.includes("laser") ? "laser" : "cable",
+                          );
+                        }}
+                        className="flex h-5 w-5 cursor-pointer items-center justify-center rounded bg-violet-900/80 text-violet-200 transition-colors hover:bg-violet-700/90 hover:text-white"
+                        title="Settings"
+                      >
+                        <Settings
                           className="h-4 w-4"
                           aria-hidden
                           strokeWidth={2}
@@ -306,17 +334,24 @@ export function CreatorLayerOptionsGrid({
               <CreatorColorPicker
                 anchorRef={pickerAnchorRef}
                 selectedColorIndex={selectedColors[item.baseKey!] ?? 0}
-                onSelectColor={(colorIndex) => {
-                  handleColorSelect(item.baseKey!, colorIndex);
-                }}
-                onClose={() => {
-                  setOpenPickerBaseKey(null);
-                }}
+                onSelectColor={(colorIndex) =>
+                  handleColorSelect(item.baseKey!, colorIndex)
+                }
+                onClose={() => setOpenPickerBaseKey(null)}
               />
             )}
           </div>
         );
       })}
+
+      {modalEntity !== null && (
+        <EntityDelayModal
+          isOpen={true}
+          entityType={modalEntity}
+          onSave={handleModalSave}
+          onCancel={() => setModalEntity(null)}
+        />
+      )}
     </div>
   );
 }

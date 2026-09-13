@@ -58,6 +58,9 @@ export interface Laser {
   direction: Direction;
   range: number;
   active: boolean;
+  delay: number;
+  activeDuration: number;
+  inactiveDuration: number;
 }
 
 export interface Cable {

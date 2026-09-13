@@ -11,6 +11,7 @@ import {
 } from "../../../constants/layer-items";
 import { countEntityOccurrences } from "../../../utils/tileset-utils";
 import { clampDim } from "../creator-control/creator-control";
+import type { DelayConfig } from "../creator-delay-modal/entity-delay-modal";
 import { CreatorDimensionButtons } from "./creator-dimension-buttons";
 import { CreatorTile } from "./creator-tile";
 
@@ -21,6 +22,9 @@ interface CreatorBoardProps {
   setTileData: React.Dispatch<React.SetStateAction<(string | null)[][]>>;
   setDims: (dims: [number, number]) => void;
   setDirection: (direction: Direction) => void;
+  setEntityConfigs: React.Dispatch<
+    React.SetStateAction<Record<number, DelayConfig>>
+  >;
 }
 
 export function CreatorBoard({
@@ -30,6 +34,7 @@ export function CreatorBoard({
   setTileData,
   setDims,
   setDirection,
+  setEntityConfigs,
 }: CreatorBoardProps) {
   const boardRef = useRef<HTMLDivElement | null>(null);
 
@@ -106,13 +111,11 @@ export function CreatorBoard({
 
   const handleTileClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const { row, col } = handleBoardMouse(e);
-    if (row < 0 || row >= rows || col < 0 || col >= cols) {
-      return;
-    }
+    if (row < 0 || row >= rows || col < 0 || col >= cols) return;
+
     const tileIdx = row * cols + col;
     if (activeBlock) {
       const layerIdx = layerNameToIndex[activeBlock.layer];
-
       const valueToSet =
         activeBlock.frame === ASSETS.EMPTY ? null : activeBlock.key;
 
@@ -122,14 +125,8 @@ export function CreatorBoard({
         const limitKey = getEntityLimitKeyFor(valueToSet);
         if (limitKey) {
           const limit = ENTITY_LIMITS[limitKey]!;
-          const currentCount = countEntityOccurrences(
-            tileData,
-            limitKey,
-            tileIdx,
-          );
-          if (currentCount >= limit) {
+          if (countEntityOccurrences(tileData, limitKey, tileIdx) >= limit)
             return;
-          }
         }
       }
 
@@ -138,6 +135,21 @@ export function CreatorBoard({
         next[tileIdx][layerIdx] = valueToSet;
         return next;
       });
+
+      if (
+        valueToSet !== null &&
+        (valueToSet.includes("laser") || valueToSet.includes("cable"))
+      ) {
+        const isLaser = valueToSet.includes("laser");
+        setEntityConfigs((prev) => {
+          const typeKey = isLaser ? -1 : -2;
+          const configToApply = prev[typeKey];
+          if (configToApply) {
+            return { ...prev, [tileIdx]: configToApply };
+          }
+          return prev;
+        });
+      }
     }
   };
 
