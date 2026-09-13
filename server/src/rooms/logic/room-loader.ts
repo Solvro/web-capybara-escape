@@ -1,7 +1,7 @@
 import { levelRepository } from "@/services/levels/level.repository";
 import fallbackRoom from "@/static/levels/default.json";
 
-type LoadedRoom = typeof fallbackRoom;
+export type LoadedRoom = typeof fallbackRoom;
 
 export async function getRoomForGame(levelSlug?: string): Promise<LoadedRoom> {
   try {

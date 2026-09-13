@@ -6,6 +6,7 @@ import swaggerUi from "swagger-ui-express";
 
 import { createLevelsRouter } from "@/api/routes/levels/levels";
 import { createQuestionsRouter } from "@/api/routes/questions/questions";
+import { createScreenSequencesRouter } from "@/api/routes/screen-sequences/screen-sequences";
 
 import { closeMongoConnection, connectMongo } from "./config/mongo";
 import { swaggerSpec } from "./config/swagger";
@@ -15,6 +16,7 @@ import { swaggerSpec } from "./config/swagger";
 import { GameRoom } from "./rooms/game-room";
 import { levelRepository } from "./services/levels/level.repository";
 import { questionRepository } from "./services/questions/question.repository";
+import { screenSequenceRepository } from "./services/screen-sequences/screen-sequences.repository";
 
 async function gracefulShutdown(signal: string) {
   console.log(`[Server] Received ${signal}. Closing MongoDB connection...`);
@@ -43,6 +45,7 @@ export default config({
     app.use(express.json({ limit: "1mb" }));
     app.use("/api", createLevelsRouter());
     app.use("/api", createQuestionsRouter());
+    app.use("/api", createScreenSequencesRouter());
 
     app.get("/hello_world", (req, res) => {
       res.send("It's time to kick ass and chew bubblegum!");
@@ -73,5 +76,6 @@ export default config({
     await connectMongo();
     await levelRepository.ensureIndexes();
     await questionRepository.ensureIndexes();
+    await screenSequenceRepository.ensureIndexes();
   },
 });

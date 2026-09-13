@@ -5,7 +5,7 @@ interface RoomContextType {
   room: Room | null;
   isConnected: boolean;
   joinError: boolean;
-  connect: (playerName: string) => Promise<void>;
+  connect: (playerName: string, screenSequenceSlug?: string) => Promise<void>;
   disconnect: () => Promise<void>;
 }
 

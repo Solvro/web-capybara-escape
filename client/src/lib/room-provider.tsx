@@ -23,10 +23,11 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
   const [joinError, setJoinError] = useState(false);
 
-  const connect = async (playerName: string) => {
+  const connect = async (playerName: string, screenSequenceSlug?: string) => {
     try {
       const newRoom = await client.joinOrCreate("game_room", {
         name: playerName,
+        ...(screenSequenceSlug ? { screenSequenceSlug } : {}),
       });
       setRoom(newRoom);
       setIsConnected(true);
