@@ -44,7 +44,7 @@
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "tsc-alias": "1.9.1",
-    "tsx": "4.21.0",
+    "tsx": "4.23.13",
     "typescript": "7.0.2"
   },
   "engines": {
