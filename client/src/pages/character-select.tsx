@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+import { CharacterSelectorSol } from "@/components/lobby/character-selector-sol";
+import { CharacterSelectorVron } from "@/components/lobby/character-selector-vron";
+import { INTRO_CHARACTERS } from "@/constants/global";
+
 import { IntroContainer } from "../components/intro-container";
 import { Button } from "../components/ui/button";
 import { CustomInput } from "../components/ui/custom-input";
@@ -8,7 +12,7 @@ import { ErrorContainer } from "../components/ui/error-container";
 import { TitleHeader } from "../components/ui/title-header";
 import { useRoom } from "../lib/use-room";
 
-export function Intro() {
+export function CharacterSelect() {
   const navigate = useNavigate();
   const { connect, disconnect } = useRoom();
   const [searchParams] = useSearchParams();
@@ -116,22 +120,63 @@ export function Intro() {
         </div>
       ) : (
         <>
-          <CustomInput
-            value={name}
-            placeholder="Elek..."
-            setValue={(value) => {
-              setName(value.toUpperCase());
-            }}
-            disabled={status === "loading"}
-            className="my-4"
-          />
+          <div className="flex flex-row justify-between items-center w-3/4">
+            <CharacterSelectorSol
+              disabled={true}
+              selected={true}
+              onSelect={() => {}}
+              optionalDescription="Wybrany bohater"
+            />
 
-          <Button
-            onClick={handlePlay}
-            disabled={status === "loading" || name.trim() === ""}
-          >
-            {status === "loading" ? "Ładowanie..." : "Graj"}
-          </Button>
+            <div className="flex flex-col items-center gap-4 pt-8">
+              <p className="text-md text-white">WSKOCZ DO GRY</p>
+              <div className="flex flex-col items-center">
+                <p className="text-lg text-white tomorrow-font mb-2">
+                  Twój Nick
+                </p>
+                <CustomInput
+                  value={name}
+                  placeholder="Elek..."
+                  setValue={(value) => {
+                    setName(value.toUpperCase());
+                  }}
+                  disabled={status === "loading"}
+                  className="my-2"
+                />
+                <p className="text-md text-white tomorrow-font mt-4">
+                  Wybrana postać: {INTRO_CHARACTERS.SOL.name}
+                </p>
+              </div>
+
+              <Button
+                onClick={handlePlay}
+                disabled={status === "loading" || name.trim() === ""}
+                className="w-full tomorrow-font font-bold py-2 mt-12"
+              >
+                {status === "loading" ? "Ładowanie..." : "Stwórz nowy pokój"}
+              </Button>
+
+              <p className="text-md text-white mt-2">LUB</p>
+
+              <div className="flex flex-col items-center my-2">
+                <CustomInput
+                  value=""
+                  placeholder="Twój kod pokoju"
+                  setValue={() => {}}
+                  disabled={true}
+                />
+                <Button
+                  onClick={() => {}}
+                  disabled={true}
+                  className="w-full tomorrow-font font-bold py-2 my-4"
+                >
+                  Dołącz do pokoju
+                </Button>
+              </div>
+            </div>
+
+            <CharacterSelectorVron selected={false} onSelect={() => {}} />
+          </div>
         </>
       )}
 

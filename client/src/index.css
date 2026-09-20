@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #7c3aed;
+  --color-primary-foreground: #bcbcbc;
+  --color-secondary: #787a80;
+  --color-secondary-foreground: #4f4f4f;
+  --color-background: #282c3c;
+}
+
 /* Custom scrollbar for creator items select menu */
 .custom-scrollbar::-webkit-scrollbar {
   height: 10px;
@@ -19,6 +27,21 @@
   scrollbar-color: #a78bfa #4b2a86;
 }
 
+@utility glow {
+  filter: drop-shadow(0 0 10px var(--glow-color, rgb(239 68 68)))
+    drop-shadow(0 0 28px var(--glow-color, rgb(239 68 68)));
+}
+
+@utility glow-red {
+  filter: drop-shadow(0 0 10px rgb(239 68 68))
+    drop-shadow(0 0 28px rgb(239 68 68));
+}
+
+@utility glow-yellow {
+  filter: drop-shadow(0 0 10px rgb(250 204 21))
+    drop-shadow(0 0 28px rgb(250 204 21));
+}
+
 @font-face {
   font-family: "ArcadeClassic";
   src:
@@ -26,6 +49,28 @@
     url("/fonts/arcade.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "Tomorrow";
+  src:
+    local("Tomorrow"),
+    url("/fonts/tomorrow.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 .arcade-font {
   font-family: "ArcadeClassic";
+  line-height: 2;
+  letter-spacing: 0.1em;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.tomorrow-font {
+  font-family: "Tomorrow", sans-serif;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
 }

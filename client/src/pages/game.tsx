@@ -152,7 +152,7 @@ export function Game() {
   return (
     <>
       <div
-        className="flex items-center justify-center overflow-hidden rounded-2xl bg-violet-950"
+        className="flex items-center justify-center overflow-hidden rounded-2xl bg-background"
         style={{
           width: GAME_VIEW_WIDTH * MAP_SCALER,
           height: GAME_VIEW_HEIGHT * MAP_SCALER,
