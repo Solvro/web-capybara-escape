@@ -6,6 +6,7 @@ import swaggerUi from "swagger-ui-express";
 
 import { createLevelsRouter } from "@/api/routes/levels/levels";
 import { createQuestionsRouter } from "@/api/routes/questions/questions";
+import { createRoomsRouter } from "@/api/routes/rooms/rooms";
 import { createScreenSequencesRouter } from "@/api/routes/screen-sequences/screen-sequences";
 
 import { closeMongoConnection, connectMongo } from "./config/mongo";
@@ -33,7 +34,7 @@ export default config({
     /**
      * Define your room handlers:
      */
-    gameServer.define("game_room", GameRoom);
+    gameServer.define("game_room", GameRoom).filterBy(["code"]);
   },
 
   initializeExpress: (app) => {
@@ -46,6 +47,7 @@ export default config({
     app.use("/api", createLevelsRouter());
     app.use("/api", createQuestionsRouter());
     app.use("/api", createScreenSequencesRouter());
+    app.use("/api", createRoomsRouter());
 
     app.get("/hello_world", (req, res) => {
       res.send("It's time to kick ass and chew bubblegum!");

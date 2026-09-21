@@ -36,6 +36,9 @@ export {
   type MessageDemoCompleted,
   type MessageDemoEnded,
   type MessageMove,
+  type MessageSetReady,
+  type MessageLobbyPlayer,
+  type MessageLobbyState,
 } from "./types/messages.js";
 
 export type {
@@ -50,6 +53,18 @@ export type {
   LevelSummary,
   ListLevelsOptions,
 } from "./types/api.js";
+
+export {
+  CHARACTERS,
+  CHARACTER_LABELS,
+  isCharacter,
+  otherCharacter,
+  type Character,
+  type LobbyPhase,
+  type LobbyPlayerInfo,
+  type RoomLookupResponse,
+  type ReserveRoomCodeResponse,
+} from "./types/lobby.js";
 
 export {
   getMoveVectorFromDirection,

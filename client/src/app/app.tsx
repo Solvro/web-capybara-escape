@@ -18,7 +18,8 @@ export function App() {
       <Router>
         <Routes>
           <Route path="/" element={<CharacterSelect />} />
-          <Route path="/lobby" element={<LobbyRoom />} />
+          <Route path="/lobby/:roomCode" element={<LobbyRoom />} />
+          <Route path="/lobby" element={<Navigate to="/" replace />} />
           <Route path="/not-found-room" element={<NotFoundRoom />} />
           <Route path="/game" element={<Game />} />
           <Route path="/creator" element={<Creator />} />

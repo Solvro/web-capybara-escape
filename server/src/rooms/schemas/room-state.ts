@@ -19,6 +19,9 @@ export class RoomState extends Schema {
   @type("boolean") isPaused: boolean = false;
   @type("boolean") isGameOver: boolean = false;
 
+  @type("string") phase: string = "lobby";
+  @type("string") code: string = "";
+
   @type([Position]) startingPositions = new ArraySchema<Position>();
 
   @type(PlayerState) playerState: PlayerState = new PlayerState();
@@ -523,8 +526,8 @@ export class RoomState extends Schema {
     };
   }
 
-  spawnNewPlayer(sessionId: string, name: string = null) {
-    this.playerState.createPlayer(sessionId, name);
+  spawnNewPlayer(sessionId: string, name: string = null, character?: string) {
+    this.playerState.createPlayer(sessionId, name, character);
     const player = this.playerState.players.get(sessionId);
     const startingPos =
       this.startingPositions[player.index % this.startingPositions.length];
@@ -693,6 +696,7 @@ export class RoomState extends Schema {
           x: player.position.x,
           y: player.position.y,
           sessionId: player.sessionId,
+          character: player.character || undefined,
         };
       }),
       crates: Array.from(this.crateState.crates.values()).map((crate) => {

@@ -11,6 +11,7 @@ import type {
   Vent,
   Wire,
 } from "./entities.js";
+import type { Character, LobbyPhase } from "./lobby.js";
 
 export const ClientMessageType = {
   Move: "move",
@@ -20,6 +21,7 @@ export const ClientMessageType = {
   TogglePause: "togglePause",
   NextScreen: "nextScreen",
   EndDemo: "endDemo",
+  SetReady: "setReady",
 } as const;
 
 export type ClientMessageType =
@@ -44,6 +46,8 @@ export const ServerMessageType = {
   LevelComplete: "levelComplete",
   DemoCompleted: "demoCompleted",
   DemoEnded: "demoEnded",
+  LobbyState: "lobbyState",
+  GameStarting: "gameStarting",
 } as const;
 
 export type ServerMessageType =
@@ -109,10 +113,27 @@ export interface MessageOnAddPlayer {
   playerName: string;
   position: { x: number; y: number };
   index: number;
+  character?: Character;
 }
 
 export interface MessageOnRemovePlayer {
   sessionId: string;
+}
+
+export interface MessageSetReady {
+  ready: boolean;
+}
+
+export interface MessageLobbyPlayer {
+  sessionId: string;
+  name: string;
+  character: Character;
+  ready: boolean;
+}
+
+export interface MessageLobbyState {
+  phase: LobbyPhase;
+  players: MessageLobbyPlayer[];
 }
 
 export interface MessageGenerateLines {
