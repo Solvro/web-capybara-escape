@@ -1,0 +1,12 @@
+pose: skupiona
+
+text: >-
+  Ślady prowadzą w stronę bramy.\|
+  Ktoś przechodził tędy całkiem niedawno.
+
+answers:
+  - text: Podejdźmy do bramy.
+    next: brama
+
+  - text: Wróćmy do początku.
+    next: intro

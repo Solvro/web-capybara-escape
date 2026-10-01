@@ -55,3 +55,15 @@ export {
   getMoveVectorFromDirection,
   getDirectionFromMoveVector,
 } from "./utils/vector.js";
+
+export {
+  parseLoreDialog,
+  validateLoreDialog,
+  type LoreDialogContent,
+  type LoreAnswer,
+} from "./lore.js";
+export {
+  formatLoreText,
+  stripLoreFormatting,
+  type LoreGlyph,
+} from "./lore-text.js";

@@ -1,0 +1,12 @@
+pose: zdziwiona
+
+text: >-
+  Brama jest otwarta, ale po drugiej stronie nikogo nie ma.
+  \C[6]Chyba możemy ruszać dalej.\C[0]
+
+answers:
+  - text: Idziemy.
+    next: koniec
+
+  - text: Jeszcze raz sprawdźmy ślady.
+    next: slady

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { LoreDemo } from "../components/lore/lore-demo";
 import { MinigameContainer } from "../components/minigame-container";
 import { BinMinigame } from "../components/minigames/bits/bit-minigame";
 import { WordGuessMinigame } from "../components/minigames/word-guess/word-guess-minigame";
@@ -101,6 +102,7 @@ export function Playground() {
           Open word guess minigame
         </button>
       </div>
+      <LoreDemo />
       <MinigameContainer
         isOpen={isMinigameOpen}
         onClose={() => setCurrentMinigame(null)}

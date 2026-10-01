@@ -1,0 +1,14 @@
+#przykładowe dialogi - do zmiany
+
+pose: neutral
+
+text: >-
+  Cześć. Przy bramie znaleźliśmy świeże ślady.\.
+  Od czego zaczynamy?
+
+answers:
+  - text: Sprawdźmy ślady.
+    next: slady
+
+  - text: Obejrzyjmy bramę.
+    next: brama
