@@ -15,6 +15,7 @@
     "clean": "rimraf build",
     "export:levels": "tsx src/scripts/export-levels.ts",
     "export:levels:force": "tsx src/scripts/export-levels.ts --force",
+    "import:lore": "node --import tsx src/scripts/import-lore.ts",
     "loadtest": "tsx loadtest/example.ts --room game_room --numClients 2",
     "start": "tsx watch src/index.ts",
     "test": "mocha -r tsx \"test/**/*.test.ts\" --exit --timeout 15000"
