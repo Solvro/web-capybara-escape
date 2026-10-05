@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import api from "../../api/api";
 import { LoreDialog } from "./lore-dialog";
 
-const yamlFiles = import.meta.glob("../../content/lore/*.ya?ml", {
+const yamlFiles = import.meta.glob("../../content/lore/*.yaml", {
   query: "?raw",
   import: "default",
   eager: true,
