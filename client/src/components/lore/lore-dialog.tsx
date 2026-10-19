@@ -111,7 +111,7 @@ function AnimatedLoreDialog({
       >
         <div className="relative mx-auto -mb-12 flex flex-col items-center">
           <img
-            className="block h-88 w-full max-w-88 object-cover object-[center_15%]"
+            className="mx-auto block h-96 w-96 max-w-full object-contain object-center"
             src={pose && Object.hasOwn(poses, pose) ? poses[pose] : solImage}
             data-pose={pose}
             alt={`Sol — poza: ${pose}`}
@@ -144,40 +144,33 @@ function AnimatedLoreDialog({
           </p>
         </div>
 
-        <Transition
-          show={isComplete}
-          enter="transition-opacity duration-250 ease-out motion-reduce:transition-none"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
+        <div
+          className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-3"
+          aria-label="Odpowiedzi"
         >
-          <div
-            className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-3"
-            aria-label="Odpowiedzi"
-          >
-            {answers.map((answer, index) => {
-              const answerGlyphs = formatLoreText(answer.text);
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  className="flex cursor-pointer items-center justify-center rounded-md border-3 border-stone-300 bg-zinc-950 px-4 py-3 text-center leading-snug text-white transition-all enabled:hover:border-yellow-400 enabled:hover:text-yellow-400 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-yellow-400 disabled:cursor-not-allowed disabled:opacity-45 aria-pressed:border-yellow-400 aria-pressed:text-yellow-400"
-                  disabled={disabled}
-                  aria-pressed={selectedAnswer === index}
-                  onClick={() => {
-                    setSelectedAnswer(index);
-                    onAnswer(index, answer);
-                  }}
-                >
-                  <span>
-                    {answerGlyphs.map((glyph, glyphIndex) =>
-                      renderGlyph(glyph, glyphIndex),
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </Transition>
+          {answers.map((answer, index) => {
+            const answerGlyphs = formatLoreText(answer.text);
+            return (
+              <button
+                key={index}
+                type="button"
+                className="flex cursor-pointer items-center justify-center rounded-md border-3 border-stone-300 bg-zinc-950 px-4 py-3 text-center leading-snug text-white transition-all enabled:hover:border-yellow-400 enabled:hover:text-yellow-400 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-yellow-400 disabled:cursor-not-allowed disabled:opacity-45 aria-pressed:border-yellow-400 aria-pressed:text-yellow-400"
+                disabled={disabled || !isComplete}
+                aria-pressed={selectedAnswer === index}
+                onClick={() => {
+                  setSelectedAnswer(index);
+                  onAnswer(index, answer);
+                }}
+              >
+                <span>
+                  {answerGlyphs.map((glyph, glyphIndex) =>
+                    renderGlyph(glyph, glyphIndex),
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

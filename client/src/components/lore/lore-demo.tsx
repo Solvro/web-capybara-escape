@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from "react";
 
 import api from "../../api/api";
+import { LORE_SPRITES } from "../../constants/lore-sprites";
 import { LoreDialog } from "./lore-dialog";
 
 const yamlFiles = import.meta.glob("../../content/lore/*.yaml", {
@@ -121,6 +122,7 @@ export function LoreDemo() {
       <LoreDialog
         key={`${currentSlug}-${replay}`}
         {...dialog}
+        poses={LORE_SPRITES}
         onAnswer={handleAnswer}
       />
 
