@@ -58,8 +58,8 @@ export class Laser extends Mechanic implements INetworkInterface<LaserType> {
       .setScale(SIZE_MULTIPLIER);
     this.add(this.baseSprite);
     if (data.direction === "left") {
-      this.sprite.setAngle(180);
-      this.baseSprite.setAngle(180);
+      this.sprite.setFlipX(true);
+      this.baseSprite.setFlipX(true);
     }
     this.networkId = data.laserId;
     this.laserId = data.laserId;
@@ -118,7 +118,6 @@ export class Laser extends Mechanic implements INetworkInterface<LaserType> {
       ? ASSETS.LASER_BEAM_HORIZONTAL_TIP
       : ASSETS.LASER_BEAM_VERTICAL_TIP;
 
-    const beamAngle = this.direction === "left" ? 180 : 0;
     const colorInt = Phaser.Display.Color.HexStringToColor(this.color).color;
 
     for (let index = 1; index <= this.range; index++) {
@@ -147,7 +146,9 @@ export class Laser extends Mechanic implements INetworkInterface<LaserType> {
       const frame = index === this.range ? tipFrame : baseFrame;
       const segment = this.scene.add.sprite(offsetX, offsetY, "tileset", frame);
 
-      segment.setAngle(beamAngle);
+      if (this.direction === "left") {
+        segment.setFlipX(true);
+      }
       if (this.direction === "up") {
         segment.setFlipY(true);
       }

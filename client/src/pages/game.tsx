@@ -8,14 +8,14 @@ import { ClientMessageType } from "@capybara/shared";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { AlertModal } from "@/components/alert-modal";
+import { GameLoadingScreen } from "@/components/game/game-loading-screen";
+import { LevelIntro } from "@/components/game/level-intro";
+import { LoadingAnimatorWrapper } from "@/components/loading-animator-wrapper";
 import { PauseModal } from "@/components/pause-modal";
 import { PhaserContainer } from "@/components/phaser-container";
-import { Button } from "@/components/ui/button";
-import {
-  GAME_VIEW_HEIGHT,
-  GAME_VIEW_WIDTH,
-  MAP_SCALER,
-} from "@/constants/global";
+import { IMAGE_ALERT_PATHS } from "@/constants/global";
+import { useLevelInfo } from "@/hooks/game/use-level-info";
 import { useRoom } from "@/lib/use-room";
 
 type EndGameState =
@@ -29,6 +29,8 @@ export function Game() {
   const [showTimeoutError, setShowTimeoutError] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [endGame, setEndGame] = useState<EndGameState>(null);
+  const [introActive, setIntroActive] = useState(false);
+  const levelInfo = useLevelInfo(room);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -127,71 +129,78 @@ export function Game() {
 
   if (joinError || showTimeoutError) {
     return (
-      <div className="flex flex-col items-center gap-4">
-        <div>
-          {joinError
+      <AlertModal
+        title="Błąd połączenia"
+        description={
+          joinError
             ? "Nie udało się połączyć z grą."
-            : "Przekroczono limit czasu połączenia. Serwer może być niedostępny."}
-        </div>
-        <Button
-          disabled={false}
-          onClick={async () => {
-            await navigate("/");
-          }}
-        >
-          Powrót do menu
-        </Button>
+            : "Przekroczono limit czasu połączenia. Serwer może być niedostępny."
+        }
+        imageUrl={IMAGE_ALERT_PATHS.FAILED_OR_LOST}
+        actionText="Powrót do menu"
+        onAction={() => void navigate("/")}
+      />
+    );
+  }
+
+  if (room === null || !isConnected || levelInfo === null) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <GameLoadingScreen />
       </div>
     );
   }
 
-  if (room === null || !isConnected) {
-    return <div>Łączenie z serwerem gry...</div>;
-  }
-
   return (
     <>
-      <div
-        className="flex items-center justify-center overflow-hidden rounded-2xl bg-violet-950"
-        style={{
-          width: GAME_VIEW_WIDTH * MAP_SCALER,
-          height: GAME_VIEW_HEIGHT * MAP_SCALER,
-          // Never let the view spill outside the window; the map stays fully
-          // visible because Phaser FIT scales it down to whatever fits.
-          maxWidth: "95vw",
-          maxHeight: "95vh",
-        }}
-      >
-        <PhaserContainer room={room} />
+      <div className="flex h-screen w-screen items-center justify-center">
+        <LoadingAnimatorWrapper
+          levelNumber={levelInfo.levelNumber}
+          levelName={levelInfo.levelName}
+          initialScene={levelInfo.playIntro ? "blank" : "content"}
+        >
+          <LevelIntro
+            room={room}
+            introId={levelInfo.playIntro ? levelInfo.introId : 0}
+            onActiveChange={setIntroActive}
+          />
+          <PhaserContainer room={room} />
+        </LoadingAnimatorWrapper>
       </div>
 
-      {isPaused && endGame?.kind === "demoCompleted" && (
-        <PauseModal
-          title="Ukonczono Demo"
-          subtitle={endGame.message}
-          actionLabel="Powrot do menu"
-          onRestart={handleEndDemo}
+      {isPaused && !introActive && endGame?.kind === "gameOver" && (
+        <AlertModal
+          title="Porażka"
+          description="O K... apibaro, nie udało się uratować! Spróbuj ponownie!"
+          imageUrl={IMAGE_ALERT_PATHS.FAILED_OR_LOST}
+          actionText="Zagraj od początku"
+          onAction={handleRestart}
         />
       )}
 
-      {isPaused && endGame?.kind !== "demoCompleted" && (
-        <PauseModal
-          title={endGame?.message ?? "GRA ZATRZYMANA"}
-          subtitle={
-            endGame?.kind === "levelComplete"
-              ? "Mozesz przejsc do nastepnego poziomu!"
-              : endGame?.kind === "gameOver"
-                ? "Niestety napotkano przeszkodę!"
-                : "Nacisnij P, aby wznowic..."
-          }
-          actionLabel={
-            endGame?.kind === "levelComplete"
-              ? "Nastepny poziom"
-              : "Zagraj od poczatku"
-          }
-          onRestart={endGame ? handleRestart : undefined}
+      {isPaused && !introActive && endGame?.kind === "levelComplete" && (
+        <AlertModal
+          title="Capybara uratowana"
+          description="Gramy dalej? Czy lecimy do następnego poziomu?!"
+          imageUrl={IMAGE_ALERT_PATHS.LEVEL_COMPLETE}
+          imageHeight={82}
+          actionText="Gramy dalej"
+          onAction={handleRestart}
         />
       )}
+
+      {isPaused && !introActive && endGame?.kind === "demoCompleted" && (
+        <AlertModal
+          title="Ukonczono Demo!"
+          description="Co to była za gra? Wpadnij później, aby spróbować jeszcze raz!"
+          imageUrl={IMAGE_ALERT_PATHS.LEVEL_COMPLETE}
+          imageHeight={68}
+          actionText="Powrót do menu"
+          onAction={handleEndDemo}
+        />
+      )}
+
+      {isPaused && !introActive && endGame === null && <PauseModal />}
     </>
   );
 }

@@ -1,46 +1,79 @@
 import {
+  CHARACTERS,
+  Character,
   ClientMessageType,
+  LEVEL_INTRO_COUNTDOWN_MS,
   MessageMove,
+  MessageSetReady,
   ServerMessageType,
+  isCharacter,
 } from "@capybara/shared";
 import { Client, Room } from "@colyseus/core";
 import { CloseCode } from "@colyseus/shared-types";
 
 import fallbackRoom from "@/static/levels/default.json";
+import { generateRoomCode, normalizeRoomCode } from "@/utils/room-code";
 
 import { SpeechBubble } from "../utils/speech-bubble";
 import { getMoveVectorFromDirection } from "../utils/vector-utils";
 import { CollisionHandler } from "./logic/collision-handler";
 import { LoadedRoom, getRoomForGame } from "./logic/room-loader";
-import { getSequenceLevels } from "./logic/sequence-loader";
+import { SequenceLevel, getSequenceLevels } from "./logic/sequence-loader";
 import { RoomState } from "./schemas/room-state";
 
 export class GameRoom extends Room<{ state: RoomState }> {
-  maxClients = 4;
+  maxClients = 2;
   state = new RoomState();
   private collisionHandler: CollisionHandler;
   private roomData: any = fallbackRoom;
+  private screenSequenceSlug: string | undefined;
 
-  private levels: LoadedRoom[] | null = null;
+  private levels: SequenceLevel[] | null = null;
   private currentScreenIndex = 0;
   private awaitingNextScreen = false;
   private awaitingEndDemo = false;
+  private awaitingLevelReady = new Set<string>();
+  private pendingLevel: LoadedRoom | null = null;
+  private levelCountdownPending = false;
 
   async onCreate(options: any) {
     this.collisionHandler = new CollisionHandler();
 
-    this.levels = await getSequenceLevels(options?.screenSequenceSlug);
+    this.screenSequenceSlug = options?.screenSequenceSlug;
+    this.levels = await getSequenceLevels(this.screenSequenceSlug);
     this.currentScreenIndex = 0;
     this.awaitingNextScreen = false;
     this.awaitingEndDemo = false;
 
     this.roomData = this.levels
-      ? this.levels[0]
+      ? this.levels[0].data
       : await getRoomForGame(options?.levelSlug);
 
-    this.maxClients = this.roomData.maxClients ?? this.maxClients;
     this.state.loadRoomFromJson(this.roomData);
+
+    this.state.phase = "lobby";
+    this.state.isPaused = true;
+
+    this.state.code = normalizeRoomCode(options?.code || generateRoomCode());
+    this.updateLobbyMetadata();
+
+    this.onMessage(
+      ClientMessageType.SetReady,
+      (client, message: MessageSetReady) => {
+        if (this.state.phase !== "lobby") return;
+
+        const player = this.state.playerState.players.get(client.sessionId);
+        if (!player) return;
+
+        player.ready = !!message?.ready;
+        this.broadcastLobbyState();
+
+        this.tryStartGame();
+      },
+    );
+
     this.onMessage(ClientMessageType.Move, (client, message: MessageMove) => {
+      if (this.state.phase !== "playing") return;
       if (this.state.isPaused || this.state.isGameOver) return;
 
       const player = this.state.playerState.players.get(client.sessionId);
@@ -131,6 +164,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage(ClientMessageType.Reset, (client) => {
+      if (this.isLevelIntroActive()) return;
+
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
       this.loadLevel(this.roomData);
     });
@@ -163,7 +198,24 @@ export class GameRoom extends Room<{ state: RoomState }> {
           this.levels.length
         }, requested by ${client.sessionId}`,
       );
-      this.loadLevel(this.levels[this.currentScreenIndex]);
+      // The level is loaded once every client finished its intro animation,
+      // so the new map is never visible before the transition covers the screen.
+      this.pendingLevel = this.levels[this.currentScreenIndex].data;
+      this.waitForLevelIntro();
+      this.broadcast(ServerMessageType.LevelInfo, this.getLevelInfo(true));
+    });
+
+    this.onMessage(ClientMessageType.GetLevelInfo, (client) => {
+      client.send(
+        ServerMessageType.LevelInfo,
+        this.getLevelInfo(this.awaitingLevelReady.has(client.sessionId)),
+      );
+    });
+
+    this.onMessage(ClientMessageType.LevelReady, (client) => {
+      if (this.awaitingLevelReady.delete(client.sessionId)) {
+        this.startLevelCountdown();
+      }
     });
 
     this.onMessage(ClientMessageType.EndDemo, (client) => {
@@ -187,6 +239,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage(ClientMessageType.TogglePause, (client) => {
+      if (this.isLevelIntroActive()) return;
+
       this.state.isPaused = !this.state.isPaused;
 
       this.broadcast(ServerMessageType.PauseToggled, {
@@ -195,9 +249,59 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
   }
 
+  private getLevelInfo(playIntro: boolean) {
+    return {
+      levelNumber: this.currentScreenIndex + 1,
+      totalLevels: this.levels?.length ?? 1,
+      levelName: this.levels?.[this.currentScreenIndex].name ?? "Demo",
+      playIntro,
+    };
+  }
+
+  private isLevelIntroActive() {
+    return this.awaitingLevelReady.size > 0 || this.levelCountdownPending;
+  }
+
+  private startLevelCountdown() {
+    if (this.awaitingLevelReady.size > 0 || this.state.phase !== "playing") {
+      return;
+    }
+
+    this.levelCountdownPending = true;
+    this.broadcast(ServerMessageType.CountdownStart, {});
+
+    this.clock.setTimeout(() => {
+      this.levelCountdownPending = false;
+      this.resumeIfLevelReady();
+    }, LEVEL_INTRO_COUNTDOWN_MS);
+  }
+
+  private resumeIfLevelReady() {
+    if (this.state.phase !== "playing") return;
+
+    if (this.pendingLevel !== null) {
+      const level = this.pendingLevel;
+      this.pendingLevel = null;
+      this.loadLevel(level);
+    } else if (this.state.isPaused && !this.state.isGameOver) {
+      this.state.isPaused = false;
+      this.broadcast(ServerMessageType.PauseToggled, { isPaused: false });
+    } else {
+      return;
+    }
+
+    this.broadcast(ServerMessageType.LevelStart, {});
+  }
+
+  /** Pauses the game until every client finished its level intro animation. */
+  private waitForLevelIntro() {
+    this.state.isPaused = true;
+    this.levelCountdownPending = false;
+    this.awaitingLevelReady = new Set(this.state.playerState.players.keys());
+  }
+
   private loadLevel(roomData: LoadedRoom) {
     this.roomData = roomData;
-    this.maxClients = this.roomData.maxClients ?? this.maxClients;
 
     this.awaitingNextScreen = false;
     this.awaitingEndDemo = false;
@@ -226,7 +330,16 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   onJoin(client: Client, options: any) {
-    this.state.spawnNewPlayer(client.sessionId, options.name);
+    if (this.state.phase !== "lobby") {
+      throw new Error("Room already in progress.");
+    }
+
+    const character = this.resolveCharacter(options?.character);
+    if (!character) {
+      throw new Error("Requested character is already taken.");
+    }
+
+    this.state.spawnNewPlayer(client.sessionId, options?.name, character);
     const player = this.state.playerState.players.get(client.sessionId);
 
     this.broadcast(ServerMessageType.OnAddPlayer, {
@@ -234,31 +347,107 @@ export class GameRoom extends Room<{ state: RoomState }> {
       playerName: player.name,
       position: player.position,
       index: player.index,
+      character: player.character as Character,
     });
 
-    console.log(client.sessionId, "joined!");
+    this.updateLobbyMetadata();
+    this.broadcastLobbyState();
+
+    console.log(client.sessionId, "joined as", player.character);
   }
 
   async onLeave(client: Client, code?: number) {
     if (code !== CloseCode.CONSENTED) {
       try {
-        // allow disconnected client to reconnect into this room until 20 seconds
         await this.allowReconnection(client, 20);
         return;
       } catch {
-        // reconnection failed or timed out — clean up below
+        // reconnection failed or timed out - clean up below
       }
+    }
+
+    if (this.state.phase === "lobby") {
+      if (this.state.playerState.players.has(client.sessionId)) {
+        this.state.despawnPlayer(client.sessionId);
+      }
+      this.broadcast(ServerMessageType.OnRemovePlayer, {
+        sessionId: client.sessionId,
+      });
+      this.updateLobbyMetadata();
+      this.broadcastLobbyState();
+      return;
     }
 
     this.broadcast(ServerMessageType.OnRemovePlayer, {
       sessionId: client.sessionId,
     });
     this.state.despawnPlayer(client.sessionId);
+    if (this.awaitingLevelReady.delete(client.sessionId)) {
+      this.startLevelCountdown();
+    }
   }
 
   onDispose() {
     this.state.onRoomDispose();
     console.log("room", this.roomId, "disposing...");
+  }
+
+  private resolveCharacter(requested?: string): Character | null {
+    if (isCharacter(requested)) {
+      return this.state.playerState.isCharacterTaken(requested)
+        ? null
+        : requested;
+    }
+
+    return (
+      CHARACTERS.find(
+        (character) => !this.state.playerState.isCharacterTaken(character),
+      ) ?? null
+    );
+  }
+
+  private updateLobbyMetadata() {
+    void this.setMetadata({
+      code: this.state.code,
+      phase: this.state.phase,
+      screenSequenceSlug: this.screenSequenceSlug,
+      players: Array.from(this.state.playerState.players.values()).map(
+        (player) => ({
+          name: player.name,
+          character: player.character,
+        }),
+      ),
+    });
+  }
+
+  private broadcastLobbyState() {
+    this.broadcast(ServerMessageType.LobbyState, {
+      phase: this.state.phase,
+      players: Array.from(this.state.playerState.players.values()).map(
+        (player) => ({
+          sessionId: player.sessionId,
+          name: player.name,
+          character: player.character as Character,
+          ready: player.ready,
+        }),
+      ),
+    });
+  }
+
+  private tryStartGame() {
+    if (this.state.phase !== "lobby") return;
+    if (this.state.playerState.players.size < this.maxClients) return;
+
+    const allReady = Array.from(this.state.playerState.players.values()).every(
+      (player) => player.ready,
+    );
+    if (!allReady) return;
+
+    this.state.phase = "playing";
+    this.waitForLevelIntro();
+    this.updateLobbyMetadata();
+
+    this.broadcast(ServerMessageType.GameStarting, {});
   }
 
   private handleGameOver() {

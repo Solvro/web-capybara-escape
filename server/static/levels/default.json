@@ -26,7 +26,7 @@
       "x": 6,
       "y": 3,
       "id": "laser-v",
-      "direction": "down",
+      "direction": "left",
       "range": 5,
       "color": "#aa44ff",
       "active": false,

@@ -11,6 +11,7 @@ import type {
   Vent,
   Wire,
 } from "./entities.js";
+import type { Character, LobbyPhase } from "./lobby.js";
 
 export const ClientMessageType = {
   Move: "move",
@@ -20,6 +21,9 @@ export const ClientMessageType = {
   TogglePause: "togglePause",
   NextScreen: "nextScreen",
   EndDemo: "endDemo",
+  SetReady: "setReady",
+  GetLevelInfo: "getLevelInfo",
+  LevelReady: "levelReady",
 } as const;
 
 export type ClientMessageType =
@@ -44,6 +48,11 @@ export const ServerMessageType = {
   LevelComplete: "levelComplete",
   DemoCompleted: "demoCompleted",
   DemoEnded: "demoEnded",
+  LobbyState: "lobbyState",
+  GameStarting: "gameStarting",
+  LevelInfo: "levelInfo",
+  CountdownStart: "countdownStart",
+  LevelStart: "levelStart",
 } as const;
 
 export type ServerMessageType =
@@ -109,10 +118,27 @@ export interface MessageOnAddPlayer {
   playerName: string;
   position: { x: number; y: number };
   index: number;
+  character?: Character;
 }
 
 export interface MessageOnRemovePlayer {
   sessionId: string;
+}
+
+export interface MessageSetReady {
+  ready: boolean;
+}
+
+export interface MessageLobbyPlayer {
+  sessionId: string;
+  name: string;
+  character: Character;
+  ready: boolean;
+}
+
+export interface MessageLobbyState {
+  phase: LobbyPhase;
+  players: MessageLobbyPlayer[];
 }
 
 export interface MessageGenerateLines {
@@ -147,6 +173,17 @@ export interface MessageLevelComplete {
   message: string;
   screenIndex?: number;
   totalScreens?: number;
+}
+
+export interface MessageLevelInfo {
+  levelNumber: number;
+  totalLevels: number;
+  levelName: string;
+  /**
+   * True when the server is paused until this client plays the level intro
+   * animation and answers with `levelReady`.
+   */
+  playIntro: boolean;
 }
 
 export interface MessageDemoCompleted {

@@ -5,20 +5,27 @@ import {
   Routes,
 } from "react-router-dom";
 
+import { CharacterSelect } from "@/pages/character-select";
 import { Creator } from "@/pages/creator";
 import { Game } from "@/pages/game";
-import { Intro } from "@/pages/intro";
+import { LoadingScreen } from "@/pages/loading-screen";
+import { LobbyRoom } from "@/pages/lobby-room";
+import { NotFoundRoom } from "@/pages/not-found-room";
 import { Playground } from "@/pages/playground";
 
 export function App() {
   return (
-    <div className="arcade-font flex min-h-screen items-center justify-center bg-violet-950 text-white">
+    <div className="arcade-font flex min-h-screen bg-background text-white">
       <Router>
         <Routes>
-          <Route path="/" element={<Intro />} />
+          <Route path="/" element={<CharacterSelect />} />
+          <Route path="/lobby/:roomCode" element={<LobbyRoom />} />
+          <Route path="/lobby" element={<Navigate to="/" replace />} />
+          <Route path="/not-found-room" element={<NotFoundRoom />} />
           <Route path="/game" element={<Game />} />
           <Route path="/creator" element={<Creator />} />
           <Route path="/playground" element={<Playground />} />
+          <Route path="/loading-screen" element={<LoadingScreen />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>

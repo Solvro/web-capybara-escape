@@ -1,23 +1,27 @@
+import { cn } from "@/lib/utils";
+
 interface ButtonProps {
   onClick: () => void;
   disabled: boolean;
-  textColor?: string;
-  bgColor?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 export function Button({
   onClick,
   disabled,
-  textColor = "white",
-  bgColor = "green",
   children,
+  className,
 }: ButtonProps) {
   return (
     <button
-      className={`w-2/3 px-6 py-2 bg-${bgColor}-500 text-${textColor} rounded-2xl hover:bg-${bgColor}-600 text-sm ${
-        disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-      }`}
+      className={cn(
+        "px-6 py-2 bg-primary-foreground text-black rounded-sm hover:bg-secondary hover:text-gray-200 hover:shadow-black text-md shadow-md shadow-white border-2 border-white",
+        className,
+        disabled
+          ? "cursor-not-allowed opacity-25 hover:bg-primary-foreground hover:text-black hover:shadow-white hover:border-white"
+          : "cursor-pointer",
+      )}
       onClick={onClick}
       disabled={disabled}
     >

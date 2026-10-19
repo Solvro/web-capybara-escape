@@ -12,6 +12,7 @@ export interface Player {
   index: number;
   sessionId: string;
   isLocal?: boolean;
+  character?: string;
 }
 
 export interface Crate {
