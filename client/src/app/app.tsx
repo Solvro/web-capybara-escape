@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import { Creator } from "@/pages/creator";
+import { CreatorSchemes } from "@/pages/creator-schemes";
 import { Game } from "@/pages/game";
 import { Intro } from "@/pages/intro";
 import { Playground } from "@/pages/playground";
@@ -18,6 +19,7 @@ export function App() {
           <Route path="/" element={<Intro />} />
           <Route path="/game" element={<Game />} />
           <Route path="/creator" element={<Creator />} />
+          <Route path="/creator/schemes" element={<CreatorSchemes />} />
           <Route path="/playground" element={<Playground />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

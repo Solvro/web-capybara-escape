@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 interface CreatorActionButtonsProps {
   onReset?: () => void;
   onRoomSubmit: () => void;
@@ -9,6 +11,12 @@ export function CreatorActionButtons({
 }: CreatorActionButtonsProps) {
   return (
     <div className="creator-control-actions ml-auto flex flex-col gap-2 md:flex-row">
+      <Link
+        to="/creator/schemes"
+        className="flex h-8 min-w-[70px] items-center justify-center rounded-md bg-violet-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-violet-400"
+      >
+        Schemes
+      </Link>
       <button
         className="h-8 min-w-[70px] rounded-md bg-violet-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-violet-400"
         onClick={onReset}
