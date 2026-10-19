@@ -3,9 +3,14 @@ import { screenSequenceRepository } from "@/services/screen-sequences/screen-seq
 
 import type { LoadedRoom } from "./room-loader";
 
+export interface SequenceLevel {
+  name: string;
+  data: LoadedRoom;
+}
+
 export async function getSequenceLevels(
   screenSequenceSlug?: string,
-): Promise<LoadedRoom[] | null> {
+): Promise<SequenceLevel[] | null> {
   const requestedSlug = screenSequenceSlug?.trim();
   if (!requestedSlug) {
     return null;
@@ -49,7 +54,7 @@ export async function getSequenceLevels(
       return null;
     }
 
-    const levels: LoadedRoom[] = [];
+    const levels: SequenceLevel[] = [];
 
     for (const screen of levelScreens) {
       const level = await levelRepository.getBySlug(screen.levelSlug!, {
@@ -63,7 +68,7 @@ export async function getSequenceLevels(
         continue;
       }
 
-      levels.push(level.data as LoadedRoom);
+      levels.push({ name: level.name, data: level.data as LoadedRoom });
     }
 
     if (levels.length === 0) {

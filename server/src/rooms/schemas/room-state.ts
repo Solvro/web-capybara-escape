@@ -631,7 +631,7 @@ export class RoomState extends Schema {
     let currentX = laser.position.x + dx;
     let currentY = laser.position.y + dy;
 
-    let range = 0;
+    let range = laser.maxRange;
     for (let i = 0; i < laser.maxRange; i++) {
       if (
         currentX < 0 ||

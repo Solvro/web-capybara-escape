@@ -8,6 +8,7 @@ import {
 import { CharacterSelect } from "@/pages/character-select";
 import { Creator } from "@/pages/creator";
 import { Game } from "@/pages/game";
+import { LoadingScreen } from "@/pages/loading-screen";
 import { LobbyRoom } from "@/pages/lobby-room";
 import { NotFoundRoom } from "@/pages/not-found-room";
 import { Playground } from "@/pages/playground";
@@ -24,6 +25,7 @@ export function App() {
           <Route path="/game" element={<Game />} />
           <Route path="/creator" element={<Creator />} />
           <Route path="/playground" element={<Playground />} />
+          <Route path="/loading-screen" element={<LoadingScreen />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>

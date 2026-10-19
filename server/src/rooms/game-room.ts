@@ -17,7 +17,7 @@ import { SpeechBubble } from "../utils/speech-bubble";
 import { getMoveVectorFromDirection } from "../utils/vector-utils";
 import { CollisionHandler } from "./logic/collision-handler";
 import { LoadedRoom, getRoomForGame } from "./logic/room-loader";
-import { getSequenceLevels } from "./logic/sequence-loader";
+import { SequenceLevel, getSequenceLevels } from "./logic/sequence-loader";
 import { RoomState } from "./schemas/room-state";
 
 export class GameRoom extends Room<{ state: RoomState }> {
@@ -27,10 +27,14 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private roomData: any = fallbackRoom;
   private screenSequenceSlug: string | undefined;
 
-  private levels: LoadedRoom[] | null = null;
+  private levels: SequenceLevel[] | null = null;
   private currentScreenIndex = 0;
   private awaitingNextScreen = false;
   private awaitingEndDemo = false;
+  /** Sessions that still have to finish the level intro animation. */
+  private awaitingLevelReady = new Set<string>();
+  /** Next level, loaded only after every client finished its intro. */
+  private pendingLevel: LoadedRoom | null = null;
 
   async onCreate(options: any) {
     this.collisionHandler = new CollisionHandler();
@@ -42,7 +46,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.awaitingEndDemo = false;
 
     this.roomData = this.levels
-      ? this.levels[0]
+      ? this.levels[0].data
       : await getRoomForGame(options?.levelSlug);
 
     this.state.loadRoomFromJson(this.roomData);
@@ -160,6 +164,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage(ClientMessageType.Reset, (client) => {
+      if (this.awaitingLevelReady.size > 0) return;
+
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
       this.loadLevel(this.roomData);
     });
@@ -192,7 +198,24 @@ export class GameRoom extends Room<{ state: RoomState }> {
           this.levels.length
         }, requested by ${client.sessionId}`,
       );
-      this.loadLevel(this.levels[this.currentScreenIndex]);
+      // The level is loaded once every client finished its intro animation,
+      // so the new map is never visible before the transition covers the screen.
+      this.pendingLevel = this.levels[this.currentScreenIndex].data;
+      this.waitForLevelIntro();
+      this.broadcast(ServerMessageType.LevelInfo, this.getLevelInfo(true));
+    });
+
+    this.onMessage(ClientMessageType.GetLevelInfo, (client) => {
+      client.send(
+        ServerMessageType.LevelInfo,
+        this.getLevelInfo(this.awaitingLevelReady.has(client.sessionId)),
+      );
+    });
+
+    this.onMessage(ClientMessageType.LevelReady, (client) => {
+      if (this.awaitingLevelReady.delete(client.sessionId)) {
+        this.resumeIfLevelReady();
+      }
     });
 
     this.onMessage(ClientMessageType.EndDemo, (client) => {
@@ -216,12 +239,49 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage(ClientMessageType.TogglePause, (client) => {
+      if (this.awaitingLevelReady.size > 0) return;
+
       this.state.isPaused = !this.state.isPaused;
 
       this.broadcast(ServerMessageType.PauseToggled, {
         isPaused: this.state.isPaused,
       });
     });
+  }
+
+  private getLevelInfo(playIntro: boolean) {
+    return {
+      levelNumber: this.currentScreenIndex + 1,
+      totalLevels: this.levels?.length ?? 1,
+      levelName: this.levels?.[this.currentScreenIndex].name ?? "Demo",
+      playIntro,
+    };
+  }
+
+  /** Starts the level as soon as every client finished its intro animation. */
+  private resumeIfLevelReady() {
+    if (this.awaitingLevelReady.size > 0 || this.state.phase !== "playing") {
+      return;
+    }
+
+    if (this.pendingLevel !== null) {
+      const level = this.pendingLevel;
+      this.pendingLevel = null;
+      this.loadLevel(level);
+    } else if (this.state.isPaused && !this.state.isGameOver) {
+      this.state.isPaused = false;
+      this.broadcast(ServerMessageType.PauseToggled, { isPaused: false });
+    } else {
+      return;
+    }
+
+    this.broadcast(ServerMessageType.LevelStart, {});
+  }
+
+  /** Pauses the game until every client finished its level intro animation. */
+  private waitForLevelIntro() {
+    this.state.isPaused = true;
+    this.awaitingLevelReady = new Set(this.state.playerState.players.keys());
   }
 
   private loadLevel(roomData: LoadedRoom) {
@@ -307,6 +367,9 @@ export class GameRoom extends Room<{ state: RoomState }> {
       sessionId: client.sessionId,
     });
     this.state.despawnPlayer(client.sessionId);
+    if (this.awaitingLevelReady.delete(client.sessionId)) {
+      this.resumeIfLevelReady();
+    }
   }
 
   onDispose() {
@@ -366,7 +429,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (!allReady) return;
 
     this.state.phase = "playing";
-    this.state.isPaused = false;
+    this.waitForLevelIntro();
     this.updateLobbyMetadata();
 
     this.broadcast(ServerMessageType.GameStarting, {});

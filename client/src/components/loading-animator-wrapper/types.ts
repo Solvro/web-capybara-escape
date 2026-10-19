@@ -1,0 +1,22 @@
+import type { ReactNode } from "react";
+
+export type LoadingScene = "blank" | "counting" | "content";
+
+export interface TransitionState {
+  id: number;
+  ms: number;
+  to?: LoadingScene;
+  resolve: () => void;
+}
+
+export interface LoadingAnimatorApi {
+  displayTransition: (ms: number, to?: LoadingScene) => Promise<void>;
+  displayCounting: (seconds: number) => Promise<void>;
+}
+
+export interface LoadingAnimatorWrapperProps {
+  levelNumber: number;
+  levelName: string;
+  children: ReactNode;
+  initialScene?: LoadingScene;
+}

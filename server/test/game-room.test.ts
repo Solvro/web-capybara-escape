@@ -149,6 +149,15 @@ describe("GameRoom", () => {
     await readyUpBothPlayers(room, [mover, companion]);
 
     assert.strictEqual(room.state.phase, "playing");
+    assert.strictEqual(
+      room.state.isPaused,
+      true,
+      "game stays paused until every client finished the level intro",
+    );
+
+    mover.send("levelReady");
+    companion.send("levelReady");
+    await room.waitForNextPatch();
     assert.strictEqual(room.state.isPaused, false);
 
     const before = room.state.playerState.players.get(mover.sessionId);

@@ -22,6 +22,8 @@ export const ClientMessageType = {
   NextScreen: "nextScreen",
   EndDemo: "endDemo",
   SetReady: "setReady",
+  GetLevelInfo: "getLevelInfo",
+  LevelReady: "levelReady",
 } as const;
 
 export type ClientMessageType =
@@ -48,6 +50,9 @@ export const ServerMessageType = {
   DemoEnded: "demoEnded",
   LobbyState: "lobbyState",
   GameStarting: "gameStarting",
+  LevelInfo: "levelInfo",
+  /** Every client finished its intro; the level is loaded and running. */
+  LevelStart: "levelStart",
 } as const;
 
 export type ServerMessageType =
@@ -168,6 +173,17 @@ export interface MessageLevelComplete {
   message: string;
   screenIndex?: number;
   totalScreens?: number;
+}
+
+export interface MessageLevelInfo {
+  levelNumber: number;
+  totalLevels: number;
+  levelName: string;
+  /**
+   * True when the server is paused until this client plays the level intro
+   * animation and answers with `levelReady`.
+   */
+  playIntro: boolean;
 }
 
 export interface MessageDemoCompleted {

@@ -33,6 +33,7 @@ export {
   type MessagePauseToggled,
   type MessageGameOver,
   type MessageLevelComplete,
+  type MessageLevelInfo,
   type MessageDemoCompleted,
   type MessageDemoEnded,
   type MessageMove,
