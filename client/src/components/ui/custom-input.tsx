@@ -36,8 +36,8 @@ export function CustomInput({
       onChange={(event) => {
         setValue(event.target.value);
       }}
-      className={`px-4 py-2 ${bgColor} ${textColor} rounded-2xl text-center text-sm ${
-        disabled ? "cursor-not-allowed opacity-50" : ""
+      className={`px-4 py-2 ${bgColor} ${textColor} rounded-sm text-center text-md tomorrow-font ${
+        disabled ? "opacity-50 text-black" : ""
       } ${className}`}
       placeholder={placeholder}
       disabled={disabled}

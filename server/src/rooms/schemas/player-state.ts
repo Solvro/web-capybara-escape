@@ -30,18 +30,26 @@ export class PlayerState extends Schema {
     return uniqueName;
   }
 
-  createPlayer(sessionId: string, name: string = null) {
+  isCharacterTaken(character: string): boolean {
+    for (const player of this.players.values()) {
+      if (player.character === character) return true;
+    }
+    return false;
+  }
+
+  createPlayer(sessionId: string, name: string = null, character?: string) {
     const player = new Player();
     const pos = new Position();
     player.position = pos;
     player.sessionId = sessionId;
-    let index = 0;
+    let index = character === "vron" ? 1 : 0;
     while (this.usedIndices.has(index)) {
       index++;
     }
-    console.log("Assigning index:", index);
+
     this.usedIndices.add(index);
     player.index = index;
+    player.character = character ?? "";
     player.name = this.createNewName(name);
     this.players.set(sessionId, player);
     this.playerSessionIds.set(player.name, sessionId);

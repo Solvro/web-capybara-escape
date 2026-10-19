@@ -1,11 +1,30 @@
+import type { Character } from "@capybara/shared";
 import type { Room } from "@colyseus/sdk";
 import { createContext, useContext } from "react";
+
+export interface CreateRoomParams {
+  name: string;
+  character: Character;
+  code: string;
+  screenSequenceSlug?: string;
+}
+
+export interface JoinRoomParams {
+  name: string;
+  character: Character;
+  code: string;
+}
+
+export type ReconnectionStatus = "idle" | "pending" | "succeeded" | "failed";
 
 interface RoomContextType {
   room: Room | null;
   isConnected: boolean;
   joinError: boolean;
-  connect: (playerName: string, screenSequenceSlug?: string) => Promise<void>;
+  activeRoomCode: string | null;
+  reconnectionStatus: ReconnectionStatus;
+  createRoom: (params: CreateRoomParams) => Promise<void>;
+  joinRoomByCode: (params: JoinRoomParams) => Promise<void>;
   disconnect: () => Promise<void>;
 }
 
@@ -13,7 +32,12 @@ export const RoomContext = createContext<RoomContextType>({
   room: null,
   isConnected: false,
   joinError: false,
-  connect: async () => {
+  activeRoomCode: null,
+  reconnectionStatus: "idle",
+  createRoom: async () => {
+    /* placeholder */
+  },
+  joinRoomByCode: async () => {
     /* placeholder */
   },
   disconnect: async () => {

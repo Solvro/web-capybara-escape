@@ -1,3 +1,5 @@
+import type { IntroCharacter } from "@/types/lobby/intro-character";
+
 export const SIZE_MULTIPLIER = 5;
 
 export const MAP_SCALER = 2;
@@ -62,3 +64,31 @@ export const layerNameToIndex: Record<string, number> = {
   [LAYER_NAMES.ENTITIES]: 3,
   [LAYER_NAMES.WALL_DECOYS]: 4,
 };
+
+export const IMAGE_LOBBY_PATHS = {
+  MONITOR: `/illustrations/intro-monitor.png`,
+  NOT_FOUND_CAPYBARA: `/illustrations/notfound-capybara.png`,
+} as const;
+
+export const IMAGE_ALERT_PATHS = {
+  FAILED_OR_LOST: `/illustrations/notfound-capybara.png`,
+  LEVEL_COMPLETE: `/illustrations/alert-sol.png`,
+} as const;
+
+export const INTRO_CHARACTERS: Record<string, IntroCharacter> = {
+  SOL: {
+    imagePath: `/illustrations/intro-sol.png`,
+    imageHighlightPath: `/illustrations/intro-sol-highlighted.png`,
+    name: "Sol",
+    description: "Blask nieskazitalnego słońca",
+  },
+  VRON: {
+    imagePath: `/illustrations/intro-vron.png`,
+    imageHighlightPath: `/illustrations/intro-vron-highlighted.png`,
+    name: "Vron",
+    description: "Ciemność za którą kryje się tajemnica",
+  },
+} as const;
+
+export const MONITOR_LOADING_SCREEN_URL = `${import.meta.env.BASE_URL}illustrations/game-monitor-loading.png`;
+export const MONITOR_SCREEN_URL = `${import.meta.env.BASE_URL}illustrations/game-monitor.png`;

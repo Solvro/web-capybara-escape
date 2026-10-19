@@ -7,4 +7,6 @@ export class Player extends Schema {
   @type("number") index: number;
   @type("string") name: string;
   @type(Position) position: Position;
+  @type("string") character: string = "";
+  @type("boolean") ready: boolean = false;
 }
