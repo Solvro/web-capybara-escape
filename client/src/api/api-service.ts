@@ -1,4 +1,4 @@
-import type { CreateLevelInput } from "@capybara/shared";
+import type { CreateLevelInput, LevelSummary } from "@capybara/shared";
 
 import api from "./api";
 
@@ -8,6 +8,21 @@ const ApiService = {
   headerWithAuth: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${import.meta.env.VITE_API_TOKEN}`,
+  },
+
+  async getLevels(): Promise<LevelSummary[]> {
+    const response = await api.get<{ levels: LevelSummary[] }>(
+      this.URL + "/api/levels",
+      { headers: this.headerWithAuth },
+    );
+    return response.data.levels;
+  },
+  async getLevel(slug: string) {
+    const response = await api.get(
+      this.URL + `/api/levels/${encodeURIComponent(slug)}`,
+      { headers: this.headerWithAuth },
+    );
+    return response.data.level;
   },
 
   async sendRoom(createLevelInput: CreateLevelInput) {

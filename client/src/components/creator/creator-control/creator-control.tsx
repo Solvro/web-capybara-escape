@@ -11,6 +11,7 @@ interface CreatorControlProps {
   onReset?: () => void;
   setDirection: (direction: Direction) => void;
   onRoomSubmit: () => void;
+  onRoomImport: () => void;
   exportError?: string | null;
 }
 
@@ -24,6 +25,7 @@ export function CreatorControl({
   setDirection,
   onReset,
   onRoomSubmit,
+  onRoomImport,
   exportError,
 }: CreatorControlProps) {
   const [rows, cols] = dims;
@@ -64,7 +66,11 @@ export function CreatorControl({
       {exportError && (
         <p className="max-w-[20dvw] text-sm text-red-300">{exportError}</p>
       )}
-      <CreatorActionButtons onReset={onReset} onRoomSubmit={onRoomSubmit} />
+      <CreatorActionButtons
+        onReset={onReset}
+        onRoomSubmit={onRoomSubmit}
+        onRoomImport={onRoomImport}
+      />
     </div>
   );
 }

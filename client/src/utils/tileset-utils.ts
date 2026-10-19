@@ -10,7 +10,11 @@ import {
   TILESET_URL,
   layerNameToIndex,
 } from "../constants/global";
-import { ALL_ITEMS_MAP, LAYER_ITEM_KEYS } from "../constants/layer-items";
+import {
+  ALL_ITEMS_MAP,
+  LAYER_ITEMS,
+  LAYER_ITEM_KEYS,
+} from "../constants/layer-items";
 
 export function countEntityOccurrences(
   tileData: (string | null)[][],
@@ -519,3 +523,98 @@ export const formatLevel = (
 
   return formattedLevel;
 };
+export function parseLevel({
+  width,
+  height,
+  layout,
+  mechanics,
+  entities,
+}: FormattedLevelType) {
+  const K = LAYER_ITEM_KEYS;
+  const [ENT, FD, WD] = [
+    LAYER_NAMES.ENTITIES,
+    LAYER_NAMES.FLOOR_DECOYS,
+    LAYER_NAMES.WALL_DECOYS,
+  ].map((n) => layerNameToIndex[n]);
+  const angle = Object.fromEntries(
+    Object.entries(ANGLE_TO_TEXT).map(([a, t]) => [t, a]),
+  );
+  const curve: Record<string, string> = {
+    "down-right": "0",
+    "down-left": "90",
+    "up-left": "180",
+    "up-right": "270",
+  };
+  const col = (c: string) => Math.max(0, COLOR_LIST.indexOf(c));
+  const isWall = (k: string) =>
+    Object.entries(LAYER_ITEMS).some(
+      ([n, items]) =>
+        layerNameToIndex[n as keyof typeof layerNameToIndex] === 1 &&
+        items?.some((i) => i.key === k),
+    );
+
+  const tiles: Tile[] = layout
+    .flat()
+    .map((k) =>
+      isWall(k)
+        ? [floorTile.key, k, null, null, null]
+        : [k || floorTile.key, null, null, null, null],
+    );
+  const set = (p: { x: number; y: number }, layer: number, v: string) => {
+    const t = tiles[p.y * width + p.x];
+    if (t) t[layer] = v;
+  };
+  const configs: Record<number, DelayConfig> = {};
+
+  if (entities.capybara.x || entities.capybara.y)
+    set(entities.capybara, ENT, K.CAPYBARA_START);
+  entities.players.forEach((p, i) =>
+    set(p, ENT, i ? K.VRON_START : K.SOL_START),
+  );
+  entities.enemies.forEach((p) => set(p, ENT, K.ENEMY));
+  entities.crates.forEach((p) => set(p, ENT, K.CRATE));
+  entities.steelBoxes.forEach((p) => set(p, ENT, K.STEEL_BOX));
+  entities.vents.forEach((p) =>
+    set(p, FD, p.open ? K.VENT_OPEN : K.VENT_CLOSED),
+  );
+
+  for (const m of mechanics as any[]) {
+    const i = m.y * width + m.x;
+    if (m.type === "laser") {
+      set(m, ENT, `${K.LASER}-${col(m.color)}-${m.direction}`);
+      configs[i] = {
+        activeDuration: m.activeDuration,
+        inactiveDuration: m.inactiveDuration,
+        delay: m.delay,
+      } as DelayConfig;
+    } else if (m.type === "cable") {
+      set(
+        m,
+        FD,
+        `${m.startDamaging ? K.CABLE_ACTIVE : K.CABLE_INACTIVE}-${angle[m.direction]}`,
+      );
+      configs[i] = {
+        damageDuration: m.damageMs,
+        safeDuration: m.safeMs,
+        delay: m.delay,
+      } as DelayConfig;
+    } else if (m.type === "door") set(m, WD, `${K.DOOR}-${col(m.color)}`);
+    else if (m.type === "button") set(m, FD, `${K.BUTTON}-${col(m.color)}`);
+    else if (m.type === "wire")
+      set(
+        m,
+        FD,
+        m.direction === "socket"
+          ? K.SOCKET
+          : m.direction in curve
+            ? `${K.WIRE_CURVE}-${curve[m.direction]}`
+            : `${K.WIRE}-${angle[m.direction]}`,
+      );
+  }
+
+  return {
+    tiles,
+    dims: [height, width] as [number, number],
+    entityConfigs: configs,
+  };
+}
