@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 
 import api from "../../api/api";
 import { LORE_SPRITES } from "../../constants/lore-sprites";
+import { Button } from "../ui/button";
 import { LoreDialog } from "./lore-dialog";
 
 const yamlFiles = import.meta.glob("../../content/lore/*.yaml", {
@@ -92,8 +93,8 @@ export function LoreDemo() {
   };
 
   return (
-    <section className="my-12 w-full max-w-4xl px-4">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+    <section className="my-12 flex w-full flex-col items-center">
+      <div className="mb-4 flex w-full max-w-4xl flex-col items-center gap-4 text-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-white">
             Podgląd dialogu YAML
@@ -103,13 +104,13 @@ export function LoreDemo() {
             własną pozę.
           </p>
         </div>
-        <button
-          type="button"
-          className="cursor-pointer rounded border border-stone-600 bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-800"
+        <Button
           onClick={handleReset}
+          disabled={false}
+          className="tomorrow-font font-bold text-sm"
         >
           Od początku
-        </button>
+        </Button>
       </div>
 
       {apiUnavailable && (
@@ -126,7 +127,10 @@ export function LoreDemo() {
         onAnswer={handleAnswer}
       />
 
-      <p className="mt-3 min-h-6 text-sm text-stone-300" role="status">
+      <p
+        className="mt-3 min-h-6 text-center text-sm text-stone-300"
+        role="status"
+      >
         {lastAction ?? ""}
       </p>
     </section>

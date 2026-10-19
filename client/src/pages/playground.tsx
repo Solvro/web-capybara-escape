@@ -60,7 +60,7 @@ export function Playground() {
   );
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex w-full flex-col items-center text-center">
       <h1>Welcome in playground</h1>
       <h2>It's place where you can test dev features</h2>
 
