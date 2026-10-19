@@ -16,7 +16,7 @@ export function LoadingAnimatorWrapper({
   children,
   initialScene = "content",
 }: LoadingAnimatorWrapperProps) {
-  const { scene, transition, count, api, handleCovered, handleDone } =
+  const { scene, transition, count, waiting, api, handleCovered, handleDone } =
     useLoadingAnimatorState(initialScene);
 
   return (
@@ -49,6 +49,7 @@ export function LoadingAnimatorWrapper({
             count={count}
             levelNumber={levelNumber}
             levelName={levelName}
+            waiting={waiting}
           />
         )}
 

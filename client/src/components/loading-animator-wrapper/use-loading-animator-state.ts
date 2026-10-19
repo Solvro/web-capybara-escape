@@ -14,6 +14,7 @@ export function useLoadingAnimatorState(initialScene: LoadingScene) {
   const [scene, setScene] = useState(initialScene);
   const [transition, setTransition] = useState<TransitionState | null>(null);
   const [count, setCount] = useState(DEFAULT_COUNT);
+  const [waiting, setWaiting] = useState(false);
   const sceneRef = useRef(initialScene);
   const transitionRef = useRef<TransitionState | null>(null);
   const transitionId = useRef(0);
@@ -68,9 +69,17 @@ export function useLoadingAnimatorState(initialScene: LoadingScene) {
   );
 
   const api = useMemo<LoadingAnimatorApi>(
-    () => ({ displayTransition, displayCounting }),
+    () => ({ displayTransition, displayCounting, setWaiting }),
     [displayTransition, displayCounting],
   );
 
-  return { scene, transition, count, api, handleCovered, handleDone };
+  return {
+    scene,
+    transition,
+    count,
+    waiting,
+    api,
+    handleCovered,
+    handleDone,
+  };
 }

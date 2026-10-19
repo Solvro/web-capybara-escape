@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AlertModal } from "@/components/alert-modal";
+import { GameLoadingScreen } from "@/components/game/game-loading-screen";
 import { LevelIntro } from "@/components/game/level-intro";
 import { LoadingAnimatorWrapper } from "@/components/loading-animator-wrapper";
 import { PauseModal } from "@/components/pause-modal";
@@ -143,7 +144,11 @@ export function Game() {
   }
 
   if (room === null || !isConnected || levelInfo === null) {
-    return <div>Łączenie z serwerem gry...</div>;
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <GameLoadingScreen />
+      </div>
+    );
   }
 
   return (
@@ -178,7 +183,7 @@ export function Game() {
           title="Capybara uratowana"
           description="Gramy dalej? Czy lecimy do następnego poziomu?!"
           imageUrl={IMAGE_ALERT_PATHS.LEVEL_COMPLETE}
-          imageHeight={68}
+          imageHeight={82}
           actionText="Gramy dalej"
           onAction={handleRestart}
         />

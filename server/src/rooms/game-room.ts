@@ -2,6 +2,7 @@ import {
   CHARACTERS,
   Character,
   ClientMessageType,
+  LEVEL_INTRO_COUNTDOWN_MS,
   MessageMove,
   MessageSetReady,
   ServerMessageType,
@@ -31,10 +32,9 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private currentScreenIndex = 0;
   private awaitingNextScreen = false;
   private awaitingEndDemo = false;
-  /** Sessions that still have to finish the level intro animation. */
   private awaitingLevelReady = new Set<string>();
-  /** Next level, loaded only after every client finished its intro. */
   private pendingLevel: LoadedRoom | null = null;
+  private levelCountdownPending = false;
 
   async onCreate(options: any) {
     this.collisionHandler = new CollisionHandler();
@@ -164,7 +164,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage(ClientMessageType.Reset, (client) => {
-      if (this.awaitingLevelReady.size > 0) return;
+      if (this.isLevelIntroActive()) return;
 
       console.log(`[RESET] Room reset requested by ${client.sessionId}`);
       this.loadLevel(this.roomData);
@@ -214,7 +214,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.onMessage(ClientMessageType.LevelReady, (client) => {
       if (this.awaitingLevelReady.delete(client.sessionId)) {
-        this.resumeIfLevelReady();
+        this.startLevelCountdown();
       }
     });
 
@@ -239,7 +239,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage(ClientMessageType.TogglePause, (client) => {
-      if (this.awaitingLevelReady.size > 0) return;
+      if (this.isLevelIntroActive()) return;
 
       this.state.isPaused = !this.state.isPaused;
 
@@ -258,11 +258,26 @@ export class GameRoom extends Room<{ state: RoomState }> {
     };
   }
 
-  /** Starts the level as soon as every client finished its intro animation. */
-  private resumeIfLevelReady() {
+  private isLevelIntroActive() {
+    return this.awaitingLevelReady.size > 0 || this.levelCountdownPending;
+  }
+
+  private startLevelCountdown() {
     if (this.awaitingLevelReady.size > 0 || this.state.phase !== "playing") {
       return;
     }
+
+    this.levelCountdownPending = true;
+    this.broadcast(ServerMessageType.CountdownStart, {});
+
+    this.clock.setTimeout(() => {
+      this.levelCountdownPending = false;
+      this.resumeIfLevelReady();
+    }, LEVEL_INTRO_COUNTDOWN_MS);
+  }
+
+  private resumeIfLevelReady() {
+    if (this.state.phase !== "playing") return;
 
     if (this.pendingLevel !== null) {
       const level = this.pendingLevel;
@@ -281,6 +296,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   /** Pauses the game until every client finished its level intro animation. */
   private waitForLevelIntro() {
     this.state.isPaused = true;
+    this.levelCountdownPending = false;
     this.awaitingLevelReady = new Set(this.state.playerState.players.keys());
   }
 
@@ -341,6 +357,15 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   async onLeave(client: Client, code?: number) {
+    if (code !== CloseCode.CONSENTED) {
+      try {
+        await this.allowReconnection(client, 20);
+        return;
+      } catch {
+        // reconnection failed or timed out - clean up below
+      }
+    }
+
     if (this.state.phase === "lobby") {
       if (this.state.playerState.players.has(client.sessionId)) {
         this.state.despawnPlayer(client.sessionId);
@@ -353,22 +378,12 @@ export class GameRoom extends Room<{ state: RoomState }> {
       return;
     }
 
-    if (code !== CloseCode.CONSENTED) {
-      try {
-        // allow disconnected client to reconnect into this room until 20 seconds
-        await this.allowReconnection(client, 20);
-        return;
-      } catch {
-        // reconnection failed or timed out — clean up below
-      }
-    }
-
     this.broadcast(ServerMessageType.OnRemovePlayer, {
       sessionId: client.sessionId,
     });
     this.state.despawnPlayer(client.sessionId);
     if (this.awaitingLevelReady.delete(client.sessionId)) {
-      this.resumeIfLevelReady();
+      this.startLevelCountdown();
     }
   }
 

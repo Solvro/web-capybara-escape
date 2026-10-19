@@ -1,15 +1,15 @@
 import { ClientMessageType } from "@capybara/shared";
 import type { Room } from "@colyseus/sdk";
-import { useState } from "react";
 
-export function useReadyUp(room: Room | null, canReady: boolean) {
-  const [hasReadied, setHasReadied] = useState(false);
-
+export function useReadyUp(
+  room: Room | null,
+  canReady: boolean,
+  hasReadied: boolean,
+) {
   const handlePlay = () => {
     if (!room || !canReady || hasReadied) return;
-    setHasReadied(true);
     room.send(ClientMessageType.SetReady, { ready: true });
   };
 
-  return { hasReadied, handlePlay };
+  return { handlePlay };
 }

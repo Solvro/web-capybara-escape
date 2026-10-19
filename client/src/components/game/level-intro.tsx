@@ -1,12 +1,16 @@
-﻿import { ClientMessageType } from "@capybara/shared";
+﻿import {
+  ClientMessageType,
+  LEVEL_INTRO_COUNTDOWN_MS,
+  ServerMessageType,
+} from "@capybara/shared";
 import type { Room } from "@colyseus/sdk";
 import { useEffect } from "react";
 
 import { useLoadingAnimator } from "@/components/loading-animator-wrapper";
-import { listenForLevelStart } from "@/utils/wait-for-level-start";
+import { waitForServerMessage } from "@/utils/wait-for-level-start";
 
 const INTRO_TRANSITION_MS = 700;
-const INTRO_COUNT_SECONDS = 3;
+const INTRO_COUNT_SECONDS = LEVEL_INTRO_COUNTDOWN_MS / 1000;
 
 interface LevelIntroProps {
   room: Room;
@@ -15,7 +19,8 @@ interface LevelIntroProps {
 }
 
 export function LevelIntro({ room, introId, onActiveChange }: LevelIntroProps) {
-  const { displayTransition, displayCounting } = useLoadingAnimator();
+  const { displayTransition, displayCounting, setWaiting } =
+    useLoadingAnimator();
 
   useEffect(() => {
     if (introId === 0) return;
@@ -24,14 +29,29 @@ export function LevelIntro({ room, introId, onActiveChange }: LevelIntroProps) {
 
     const run = async () => {
       onActiveChange(true);
+      setWaiting(true);
 
       await displayTransition(INTRO_TRANSITION_MS, "counting");
       if (cancelled) return;
+
+      const countdown = waitForServerMessage(
+        room,
+        ServerMessageType.CountdownStart,
+      );
+      room.send(ClientMessageType.LevelReady);
+
+      await countdown;
+      if (cancelled) return;
+
+      setWaiting(false);
+      const levelStart = waitForServerMessage(
+        room,
+        ServerMessageType.LevelStart,
+      );
       await displayCounting(INTRO_COUNT_SECONDS);
       if (cancelled) return;
-      const started = listenForLevelStart(room);
-      room.send(ClientMessageType.LevelReady);
-      await started;
+
+      await levelStart;
       if (cancelled) return;
 
       await displayTransition(INTRO_TRANSITION_MS, "content");
@@ -43,7 +63,14 @@ export function LevelIntro({ room, introId, onActiveChange }: LevelIntroProps) {
     return () => {
       cancelled = true;
     };
-  }, [introId, room, displayTransition, displayCounting, onActiveChange]);
+  }, [
+    introId,
+    room,
+    displayTransition,
+    displayCounting,
+    setWaiting,
+    onActiveChange,
+  ]);
 
   return null;
 }

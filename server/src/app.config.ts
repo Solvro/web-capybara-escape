@@ -34,7 +34,7 @@ export default config({
     /**
      * Define your room handlers:
      */
-    gameServer.define("game_room", GameRoom).filterBy(["code"]);
+    gameServer.define("game_room", GameRoom);
   },
 
   initializeExpress: (app) => {

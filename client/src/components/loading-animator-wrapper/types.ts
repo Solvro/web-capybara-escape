@@ -12,6 +12,7 @@ export interface TransitionState {
 export interface LoadingAnimatorApi {
   displayTransition: (ms: number, to?: LoadingScene) => Promise<void>;
   displayCounting: (seconds: number) => Promise<void>;
+  setWaiting: (waiting: boolean) => void;
 }
 
 export interface LoadingAnimatorWrapperProps {

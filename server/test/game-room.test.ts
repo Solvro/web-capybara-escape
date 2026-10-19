@@ -1,3 +1,4 @@
+import { LEVEL_INTRO_COUNTDOWN_MS } from "@capybara/shared";
 import { ColyseusTestServer, boot } from "@colyseus/testing";
 import assert from "assert";
 import { after, before, beforeEach, describe, it } from "mocha";
@@ -157,6 +158,16 @@ describe("GameRoom", () => {
 
     mover.send("levelReady");
     companion.send("levelReady");
+
+    await companion.waitForMessage("countdownStart");
+    assert.strictEqual(
+      room.state.isPaused,
+      true,
+      "game stays paused during the level intro countdown",
+    );
+
+    room.clock.currentTime -= LEVEL_INTRO_COUNTDOWN_MS;
+    room.clock.tick();
     await room.waitForNextPatch();
     assert.strictEqual(room.state.isPaused, false);
 

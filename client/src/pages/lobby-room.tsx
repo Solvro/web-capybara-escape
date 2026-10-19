@@ -22,9 +22,17 @@ export function LobbyRoom() {
 
   const guardStatus = useLobbyGuard(normalizedRoomCode, sequence);
   const { solPlayer, vronPlayer, bothPresent } = useLobbySync(room);
-  const { hasReadied, handlePlay } = useReadyUp(room, bothPresent);
 
   const mySessionId = room?.sessionId;
+  const myPlayer =
+    solPlayer?.sessionId === mySessionId
+      ? solPlayer
+      : vronPlayer?.sessionId === mySessionId
+        ? vronPlayer
+        : null;
+  const hasReadied = myPlayer?.ready ?? false;
+  const { handlePlay } = useReadyUp(room, bothPresent, hasReadied);
+
   const roomCodeLink = `${window.location.origin}/?code=${normalizedRoomCode}`;
 
   if (guardStatus === "not-found") {

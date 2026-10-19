@@ -7,12 +7,14 @@ interface CountingLayerProps {
   count: number;
   levelNumber: number;
   levelName: string;
+  waiting?: boolean;
 }
 
 export function CountingLayer({
   count,
   levelNumber,
   levelName,
+  waiting = false,
 }: CountingLayerProps) {
   return (
     <div className="absolute inset-0">
@@ -30,12 +32,22 @@ export function CountingLayer({
         <div className="crt-roll-bar absolute inset-x-0" />
       </div>
 
-      <p
-        className="crt-text absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-white"
-        style={{ fontSize: "12cqw", lineHeight: 1 }}
-      >
-        {count}
-      </p>
+      {waiting ? (
+        <p
+          className="crt-text absolute left-1/2 top-1/2 w-full -translate-x-1/2 -translate-y-1/2 px-4 text-center font-bold text-white"
+          style={{ fontSize: "4cqw", lineHeight: 1.2 }}
+        >
+          Oczekiwanie na drugiego gracza
+          <AnimatedDots />
+        </p>
+      ) : (
+        <p
+          className="crt-text absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-white"
+          style={{ fontSize: "12cqw", lineHeight: 1 }}
+        >
+          {count}
+        </p>
+      )}
       <p
         className="crt-text absolute font-bold text-gray-300"
         style={{

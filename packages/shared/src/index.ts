@@ -71,3 +71,5 @@ export {
   getMoveVectorFromDirection,
   getDirectionFromMoveVector,
 } from "./utils/vector.js";
+
+export { LEVEL_INTRO_COUNTDOWN_MS } from "./constants.js";

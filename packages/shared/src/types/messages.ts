@@ -51,7 +51,7 @@ export const ServerMessageType = {
   LobbyState: "lobbyState",
   GameStarting: "gameStarting",
   LevelInfo: "levelInfo",
-  /** Every client finished its intro; the level is loaded and running. */
+  CountdownStart: "countdownStart",
   LevelStart: "levelStart",
 } as const;
 

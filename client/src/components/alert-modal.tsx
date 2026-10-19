@@ -72,10 +72,12 @@ export function AlertModal({
           <img
             src={imageUrl}
             alt={title}
-            className={`w-${imageWidth} h-${imageHeight}`}
+            style={{ width: imageWidth * 4, height: imageHeight * 4 }}
           />
         )}
-        <div className="tomorrow-font text-md text-white">{description}</div>
+        <div className="tomorrow-font text-md text-white text-center">
+          {description}
+        </div>
         {onClose && (
           <Button
             onClick={handleClose}
