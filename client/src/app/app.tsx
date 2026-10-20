@@ -7,6 +7,7 @@ import {
 
 import { CharacterSelect } from "@/pages/character-select";
 import { Creator } from "@/pages/creator";
+import { CreatorSchemes } from "@/pages/creator-schemes";
 import { Game } from "@/pages/game";
 import { LoadingScreen } from "@/pages/loading-screen";
 import { LobbyRoom } from "@/pages/lobby-room";
@@ -24,6 +25,7 @@ export function App() {
           <Route path="/not-found-room" element={<NotFoundRoom />} />
           <Route path="/game" element={<Game />} />
           <Route path="/creator" element={<Creator />} />
+          <Route path="/creator/schemes" element={<CreatorSchemes />} />
           <Route path="/playground" element={<Playground />} />
           <Route path="/loading-screen" element={<LoadingScreen />} />
           <Route path="*" element={<Navigate to="/" />} />

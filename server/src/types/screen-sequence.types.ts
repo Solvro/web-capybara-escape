@@ -1,3 +1,5 @@
+import type { ScreenType } from "@capybara/shared";
+
 import { LevelDocument } from "./level.types";
 import { QuestionDocument } from "./question.types";
 
@@ -13,7 +15,7 @@ export type ScreenSequence = {
 export type ScreenDocument = {
   id: string;
   sequence: number;
-  type: "level" | "question";
+  type: ScreenType;
   levelSlug?: string;
   questionId?: string;
 };
@@ -23,21 +25,8 @@ export type ScreenDocumentDetailed = ScreenDocument & {
   question?: QuestionDocument;
 };
 
-export type ScreenInput = {
-  sequence: number;
-  type: "level" | "question";
-  levelSlug?: string;
-  questionId?: string;
-};
-
-export type CreateScreenSequenceInput = {
-  slug: string;
-  description?: string;
-  screens: ScreenInput[];
-};
-
-export type UpdateScreenSequenceInput = {
-  slug?: string;
-  description?: string;
-  screens?: ScreenInput[];
-};
+export type {
+  ScreenInput,
+  CreateScreenSequenceInput,
+  UpdateScreenSequenceInput,
+} from "@capybara/shared";
