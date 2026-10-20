@@ -11,7 +11,6 @@ import api from "../api/api-service";
 import { CreatorSchemeDeleteModal } from "../components/creator/creator-schemes/creator-scheme-delete-modal";
 import { CreatorSchemeFormModal } from "../components/creator/creator-schemes/creator-scheme-form-modal";
 import { CreatorSchemesList } from "../components/creator/creator-schemes/creator-schemes-list";
-import { ErrorContainer } from "../components/ui/error-container";
 
 function getErrorMessage(error: unknown) {
   if (isAxiosError<{ error?: string }>(error)) {
@@ -134,7 +133,7 @@ export function CreatorSchemes() {
       {isLoading ? (
         <p className="text-sm text-violet-200">Loading...</p>
       ) : loadError !== null ? (
-        <ErrorContainer errorMessage={loadError} />
+        <p className="text-xs text-red-400">{loadError}</p>
       ) : (
         <CreatorSchemesList
           schemes={schemes}
