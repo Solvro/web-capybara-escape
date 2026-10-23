@@ -14,6 +14,7 @@ export function LoadingAnimatorWrapper({
   levelNumber,
   levelName,
   children,
+  question,
   initialScene = "content",
 }: LoadingAnimatorWrapperProps) {
   const { scene, transition, count, waiting, api, handleCovered, handleDone } =
@@ -43,6 +44,10 @@ export function LoadingAnimatorWrapper({
         >
           {children}
         </div>
+
+        {scene === "question" && (
+          <div className="absolute inset-0">{question}</div>
+        )}
 
         {scene === "counting" && (
           <CountingLayer

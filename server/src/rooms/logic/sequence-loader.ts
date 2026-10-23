@@ -1,16 +1,22 @@
 import { levelRepository } from "@/services/levels/level.repository";
+import { questionRepository } from "@/services/questions/question.repository";
 import { screenSequenceRepository } from "@/services/screen-sequences/screen-sequences.repository";
 
 import type { LoadedRoom } from "./room-loader";
 
-export interface SequenceLevel {
-  name: string;
-  data: LoadedRoom;
+export type SequenceScreen =
+  | { type: "level"; name: string; data: LoadedRoom }
+  | { type: "question"; questionId: string };
+
+export type SequenceLevel = Extract<SequenceScreen, { type: "level" }>;
+
+export function isLevelScreen(screen: SequenceScreen): screen is SequenceLevel {
+  return screen.type === "level";
 }
 
-export async function getSequenceLevels(
+export async function getSequenceScreens(
   screenSequenceSlug?: string,
-): Promise<SequenceLevel[] | null> {
+): Promise<SequenceScreen[] | null> {
   const requestedSlug = screenSequenceSlug?.trim();
   if (!requestedSlug) {
     return null;
@@ -29,37 +35,30 @@ export async function getSequenceLevels(
       (a, b) => a.sequence - b.sequence,
     );
 
-    const questionScreens = sortedScreens.filter(
-      (screen) => screen.type === "question",
-    );
-    if (questionScreens.length > 0) {
-      console.warn(
-        `[SequenceLoader] Screen sequence "${requestedSlug}" contains question screens (sequences: ${questionScreens
-          .map((s) => s.sequence)
-          .join(
-            ", ",
-          )}). Level-only gameplay path does not support questions yet. Falling back to single-level mode.`,
-      );
-      return null;
-    }
+    const screens: SequenceScreen[] = [];
 
-    const levelScreens = sortedScreens.filter(
-      (screen) => screen.type === "level" && screen.levelSlug,
-    );
+    for (const screen of sortedScreens) {
+      if (screen.type === "question") {
+        const question = screen.questionId
+          ? await questionRepository.getById(screen.questionId)
+          : null;
 
-    if (levelScreens.length === 0) {
-      console.warn(
-        `[SequenceLoader] Screen sequence "${requestedSlug}" has no level screens. Falling back to single-level mode.`,
-      );
-      return null;
-    }
+        if (!question) {
+          console.warn(
+            `[SequenceLoader] Question "${screen.questionId}" (sequence #${screen.sequence}) not found. Skipping it.`,
+          );
+          continue;
+        }
 
-    const levels: SequenceLevel[] = [];
+        screens.push({ type: "question", questionId: question.id });
+        continue;
+      }
 
-    for (const screen of levelScreens) {
-      const level = await levelRepository.getBySlug(screen.levelSlug!, {
-        publishedOnly: true,
-      });
+      const level = screen.levelSlug
+        ? await levelRepository.getBySlug(screen.levelSlug, {
+            publishedOnly: true,
+          })
+        : null;
 
       if (!level?.data) {
         console.warn(
@@ -68,17 +67,21 @@ export async function getSequenceLevels(
         continue;
       }
 
-      levels.push({ name: level.name, data: level.data as LoadedRoom });
+      screens.push({
+        type: "level",
+        name: level.name,
+        data: level.data as LoadedRoom,
+      });
     }
 
-    if (levels.length === 0) {
+    if (!screens.some(isLevelScreen)) {
       console.warn(
         `[SequenceLoader] Screen sequence "${requestedSlug}" has no loadable published levels. Falling back to single-level mode.`,
       );
       return null;
     }
 
-    return levels;
+    return screens;
   } catch (error) {
     console.warn(
       `[SequenceLoader] Failed to load screen sequence "${requestedSlug}" from MongoDB. Falling back to single-level mode.`,

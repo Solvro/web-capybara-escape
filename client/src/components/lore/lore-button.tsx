@@ -10,6 +10,7 @@ interface LoreButtonProps {
   isRevealed: boolean;
   disabled: boolean;
   onClick: () => void;
+  className?: string;
 }
 
 export function LoreButton({
@@ -17,14 +18,16 @@ export function LoreButton({
   isRevealed,
   disabled,
   onClick,
+  className,
 }: LoreButtonProps) {
   return (
     <button
       type="button"
       className={cn(
-        "tomorrow-font relative flex aspect-3/1 basis-2/5 flex-1 items-center justify-center overflow-hidden rounded-sm border-4 border-stone-100 bg-black px-2 text-center leading-snug! text-white transition-colors enabled:cursor-pointer enabled:hover:border-yellow-400 enabled:hover:text-yellow-400 focus-visible:outline-2 focus-visible:outline-yellow-400 disabled:cursor-default",
+        "tomorrow-font relative flex aspect-3/1 w-full items-center justify-center overflow-hidden rounded-sm border-4 border-stone-100 bg-black px-2 text-center leading-snug! text-white transition-colors enabled:cursor-pointer enabled:hover:border-yellow-400 enabled:hover:text-yellow-400 focus-visible:outline-2 focus-visible:outline-yellow-400 disabled:cursor-default",
         disabled && isRevealed && "opacity-50",
         LORE_TEXT_SIZE,
+        className,
       )}
       aria-label={stripLoreFormatting(text)}
       disabled={disabled || !isRevealed}

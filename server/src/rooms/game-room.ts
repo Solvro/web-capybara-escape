@@ -18,7 +18,11 @@ import { SpeechBubble } from "../utils/speech-bubble";
 import { getMoveVectorFromDirection } from "../utils/vector-utils";
 import { CollisionHandler } from "./logic/collision-handler";
 import { LoadedRoom, getRoomForGame } from "./logic/room-loader";
-import { SequenceLevel, getSequenceLevels } from "./logic/sequence-loader";
+import {
+  SequenceScreen,
+  getSequenceScreens,
+  isLevelScreen,
+} from "./logic/sequence-loader";
 import { RoomState } from "./schemas/room-state";
 
 export class GameRoom extends Room<{ state: RoomState }> {
@@ -28,10 +32,11 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private roomData: any = fallbackRoom;
   private screenSequenceSlug: string | undefined;
 
-  private levels: SequenceLevel[] | null = null;
+  private screens: SequenceScreen[] | null = null;
   private currentScreenIndex = 0;
   private awaitingNextScreen = false;
   private awaitingEndDemo = false;
+  private awaitingQuestion = new Set<string>();
   private awaitingLevelReady = new Set<string>();
   private pendingLevel: LoadedRoom | null = null;
   private levelCountdownPending = false;
@@ -40,13 +45,13 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.collisionHandler = new CollisionHandler();
 
     this.screenSequenceSlug = options?.screenSequenceSlug;
-    this.levels = await getSequenceLevels(this.screenSequenceSlug);
+    this.screens = await getSequenceScreens(this.screenSequenceSlug);
     this.currentScreenIndex = 0;
     this.awaitingNextScreen = false;
     this.awaitingEndDemo = false;
 
-    this.roomData = this.levels
-      ? this.levels[0].data
+    this.roomData = this.screens
+      ? this.screens.find(isLevelScreen).data
       : await getRoomForGame(options?.levelSlug);
 
     this.state.loadRoomFromJson(this.roomData);
@@ -171,7 +176,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
 
     this.onMessage(ClientMessageType.NextScreen, (client) => {
-      if (!this.levels) {
+      if (!this.screens) {
         console.log(
           `[NEXT_SCREEN] No sequence configured, resetting level (requested by ${client.sessionId})`,
         );
@@ -186,7 +191,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
         return;
       }
 
-      if (this.currentScreenIndex >= this.levels.length - 1) {
+      if (this.currentScreenIndex >= this.screens.length - 1) {
         this.awaitingNextScreen = false;
         return;
       }
@@ -194,22 +199,25 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.awaitingNextScreen = false;
       this.currentScreenIndex += 1;
       console.log(
-        `[NEXT_SCREEN] Advancing to level ${this.currentScreenIndex + 1}/${
-          this.levels.length
+        `[NEXT_SCREEN] Advancing to screen ${this.currentScreenIndex + 1}/${
+          this.screens.length
         }, requested by ${client.sessionId}`,
       );
-      // The level is loaded once every client finished its intro animation,
-      // so the new map is never visible before the transition covers the screen.
-      this.pendingLevel = this.levels[this.currentScreenIndex].data;
-      this.waitForLevelIntro();
-      this.broadcast(ServerMessageType.LevelInfo, this.getLevelInfo(true));
+      this.enterCurrentScreen();
     });
 
     this.onMessage(ClientMessageType.GetLevelInfo, (client) => {
+      if (this.awaitingQuestion.size > 0) {
+        client.send(ServerMessageType.QuestionStart, this.getQuestionInfo());
+      }
       client.send(
         ServerMessageType.LevelInfo,
         this.getLevelInfo(this.awaitingLevelReady.has(client.sessionId)),
       );
+    });
+
+    this.onMessage(ClientMessageType.QuestionDone, (client) => {
+      this.finishQuestionFor(client.sessionId);
     });
 
     this.onMessage(ClientMessageType.LevelReady, (client) => {
@@ -250,16 +258,74 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   private getLevelInfo(playIntro: boolean) {
+    const levels = this.screens?.filter(isLevelScreen) ?? [];
+    const reachedLevels =
+      this.screens?.slice(0, this.currentScreenIndex + 1).filter(isLevelScreen)
+        .length ?? 1;
+    const levelNumber = Math.max(reachedLevels, 1);
+
     return {
-      levelNumber: this.currentScreenIndex + 1,
-      totalLevels: this.levels?.length ?? 1,
-      levelName: this.levels?.[this.currentScreenIndex].name ?? "Demo",
+      levelNumber,
+      totalLevels: levels.length || 1,
+      levelName: levels[levelNumber - 1]?.name ?? "Demo",
       playIntro,
     };
   }
 
+  private getQuestionInfo() {
+    const screen = this.screens[this.currentScreenIndex];
+
+    return {
+      questionId: screen.type === "question" ? screen.questionId : "",
+      screenIndex: this.currentScreenIndex,
+    };
+  }
+
+  private enterCurrentScreen() {
+    const screen = this.screens[this.currentScreenIndex];
+
+    if (screen.type === "question") {
+      this.startQuestion();
+      return;
+    }
+
+    this.pendingLevel = screen.data;
+    this.waitForLevelIntro();
+    this.broadcast(ServerMessageType.LevelInfo, this.getLevelInfo(true));
+  }
+
+  private startQuestion() {
+    this.state.isPaused = true;
+    this.awaitingQuestion = new Set(this.state.playerState.players.keys());
+    this.broadcast(ServerMessageType.QuestionStart, this.getQuestionInfo());
+  }
+
+  private finishQuestionFor(sessionId: string) {
+    if (!this.awaitingQuestion.delete(sessionId)) return;
+    if (this.awaitingQuestion.size > 0) return;
+
+    if (this.currentScreenIndex >= this.screens.length - 1) {
+      this.completeDemo();
+      return;
+    }
+
+    this.currentScreenIndex += 1;
+    this.enterCurrentScreen();
+  }
+
+  private completeDemo() {
+    this.awaitingEndDemo = true;
+    this.broadcast(ServerMessageType.DemoCompleted, {
+      message: "Solvroviczu, Ukonczyles Demo!",
+    });
+  }
+
   private isLevelIntroActive() {
-    return this.awaitingLevelReady.size > 0 || this.levelCountdownPending;
+    return (
+      this.awaitingLevelReady.size > 0 ||
+      this.levelCountdownPending ||
+      this.awaitingQuestion.size > 0
+    );
   }
 
   private startLevelCountdown() {
@@ -385,6 +451,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (this.awaitingLevelReady.delete(client.sessionId)) {
       this.startLevelCountdown();
     }
+    this.finishQuestionFor(client.sessionId);
   }
 
   onDispose() {
@@ -444,7 +511,11 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (!allReady) return;
 
     this.state.phase = "playing";
-    this.waitForLevelIntro();
+    if (this.screens?.[this.currentScreenIndex].type === "question") {
+      this.startQuestion();
+    } else {
+      this.waitForLevelIntro();
+    }
     this.updateLobbyMetadata();
 
     this.broadcast(ServerMessageType.GameStarting, {});
@@ -463,14 +534,11 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.state.isGameOver = true;
     this.state.isPaused = true;
 
-    if (this.levels) {
-      const isLastScreen = this.currentScreenIndex >= this.levels.length - 1;
+    if (this.screens) {
+      const isLastScreen = this.currentScreenIndex >= this.screens.length - 1;
 
       if (isLastScreen) {
-        this.awaitingEndDemo = true;
-        this.broadcast(ServerMessageType.DemoCompleted, {
-          message: "Solvroviczu, Ukonczyles Demo!",
-        });
+        this.completeDemo();
         return;
       }
 
@@ -478,7 +546,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.broadcast(ServerMessageType.LevelComplete, {
         message: "Solvroviczu, Ukonczyles poziom",
         screenIndex: this.currentScreenIndex,
-        totalScreens: this.levels.length,
+        totalScreens: this.screens.length,
       });
       return;
     }

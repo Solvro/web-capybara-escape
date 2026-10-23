@@ -6,6 +6,7 @@ export type QuestionOption = {
 
 export type QuestionNode = {
   title: string;
+  pose?: string;
   options: QuestionOption[];
 };
 

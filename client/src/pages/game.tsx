@@ -11,11 +11,15 @@ import { useNavigate } from "react-router-dom";
 import { AlertModal } from "@/components/alert-modal";
 import { GameLoadingScreen } from "@/components/game/game-loading-screen";
 import { LevelIntro } from "@/components/game/level-intro";
+import { QuestionIntro } from "@/components/game/question-intro";
 import { LoadingAnimatorWrapper } from "@/components/loading-animator-wrapper";
+import { QuestionScreen } from "@/components/lore/question-screen";
 import { PauseModal } from "@/components/pause-modal";
 import { PhaserContainer } from "@/components/phaser-container";
 import { IMAGE_ALERT_PATHS } from "@/constants/global";
 import { useLevelInfo } from "@/hooks/game/use-level-info";
+import { useQuestion } from "@/hooks/game/use-question";
+import { useQuestionDocument } from "@/hooks/questions/use-question-document";
 import { useRoom } from "@/lib/use-room";
 
 type EndGameState =
@@ -30,8 +34,16 @@ export function Game() {
   const [isPaused, setIsPaused] = useState(false);
   const [endGame, setEndGame] = useState<EndGameState>(null);
   const [introActive, setIntroActive] = useState(false);
+  const question = useQuestion(room);
   const levelInfo = useLevelInfo(room);
+  const questionDocument = useQuestionDocument(question?.questionId ?? null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (room !== null && questionDocument.failed) {
+      room.send(ClientMessageType.QuestionDone);
+    }
+  }, [room, questionDocument.failed]);
 
   useEffect(() => {
     if (room !== null && isConnected) {
@@ -127,6 +139,12 @@ export function Game() {
     room.send(ClientMessageType.EndDemo);
   };
 
+  const handleQuestionFinish = () => {
+    if (!room) return;
+
+    room.send(ClientMessageType.QuestionDone);
+  };
+
   if (joinError || showTimeoutError) {
     return (
       <AlertModal
@@ -158,11 +176,27 @@ export function Game() {
           levelNumber={levelInfo.levelNumber}
           levelName={levelInfo.levelName}
           initialScene={levelInfo.playIntro ? "blank" : "content"}
+          question={
+            question !== null && questionDocument.document !== null ? (
+              <QuestionScreen
+                key={question.screenIndex}
+                root={questionDocument.document.question}
+                onFinish={handleQuestionFinish}
+              />
+            ) : null
+          }
         >
           <LevelIntro
             room={room}
             introId={levelInfo.playIntro ? levelInfo.introId : 0}
             onActiveChange={setIntroActive}
+          />
+          <QuestionIntro
+            introId={
+              question !== null && questionDocument.document !== null
+                ? question.introId
+                : 0
+            }
           />
           <PhaserContainer room={room} />
         </LoadingAnimatorWrapper>

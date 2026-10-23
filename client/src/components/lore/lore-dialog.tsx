@@ -1,33 +1,23 @@
-import {
-  type LoreAnswer,
-  type LoreDialogContent,
-  formatLoreText,
-} from "@capybara/shared";
+import { formatLoreText } from "@capybara/shared";
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  MONITOR_ASPECT,
-  MONITOR_VIEWPORT_FILL,
-} from "@/components/loading-animator-wrapper/constants";
+import { monitorMask } from "@/components/loading-animator-wrapper/monitor-mask";
 import {
   LORE_DEFAULT_POSE,
   LORE_SPEAKER_NAME,
   LORE_TYPING_DELAY_MS,
 } from "@/constants/lore";
-import { LORE_BACKGROUNDS } from "@/constants/lore-sprites";
+import { LORE_BACKGROUNDS, LORE_SPRITES } from "@/constants/lore-sprites";
+import type { QuestionNode, QuestionOption } from "@/types/question";
 
-import solImage from "../../../../images/Sol.png";
 import { LoreButton } from "./lore-button";
 import { LoreCharacter } from "./lore-character";
 import { LoreContainer } from "./lore-container";
 import { LoreTitle } from "./lore-title";
 
-const FILL_PERCENT = MONITOR_VIEWPORT_FILL * 100;
-
-export interface LoreDialogProps extends LoreDialogContent {
-  onAnswer: (answerIndex: number, answer: LoreAnswer) => void;
+export interface LoreDialogProps extends QuestionNode {
+  onSelect: (option: QuestionOption) => void;
   typingDelay?: number;
-  poses?: Record<string, string>;
   disabled?: boolean;
 }
 
@@ -35,9 +25,9 @@ export function LoreDialog(props: LoreDialogProps) {
   return (
     <AnimatedLoreDialog
       key={JSON.stringify([
-        props.text,
+        props.title,
         props.pose,
-        props.answers,
+        props.options,
         props.typingDelay,
       ])}
       {...props}
@@ -46,15 +36,14 @@ export function LoreDialog(props: LoreDialogProps) {
 }
 
 function AnimatedLoreDialog({
-  text,
-  answers,
+  title,
+  options,
   pose = LORE_DEFAULT_POSE,
-  poses = {},
   disabled = false,
-  onAnswer,
+  onSelect,
   typingDelay = LORE_TYPING_DELAY_MS,
 }: LoreDialogProps) {
-  const characters = useMemo(() => formatLoreText(text), [text]);
+  const characters = useMemo(() => formatLoreText(title), [title]);
   const [visibleCount, setVisibleCount] = useState(0);
   const isComplete = visibleCount >= characters.length;
 
@@ -82,15 +71,14 @@ function AnimatedLoreDialog({
     return () => window.clearTimeout(timer);
   }, [characters, typingDelay]);
 
-  const sprite = Object.hasOwn(poses, pose) ? poses[pose] : solImage;
+  const sprite = Object.hasOwn(LORE_SPRITES, pose)
+    ? LORE_SPRITES[pose]
+    : LORE_SPRITES[LORE_DEFAULT_POSE];
 
   return (
     <section
-      className="@container relative isolate shrink-0 overflow-hidden rounded-2xl text-white shadow-2xl"
-      style={{
-        width: `min(${FILL_PERCENT}vw, calc(${FILL_PERCENT}vh * ${MONITOR_ASPECT}))`,
-        aspectRatio: `${MONITOR_ASPECT}`,
-      }}
+      className="@container relative isolate h-full w-full overflow-hidden text-white"
+      style={monitorMask}
       aria-label={`Dialog z ${LORE_SPEAKER_NAME}`}
     >
       <img
@@ -110,14 +98,19 @@ function AnimatedLoreDialog({
           onSkip={() => setVisibleCount(characters.length)}
         />
 
-        <div className="flex flex-wrap gap-4" aria-label="Odpowiedzi">
-          {answers.map((answer, index) => (
+        <div className="grid grid-cols-2 gap-4" aria-label="Odpowiedzi">
+          {options.map((option, index) => (
             <LoreButton
               key={index}
-              text={answer.text}
+              text={option.text}
               isRevealed={isComplete}
               disabled={disabled}
-              onClick={() => onAnswer(index, answer)}
+              onClick={() => onSelect(option)}
+              className={
+                options.length === 1
+                  ? "col-span-2 w-1/2 justify-self-center"
+                  : undefined
+              }
             />
           ))}
         </div>

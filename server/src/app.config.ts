@@ -9,7 +9,6 @@ import { createQuestionsRouter } from "@/api/routes/questions/questions";
 import { createRoomsRouter } from "@/api/routes/rooms/rooms";
 import { createScreenSequencesRouter } from "@/api/routes/screen-sequences/screen-sequences";
 
-import { createLoreRouter } from "./api/routes/lore/lore";
 import { closeMongoConnection, connectMongo } from "./config/mongo";
 import { swaggerSpec } from "./config/swagger";
 /**
@@ -46,7 +45,6 @@ export default config({
 
     app.use(express.json({ limit: "1mb" }));
     app.use("/api", createLevelsRouter());
-    app.use("/api", createLoreRouter());
     app.use("/api", createQuestionsRouter());
     app.use("/api", createScreenSequencesRouter());
     app.use("/api", createRoomsRouter());

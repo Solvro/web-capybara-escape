@@ -34,6 +34,7 @@ export {
   type MessageGameOver,
   type MessageLevelComplete,
   type MessageLevelInfo,
+  type MessageQuestionStart,
   type MessageDemoCompleted,
   type MessageDemoEnded,
   type MessageMove,
@@ -72,12 +73,6 @@ export {
   getDirectionFromMoveVector,
 } from "./utils/vector.js";
 
-export {
-  parseLoreDialog,
-  validateLoreDialog,
-  type LoreDialogContent,
-  type LoreAnswer,
-} from "./lore.js";
 export {
   formatLoreText,
   stripLoreFormatting,

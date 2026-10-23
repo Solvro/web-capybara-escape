@@ -24,6 +24,7 @@ export const ClientMessageType = {
   SetReady: "setReady",
   GetLevelInfo: "getLevelInfo",
   LevelReady: "levelReady",
+  QuestionDone: "questionDone",
 } as const;
 
 export type ClientMessageType =
@@ -53,6 +54,7 @@ export const ServerMessageType = {
   LevelInfo: "levelInfo",
   CountdownStart: "countdownStart",
   LevelStart: "levelStart",
+  QuestionStart: "questionStart",
 } as const;
 
 export type ServerMessageType =
@@ -184,6 +186,11 @@ export interface MessageLevelInfo {
    * animation and answers with `levelReady`.
    */
   playIntro: boolean;
+}
+
+export interface MessageQuestionStart {
+  questionId: string;
+  screenIndex: number;
 }
 
 export interface MessageDemoCompleted {
