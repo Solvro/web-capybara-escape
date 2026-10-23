@@ -1,11 +1,13 @@
 interface CreatorActionButtonsProps {
   onReset?: () => void;
   onRoomSubmit: () => void;
+  onRoomImport: () => void;
 }
 
 export function CreatorActionButtons({
   onReset,
   onRoomSubmit,
+  onRoomImport,
 }: CreatorActionButtonsProps) {
   return (
     <div className="creator-control-actions ml-auto flex flex-col gap-2 md:flex-row">
@@ -14,6 +16,12 @@ export function CreatorActionButtons({
         onClick={onReset}
       >
         Reset
+      </button>
+      <button
+        className="h-8 min-w-[70px] rounded-md bg-cyan-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-cyan-400"
+        onClick={onRoomImport}
+      >
+        Import
       </button>
       <button
         className="h-8 min-w-[70px] rounded-md bg-emerald-500 px-3 py-1 text-[0.8rem] font-semibold text-white transition-colors hover:bg-emerald-400"

@@ -2,6 +2,8 @@ import type { CreateLevelInput, Direction } from "@capybara/shared";
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
+import { CreatorImportModal } from "@/components/creator/creator-import-modal/creator-import-modal";
+
 import api from "../api/api-service";
 import { CreatorBoard } from "../components/creator/creator-board/creator-board";
 import { CreatorControl } from "../components/creator/creator-control/creator-control";
@@ -21,6 +23,7 @@ import {
   changeBoardSize,
   formatLevel,
   generateInitialTiles,
+  parseLevel,
 } from "../utils/tileset-utils";
 
 export function Creator() {
@@ -28,6 +31,7 @@ export function Creator() {
   const [dims, setDims] = useState<[number, number]>([7, 8]);
   const [direction, setDirection] = useState<Direction | null>(null);
   const [formattedLevel, setFormattedLevel] = useState("");
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [isOverwriteModalOpen, setIsOverwriteModalOpen] = useState(false);
@@ -81,6 +85,17 @@ export function Creator() {
     setEntityConfigs({});
   };
   console.log("AKTUALNY STAN entityConfigs:", entityConfigs);
+
+  const onRoomImport = (level: Awaited<ReturnType<typeof api.getLevel>>) => {
+    const { tiles, dims, entityConfigs } = parseLevel(level.data);
+    setDirection(null);
+    setDims(dims);
+    setTileData(tiles);
+    setEntityConfigs(entityConfigs);
+    setLevelName(level.name);
+    setIsImportOpen(false);
+  };
+
   const onRoomSubmit = () => {
     try {
       const newFormattedLevel = formatLevel(tileData, dims, entityConfigs);
@@ -174,6 +189,7 @@ export function Creator() {
               onReset={handleReset}
               setDirection={setDirection}
               onRoomSubmit={onRoomSubmit}
+              onRoomImport={() => setIsImportOpen(true)}
               exportError={exportError}
             />
           </div>
@@ -218,6 +234,11 @@ export function Creator() {
         uploadStatus={uploadStatus}
         onClose={handleCloseOverwriteModal}
         onConfirm={handleOverwriteConfirm}
+      />
+      <CreatorImportModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImport={onRoomImport}
       />
     </>
   );
