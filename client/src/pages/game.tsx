@@ -9,13 +9,19 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AlertModal } from "@/components/alert-modal";
+import { DemoEndScreen } from "@/components/game/demo-end-screen";
 import { GameLoadingScreen } from "@/components/game/game-loading-screen";
 import { LevelIntro } from "@/components/game/level-intro";
+import { SceneIntro } from "@/components/game/scene-intro";
 import { LoadingAnimatorWrapper } from "@/components/loading-animator-wrapper";
+import { QuestionScreen } from "@/components/lore/question-screen";
 import { PauseModal } from "@/components/pause-modal";
 import { PhaserContainer } from "@/components/phaser-container";
 import { IMAGE_ALERT_PATHS } from "@/constants/global";
 import { useLevelInfo } from "@/hooks/game/use-level-info";
+import { useQuestion } from "@/hooks/game/use-question";
+import { useQuestionDocument } from "@/hooks/questions/use-question-document";
+import { usePreloadedImage } from "@/hooks/use-preloaded-image";
 import { useRoom } from "@/lib/use-room";
 
 type EndGameState =
@@ -30,8 +36,17 @@ export function Game() {
   const [isPaused, setIsPaused] = useState(false);
   const [endGame, setEndGame] = useState<EndGameState>(null);
   const [introActive, setIntroActive] = useState(false);
+  const question = useQuestion(room);
   const levelInfo = useLevelInfo(room);
+  const questionDocument = useQuestionDocument(question?.questionId ?? null);
+  const isEndImageReady = usePreloadedImage(IMAGE_ALERT_PATHS.LEVEL_COMPLETE);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (room !== null && questionDocument.failed) {
+      room.send(ClientMessageType.QuestionDone);
+    }
+  }, [room, questionDocument.failed]);
 
   useEffect(() => {
     if (room !== null && isConnected) {
@@ -127,6 +142,12 @@ export function Game() {
     room.send(ClientMessageType.EndDemo);
   };
 
+  const handleQuestionFinish = () => {
+    if (!room) return;
+
+    room.send(ClientMessageType.QuestionDone);
+  };
+
   if (joinError || showTimeoutError) {
     return (
       <AlertModal
@@ -146,7 +167,7 @@ export function Game() {
   if (room === null || !isConnected || levelInfo === null) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
-        <GameLoadingScreen />
+        <GameLoadingScreen isConnected={room !== null && isConnected} />
       </div>
     );
   }
@@ -158,11 +179,35 @@ export function Game() {
           levelNumber={levelInfo.levelNumber}
           levelName={levelInfo.levelName}
           initialScene={levelInfo.playIntro ? "blank" : "content"}
+          end={<DemoEndScreen onExit={handleEndDemo} />}
+          question={
+            question !== null && questionDocument.document !== null ? (
+              <QuestionScreen
+                key={question.screenIndex}
+                root={questionDocument.document.question}
+                onFinish={handleQuestionFinish}
+              />
+            ) : null
+          }
         >
           <LevelIntro
             room={room}
             introId={levelInfo.playIntro ? levelInfo.introId : 0}
             onActiveChange={setIntroActive}
+          />
+          <SceneIntro
+            scene="question"
+            introId={
+              question !== null && questionDocument.document !== null
+                ? question.introId
+                : 0
+            }
+          />
+          <SceneIntro
+            scene="end"
+            introId={
+              endGame?.kind === "demoCompleted" && isEndImageReady ? 1 : 0
+            }
           />
           <PhaserContainer room={room} />
         </LoadingAnimatorWrapper>
@@ -186,17 +231,6 @@ export function Game() {
           imageHeight={82}
           actionText="Gramy dalej"
           onAction={handleRestart}
-        />
-      )}
-
-      {isPaused && !introActive && endGame?.kind === "demoCompleted" && (
-        <AlertModal
-          title="Ukonczono Demo!"
-          description="Co to była za gra? Wpadnij później, aby spróbować jeszcze raz!"
-          imageUrl={IMAGE_ALERT_PATHS.LEVEL_COMPLETE}
-          imageHeight={68}
-          actionText="Powrót do menu"
-          onAction={handleEndDemo}
         />
       )}
 

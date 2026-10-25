@@ -10,6 +10,7 @@ import { useLoadingAnimator } from "@/components/loading-animator-wrapper";
 import { waitForServerMessage } from "@/utils/wait-for-level-start";
 
 const INTRO_TRANSITION_MS = 700;
+const INTRO_WAITING_DELAY_MS = 1500;
 const INTRO_COUNT_SECONDS = LEVEL_INTRO_COUNTDOWN_MS / 1000;
 
 interface LevelIntroProps {
@@ -26,13 +27,18 @@ export function LevelIntro({ room, introId, onActiveChange }: LevelIntroProps) {
     if (introId === 0) return;
 
     let cancelled = false;
+    let waitingTimer: number | undefined;
 
     const run = async () => {
       onActiveChange(true);
-      setWaiting(true);
 
       await displayTransition(INTRO_TRANSITION_MS, "counting");
       if (cancelled) return;
+
+      waitingTimer = window.setTimeout(
+        () => setWaiting(true),
+        INTRO_WAITING_DELAY_MS,
+      );
 
       const countdown = waitForServerMessage(
         room,
@@ -43,6 +49,7 @@ export function LevelIntro({ room, introId, onActiveChange }: LevelIntroProps) {
       await countdown;
       if (cancelled) return;
 
+      window.clearTimeout(waitingTimer);
       setWaiting(false);
       const levelStart = waitForServerMessage(
         room,
@@ -62,6 +69,8 @@ export function LevelIntro({ room, introId, onActiveChange }: LevelIntroProps) {
 
     return () => {
       cancelled = true;
+      window.clearTimeout(waitingTimer);
+      setWaiting(false);
     };
   }, [
     introId,

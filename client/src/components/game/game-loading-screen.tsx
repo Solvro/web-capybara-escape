@@ -4,20 +4,36 @@ import {
   MONITOR_VIEWPORT_FILL,
 } from "@/components/loading-animator-wrapper/constants";
 import { monitorMask } from "@/components/loading-animator-wrapper/monitor-mask";
-import { MONITOR_LOADING_SCREEN_URL } from "@/constants/global";
+import { NoiseLayer } from "@/components/loading-animator-wrapper/noise-layer";
+import {
+  MONITOR_LOADING_SCREEN_URL,
+  MONITOR_SCREEN_URL,
+} from "@/constants/global";
 
 const FILL_PERCENT = MONITOR_VIEWPORT_FILL * 100;
 
-export function GameLoadingScreen() {
+interface GameLoadingScreenProps {
+  isConnected: boolean;
+}
+
+export function GameLoadingScreen({ isConnected }: GameLoadingScreenProps) {
+  const monitorStyle = {
+    width: `min(${FILL_PERCENT}vw, calc(${FILL_PERCENT}vh * ${MONITOR_ASPECT}))`,
+    aspectRatio: `${MONITOR_ASPECT}`,
+    containerType: "inline-size",
+  } as const;
+
+  if (isConnected) {
+    return (
+      <div className="relative" style={monitorStyle}>
+        <img src={MONITOR_SCREEN_URL} className="h-full w-full" alt="" />
+        <NoiseLayer />
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="relative"
-      style={{
-        width: `min(${FILL_PERCENT}vw, calc(${FILL_PERCENT}vh * ${MONITOR_ASPECT}))`,
-        aspectRatio: `${MONITOR_ASPECT}`,
-        containerType: "inline-size",
-      }}
-    >
+    <div className="relative" style={monitorStyle}>
       <img
         src={MONITOR_LOADING_SCREEN_URL}
         className="h-full w-full crt-blur"

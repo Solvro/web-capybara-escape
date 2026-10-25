@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { MONITOR_ASPECT, MONITOR_VIEWPORT_FILL } from "./constants";
 import { CountingLayer } from "./counting-layer";
 import { LoadingAnimatorContext } from "./loading-animator-context";
+import { NoiseLayer } from "./noise-layer";
 import { TransitionLayer } from "./transition-layer";
 import type { LoadingAnimatorWrapperProps } from "./types";
 import { useLoadingAnimatorState } from "./use-loading-animator-state";
@@ -14,6 +15,8 @@ export function LoadingAnimatorWrapper({
   levelNumber,
   levelName,
   children,
+  question,
+  end,
   initialScene = "content",
 }: LoadingAnimatorWrapperProps) {
   const { scene, transition, count, waiting, api, handleCovered, handleDone } =
@@ -43,6 +46,14 @@ export function LoadingAnimatorWrapper({
         >
           {children}
         </div>
+
+        {scene === "blank" && <NoiseLayer />}
+
+        {scene === "question" && (
+          <div className="absolute inset-0">{question}</div>
+        )}
+
+        {scene === "end" && <div className="absolute inset-0">{end}</div>}
 
         {scene === "counting" && (
           <CountingLayer

@@ -1,0 +1,54 @@
+{
+  "question": {
+    "title": "Cześć. Przy bramie znaleźliśmy świeże ślady.\\. Od czego zaczynamy?",
+    "pose": "vron_based",
+    "options": [
+      {
+        "text": "Sprawdźmy ślady.",
+        "nextQuestion": {
+          "title": "Ślady prowadzą w stronę bramy.\\| Ktoś przechodził tędy całkiem niedawno.",
+          "pose": "vron_rat",
+          "options": [
+            {
+              "text": "Podejdźmy do bramy.",
+              "nextQuestion": {
+                "title": "Brama jest otwarta, ale po drugiej stronie nikogo nie ma. \\C[6]Chyba możemy ruszać dalej.\\C[0]",
+                "pose": "vron_cocktail",
+                "options": [
+                  {
+                    "text": "Idziemy.",
+                    "nextQuestion": {
+                      "title": "W porządku. Ruszajmy.",
+                      "pose": "sol_happy",
+                      "options": [{ "text": "Dalej.", "endResult": "gate" }]
+                    }
+                  },
+                  { "text": "Wróćmy do początku.", "endResult": "retreat" }
+                ]
+              }
+            },
+            { "text": "Wróćmy do początku.", "endResult": "retreat" }
+          ]
+        }
+      },
+      {
+        "text": "Obejrzyjmy bramę.",
+        "nextQuestion": {
+          "title": "Brama jest otwarta, ale po drugiej stronie nikogo nie ma. \\C[6]Chyba możemy ruszać dalej.\\C[0]",
+          "pose": "vron_cocktail",
+          "options": [
+            {
+              "text": "Idziemy.",
+              "nextQuestion": {
+                "title": "W porządku. Ruszajmy.",
+                "pose": "vron_based",
+                "options": [{ "text": "Dalej.", "endResult": "gate" }]
+              }
+            },
+            { "text": "Jeszcze raz sprawdźmy ślady.", "endResult": "tracks" }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -34,6 +34,7 @@ export {
   type MessageGameOver,
   type MessageLevelComplete,
   type MessageLevelInfo,
+  type MessageQuestionStart,
   type MessageDemoCompleted,
   type MessageDemoEnded,
   type MessageMove,
@@ -55,6 +56,14 @@ export type {
   ListLevelsOptions,
 } from "./types/api.js";
 
+export type {
+  QuestionOption,
+  QuestionNode,
+  QuestionDocument,
+  CreateQuestionInput,
+  UpdateQuestionInput,
+} from "./types/questions.js";
+
 export {
   CHARACTERS,
   CHARACTER_LABELS,
@@ -71,5 +80,11 @@ export {
   getMoveVectorFromDirection,
   getDirectionFromMoveVector,
 } from "./utils/vector.js";
+
+export {
+  formatLoreText,
+  stripLoreFormatting,
+  type LoreGlyph,
+} from "./lore-text.js";
 
 export { LEVEL_INTRO_COUNTDOWN_MS } from "./constants.js";

@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
 
-export type LoadingScene = "blank" | "counting" | "content";
+export type LoadingScene =
+  | "blank"
+  | "counting"
+  | "content"
+  | "question"
+  | "end";
 
 export interface TransitionState {
   id: number;
@@ -19,5 +24,7 @@ export interface LoadingAnimatorWrapperProps {
   levelNumber: number;
   levelName: string;
   children: ReactNode;
+  question?: ReactNode;
+  end?: ReactNode;
   initialScene?: LoadingScene;
 }

@@ -1,5 +1,7 @@
 import { randomUUID } from "crypto";
 
+import defaultQuestion from "@/static/questions/default.json";
+
 import { getMongoDb } from "../../config/mongo";
 import {
   CreateQuestionInput,
@@ -8,9 +10,21 @@ import {
 } from "../../types/question.types";
 
 const QUESTIONS_COLLECTION = "questions";
+const DEFAULT_QUESTION_ID = "default";
+
+const defaultQuestionDocument: QuestionDocument = {
+  id: DEFAULT_QUESTION_ID,
+  question: defaultQuestion.question,
+  createdAt: new Date(0),
+  updatedAt: new Date(0),
+};
 
 function validateQuestion(question: any): boolean {
   if (!question) return false;
+
+  if (question.pose !== undefined && typeof question.pose !== "string") {
+    return false;
+  }
 
   if (!Array.isArray(question.options)) return false;
 
@@ -71,11 +85,14 @@ export class QuestionRepository {
 
   async getById(id: string) {
     const db = await getMongoDb();
-    if (!db) return null;
+    const stored = db
+      ? await db
+          .collection<QuestionDocument>(QUESTIONS_COLLECTION)
+          .findOne({ id })
+      : null;
 
-    return db
-      .collection<QuestionDocument>(QUESTIONS_COLLECTION)
-      .findOne({ id });
+    if (stored) return stored;
+    return id === DEFAULT_QUESTION_ID ? defaultQuestionDocument : null;
   }
 
   async createQuestion(input: CreateQuestionInput) {
