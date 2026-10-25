@@ -25,6 +25,8 @@ import {
 } from "./logic/sequence-loader";
 import { RoomState } from "./schemas/room-state";
 
+const LEVEL_COMPLETE_DELAY_MS = 2500;
+
 export class GameRoom extends Room<{ state: RoomState }> {
   maxClients = 2;
   state = new RoomState();
@@ -40,6 +42,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private awaitingLevelReady = new Set<string>();
   private pendingLevel: LoadedRoom | null = null;
   private levelCountdownPending = false;
+  private levelAdvancePending = false;
 
   async onCreate(options: any) {
     this.collisionHandler = new CollisionHandler();
@@ -324,6 +327,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     return (
       this.awaitingLevelReady.size > 0 ||
       this.levelCountdownPending ||
+      this.levelAdvancePending ||
       this.awaitingQuestion.size > 0
     );
   }
@@ -530,6 +534,15 @@ export class GameRoom extends Room<{ state: RoomState }> {
     });
   }
 
+  private advanceAfterJump(advance: () => void) {
+    this.levelAdvancePending = true;
+
+    this.clock.setTimeout(() => {
+      this.levelAdvancePending = false;
+      advance();
+    }, LEVEL_COMPLETE_DELAY_MS);
+  }
+
   private handleLevelComplete() {
     this.state.isGameOver = true;
     this.state.isPaused = true;
@@ -538,7 +551,15 @@ export class GameRoom extends Room<{ state: RoomState }> {
       const isLastScreen = this.currentScreenIndex >= this.screens.length - 1;
 
       if (isLastScreen) {
-        this.completeDemo();
+        this.advanceAfterJump(() => this.completeDemo());
+        return;
+      }
+
+      if (process.env.SHOW_END_LEVEL_MODAL !== "true") {
+        this.advanceAfterJump(() => {
+          this.currentScreenIndex += 1;
+          this.enterCurrentScreen();
+        });
         return;
       }
 

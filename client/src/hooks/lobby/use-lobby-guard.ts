@@ -56,5 +56,5 @@ export function useLobbyGuard(roomCode: string, sequence: string | null) {
     };
   }, [connectedToThisRoom, reconnectionStatus, roomCode, navigate, sequence]);
 
-  return status;
+  return connectedToThisRoom ? "ready" : status;
 }

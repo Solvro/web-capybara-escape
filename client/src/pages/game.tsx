@@ -9,9 +9,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AlertModal } from "@/components/alert-modal";
+import { DemoEndScreen } from "@/components/game/demo-end-screen";
 import { GameLoadingScreen } from "@/components/game/game-loading-screen";
 import { LevelIntro } from "@/components/game/level-intro";
-import { QuestionIntro } from "@/components/game/question-intro";
+import { SceneIntro } from "@/components/game/scene-intro";
 import { LoadingAnimatorWrapper } from "@/components/loading-animator-wrapper";
 import { QuestionScreen } from "@/components/lore/question-screen";
 import { PauseModal } from "@/components/pause-modal";
@@ -164,7 +165,7 @@ export function Game() {
   if (room === null || !isConnected || levelInfo === null) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
-        <GameLoadingScreen />
+        <GameLoadingScreen isConnected={room !== null && isConnected} />
       </div>
     );
   }
@@ -176,6 +177,7 @@ export function Game() {
           levelNumber={levelInfo.levelNumber}
           levelName={levelInfo.levelName}
           initialScene={levelInfo.playIntro ? "blank" : "content"}
+          end={<DemoEndScreen onExit={handleEndDemo} />}
           question={
             question !== null && questionDocument.document !== null ? (
               <QuestionScreen
@@ -191,12 +193,17 @@ export function Game() {
             introId={levelInfo.playIntro ? levelInfo.introId : 0}
             onActiveChange={setIntroActive}
           />
-          <QuestionIntro
+          <SceneIntro
+            scene="question"
             introId={
               question !== null && questionDocument.document !== null
                 ? question.introId
                 : 0
             }
+          />
+          <SceneIntro
+            scene="end"
+            introId={endGame?.kind === "demoCompleted" ? 1 : 0}
           />
           <PhaserContainer room={room} />
         </LoadingAnimatorWrapper>
@@ -220,17 +227,6 @@ export function Game() {
           imageHeight={82}
           actionText="Gramy dalej"
           onAction={handleRestart}
-        />
-      )}
-
-      {isPaused && !introActive && endGame?.kind === "demoCompleted" && (
-        <AlertModal
-          title="Ukonczono Demo!"
-          description="Co to była za gra? Wpadnij później, aby spróbować jeszcze raz!"
-          imageUrl={IMAGE_ALERT_PATHS.LEVEL_COMPLETE}
-          imageHeight={68}
-          actionText="Powrót do menu"
-          onAction={handleEndDemo}
         />
       )}
 

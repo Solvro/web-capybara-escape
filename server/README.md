@@ -26,6 +26,7 @@ Due to fact that levels are preferably read from MongoDB database, the following
 - `MONGODB_DB_NAME`
 - `ADMIN_API_TOKEN`
 - `DEFAULT_LEVEL_SLUG` (optional fallback slug)
+- `SHOW_END_LEVEL_MODAL` (optional, `true` shows the "level complete" modal between screens, default `false` loads the next screen immediately)
 
 ### Export room JSON files to MongoDB
 
