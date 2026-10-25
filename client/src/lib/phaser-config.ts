@@ -8,11 +8,13 @@ export const phaserConfig: Phaser.Types.Core.GameConfig = {
   width: CELL_SIZE * 10,
   height: CELL_SIZE * 8.5,
   pixelArt: true,
+  transparent: true,
   render: {
     antialias: false,
     pixelArt: true,
     antialiasGL: false,
     roundPixels: true,
+    transparent: true,
   },
   parent: "game-container",
   scene: [Main],

@@ -2,7 +2,7 @@ import type { QuestionOption } from "@/types/question";
 
 export const LORE_SPEAKER_NAME = "Sol";
 
-export const LORE_DEFAULT_POSE = "neutral";
+export const LORE_DEFAULT_POSE = "vron_based";
 
 export const LORE_DEFAULT_QUESTION_ID = "default";
 

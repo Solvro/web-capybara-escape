@@ -1,25 +1,25 @@
 {
   "question": {
     "title": "Cześć. Przy bramie znaleźliśmy świeże ślady.\\. Od czego zaczynamy?",
-    "pose": "neutral",
+    "pose": "vron_based",
     "options": [
       {
         "text": "Sprawdźmy ślady.",
         "nextQuestion": {
           "title": "Ślady prowadzą w stronę bramy.\\| Ktoś przechodził tędy całkiem niedawno.",
-          "pose": "skupiona",
+          "pose": "vron_rat",
           "options": [
             {
               "text": "Podejdźmy do bramy.",
               "nextQuestion": {
                 "title": "Brama jest otwarta, ale po drugiej stronie nikogo nie ma. \\C[6]Chyba możemy ruszać dalej.\\C[0]",
-                "pose": "zdziwiona",
+                "pose": "vron_cocktail",
                 "options": [
                   {
                     "text": "Idziemy.",
                     "nextQuestion": {
                       "title": "W porządku. Ruszajmy.",
-                      "pose": "spokojna",
+                      "pose": "sol_happy",
                       "options": [{ "text": "Dalej.", "endResult": "gate" }]
                     }
                   },
@@ -35,13 +35,13 @@
         "text": "Obejrzyjmy bramę.",
         "nextQuestion": {
           "title": "Brama jest otwarta, ale po drugiej stronie nikogo nie ma. \\C[6]Chyba możemy ruszać dalej.\\C[0]",
-          "pose": "zdziwiona",
+          "pose": "vron_cocktail",
           "options": [
             {
               "text": "Idziemy.",
               "nextQuestion": {
                 "title": "W porządku. Ruszajmy.",
-                "pose": "spokojna",
+                "pose": "vron_based",
                 "options": [{ "text": "Dalej.", "endResult": "gate" }]
               }
             },

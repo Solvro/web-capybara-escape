@@ -71,9 +71,10 @@ function AnimatedLoreDialog({
     return () => window.clearTimeout(timer);
   }, [characters, typingDelay]);
 
-  const sprite = Object.hasOwn(LORE_SPRITES, pose)
-    ? LORE_SPRITES[pose]
-    : LORE_SPRITES[LORE_DEFAULT_POSE];
+  const sprite =
+    LORE_SPRITES[pose] ??
+    LORE_SPRITES[LORE_DEFAULT_POSE] ??
+    Object.values(LORE_SPRITES)[0];
 
   return (
     <section
@@ -87,7 +88,14 @@ function AnimatedLoreDialog({
         className="absolute inset-0 h-full w-full object-cover"
       />
 
-      <LoreCharacter src={sprite} alt={LORE_SPEAKER_NAME} />
+      <LoreCharacter
+        src={sprite.src}
+        alt={LORE_SPEAKER_NAME}
+        scaleX={sprite.scaleX}
+        scaleY={sprite.scaleY}
+        offsetX={sprite.offsetX}
+        offsetY={sprite.offsetY}
+      />
 
       <div className="absolute bottom-4 left-1/4 z-10 flex w-1/2 flex-col gap-2">
         <LoreTitle>{LORE_SPEAKER_NAME}</LoreTitle>
