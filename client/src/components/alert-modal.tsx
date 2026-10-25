@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { usePreloadedImage } from "@/hooks/use-preloaded-image";
 
 import { Button } from "./ui/button";
 
@@ -26,30 +28,7 @@ export function AlertModal({
   actionText,
 }: AlertModalProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [loadedImageUrl, setLoadedImageUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!imageUrl) return;
-
-    let isCancelled = false;
-    const image = new Image();
-    const markAsReady = () => {
-      if (!isCancelled) setLoadedImageUrl(imageUrl);
-    };
-
-    image.src = imageUrl;
-
-    if (typeof image.decode === "function") {
-      image.decode().then(markAsReady).catch(markAsReady);
-    } else {
-      image.onload = markAsReady;
-      image.onerror = markAsReady;
-    }
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [imageUrl]);
+  const isImageReady = usePreloadedImage(imageUrl);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -61,7 +40,6 @@ export function AlertModal({
     onAction?.();
   };
 
-  const isImageReady = !imageUrl || loadedImageUrl === imageUrl;
   if (!isOpen || !isImageReady) return null;
 
   return (

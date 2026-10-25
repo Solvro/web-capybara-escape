@@ -56,6 +56,14 @@ export type {
   ListLevelsOptions,
 } from "./types/api.js";
 
+export type {
+  QuestionOption,
+  QuestionNode,
+  QuestionDocument,
+  CreateQuestionInput,
+  UpdateQuestionInput,
+} from "./types/questions.js";
+
 export {
   CHARACTERS,
   CHARACTER_LABELS,

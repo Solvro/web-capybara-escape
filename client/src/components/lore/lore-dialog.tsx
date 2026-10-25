@@ -1,4 +1,8 @@
-import { formatLoreText } from "@capybara/shared";
+import {
+  type QuestionNode,
+  type QuestionOption,
+  formatLoreText,
+} from "@capybara/shared";
 import { useEffect, useMemo, useState } from "react";
 
 import { monitorMask } from "@/components/loading-animator-wrapper/monitor-mask";
@@ -8,7 +12,6 @@ import {
   LORE_TYPING_DELAY_MS,
 } from "@/constants/lore";
 import { LORE_BACKGROUNDS, LORE_SPRITES } from "@/constants/lore-sprites";
-import type { QuestionNode, QuestionOption } from "@/types/question";
 
 import { LoreButton } from "./lore-button";
 import { LoreCharacter } from "./lore-character";

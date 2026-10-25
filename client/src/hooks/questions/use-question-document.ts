@@ -1,7 +1,7 @@
+import type { QuestionDocument } from "@capybara/shared";
 import { useEffect, useState } from "react";
 
 import QuestionsApi from "@/api/questions-api";
-import type { QuestionDocument } from "@/types/question";
 
 interface LoadedQuestion {
   id: string;

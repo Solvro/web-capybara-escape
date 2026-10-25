@@ -1,4 +1,4 @@
-import type { QuestionOption } from "@/types/question";
+import type { QuestionOption } from "@capybara/shared";
 
 export const LORE_SPEAKER_NAME = "Sol";
 

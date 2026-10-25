@@ -4,6 +4,7 @@ import {
   MONITOR_VIEWPORT_FILL,
 } from "@/components/loading-animator-wrapper/constants";
 import { monitorMask } from "@/components/loading-animator-wrapper/monitor-mask";
+import { NoiseLayer } from "@/components/loading-animator-wrapper/noise-layer";
 import {
   MONITOR_LOADING_SCREEN_URL,
   MONITOR_SCREEN_URL,
@@ -26,6 +27,7 @@ export function GameLoadingScreen({ isConnected }: GameLoadingScreenProps) {
     return (
       <div className="relative" style={monitorStyle}>
         <img src={MONITOR_SCREEN_URL} className="h-full w-full" alt="" />
+        <NoiseLayer />
       </div>
     );
   }

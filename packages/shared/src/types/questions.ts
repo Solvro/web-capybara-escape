@@ -10,9 +10,17 @@ export interface QuestionNode {
   options: QuestionOption[];
 }
 
-export interface QuestionDocument {
+export interface QuestionDocument<TDate = string> {
   id: string;
   question: QuestionNode;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: TDate;
+  updatedAt: TDate;
+}
+
+export interface CreateQuestionInput {
+  question: QuestionNode;
+}
+
+export interface UpdateQuestionInput {
+  question?: QuestionNode;
 }

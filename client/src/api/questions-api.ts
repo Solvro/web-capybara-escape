@@ -1,4 +1,4 @@
-import type { QuestionDocument } from "@/types/question";
+import type { QuestionDocument } from "@capybara/shared";
 
 import api from "./api";
 

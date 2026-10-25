@@ -1,26 +1,16 @@
-export type QuestionOption = {
-  text: string;
-  endResult?: string;
-  nextQuestion?: QuestionNode;
-};
+import type {
+  CreateQuestionInput,
+  QuestionNode,
+  QuestionOption,
+  QuestionDocument as SharedQuestionDocument,
+  UpdateQuestionInput,
+} from "@capybara/shared";
 
-export type QuestionNode = {
-  title: string;
-  pose?: string;
-  options: QuestionOption[];
-};
+export type QuestionDocument = SharedQuestionDocument<Date>;
 
-export type QuestionDocument = {
-  id: string;
-  question: QuestionNode;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type CreateQuestionInput = {
-  question: QuestionNode;
-};
-
-export type UpdateQuestionInput = {
-  question?: QuestionNode;
+export type {
+  CreateQuestionInput,
+  QuestionNode,
+  QuestionOption,
+  UpdateQuestionInput,
 };

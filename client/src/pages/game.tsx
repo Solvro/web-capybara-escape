@@ -21,6 +21,7 @@ import { IMAGE_ALERT_PATHS } from "@/constants/global";
 import { useLevelInfo } from "@/hooks/game/use-level-info";
 import { useQuestion } from "@/hooks/game/use-question";
 import { useQuestionDocument } from "@/hooks/questions/use-question-document";
+import { usePreloadedImage } from "@/hooks/use-preloaded-image";
 import { useRoom } from "@/lib/use-room";
 
 type EndGameState =
@@ -38,6 +39,7 @@ export function Game() {
   const question = useQuestion(room);
   const levelInfo = useLevelInfo(room);
   const questionDocument = useQuestionDocument(question?.questionId ?? null);
+  const isEndImageReady = usePreloadedImage(IMAGE_ALERT_PATHS.LEVEL_COMPLETE);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -203,7 +205,9 @@ export function Game() {
           />
           <SceneIntro
             scene="end"
-            introId={endGame?.kind === "demoCompleted" ? 1 : 0}
+            introId={
+              endGame?.kind === "demoCompleted" && isEndImageReady ? 1 : 0
+            }
           />
           <PhaserContainer room={room} />
         </LoadingAnimatorWrapper>

@@ -1,7 +1,7 @@
+import type { QuestionNode, QuestionOption } from "@capybara/shared";
 import { useState } from "react";
 
 import { LORE_CONTINUE_OPTIONS, LORE_WAITING_TITLE } from "@/constants/lore";
-import type { QuestionNode, QuestionOption } from "@/types/question";
 
 import { LoreDialog } from "./lore-dialog";
 
