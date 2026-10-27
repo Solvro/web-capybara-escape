@@ -93,11 +93,16 @@ export class CableState extends Schema {
 
     this.cables.delete(id);
   }
-  onRoomDispose() {
+  clear() {
     this.cables.clear();
     this.usedIds.clear();
+    this.nextAvailableId = 0;
     this.toggledCableIds.clear();
     this.positionToCableId.clear();
+  }
+
+  onRoomDispose() {
+    this.clear();
   }
 
   getCableAt(x: number, y: number) {

@@ -27,7 +27,8 @@ export function DemoEndScreen({ onExit }: DemoEndScreenProps) {
       <img
         src={IMAGE_ALERT_PATHS.LEVEL_COMPLETE}
         alt=""
-        decoding="sync"
+        decoding="async"
+        fetchPriority="low"
         className="h-1/2 object-contain"
       />
 

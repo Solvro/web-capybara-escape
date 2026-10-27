@@ -41,6 +41,7 @@ import { Wire } from "../mechanics/wire";
 
 export class Main extends Phaser.Scene {
   private room!: Room;
+  private roomListeners: (() => void)[] = [];
   displayHandler!: Display;
   private capybara: Capybara | null = null;
   private enemies = new Map<number, Enemy>();
@@ -97,6 +98,19 @@ export class Main extends Phaser.Scene {
     }
     this.room = this.registry.get("room") as Room;
     this.displayHandler = new Display(this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.removeListeners, this);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.removeListeners, this);
+  }
+
+  private listen<T = unknown>(type: string, callback: (message: T) => void) {
+    this.roomListeners.push(this.room.onMessage(type, callback));
+  }
+
+  private removeListeners() {
+    for (const unsubscribe of this.roomListeners) {
+      unsubscribe();
+    }
+    this.roomListeners = [];
   }
 
   preload() {
@@ -187,9 +201,7 @@ export class Main extends Phaser.Scene {
 
     // Colyseus message handlers
     try {
-      const room = this.registry.get("room") as Room;
-
-      room.onMessage("mapInfo", (message: MessageMapInfo) => {
+      this.listen("mapInfo", (message: MessageMapInfo) => {
         this.syncPauseState(message.isPaused);
 
         // Resize the canvas to the full map so the whole map is rendered.
@@ -245,7 +257,7 @@ export class Main extends Phaser.Scene {
         }
       });
 
-      room.onMessage("onAddPlayer", (message: MessageOnAddPlayer) => {
+      this.listen("onAddPlayer", (message: MessageOnAddPlayer) => {
         this.addPlayer({
           sessionId: message.sessionId,
           name: message.playerName,
@@ -255,23 +267,23 @@ export class Main extends Phaser.Scene {
         });
       });
 
-      room.onMessage("onRemovePlayer", (message: MessageOnRemovePlayer) => {
+      this.listen("onRemovePlayer", (message: MessageOnRemovePlayer) => {
         this.removePlayer(message.sessionId);
       });
 
-      room.onMessage("positionUpdate", (message: MessagePositionUpdate) => {
+      this.listen("positionUpdate", (message: MessagePositionUpdate) => {
         const player = this.players.get(message.sessionId);
         if (player !== undefined) {
           player.move(message.direction);
         }
       });
 
-      room.onMessage("cratesUpdate", (message: MessageCratesUpdate) => {
+      this.listen("cratesUpdate", (message: MessageCratesUpdate) => {
         for (const crateUpdate of message.crates) {
           this.crates.get(crateUpdate.crateId)?.syncState(crateUpdate);
         }
       });
-      room.onMessage("lasersUpdated", (message: MessageLasersUpdate) => {
+      this.listen("lasersUpdated", (message: MessageLasersUpdate) => {
         for (const laserUpdate of message.lasers) {
           const laser = this.lasers.get(laserUpdate.laserId);
           if (laser !== undefined) {
@@ -287,7 +299,7 @@ export class Main extends Phaser.Scene {
         }
       });
 
-      room.onMessage(
+      this.listen(
         "doorsAndButtonsUpdate",
         (message: MessageDoorsAndButtonsUpdate) => {
           for (const element of message.doorsAndButtons) {
@@ -305,38 +317,31 @@ export class Main extends Phaser.Scene {
           }
         },
       );
-      room.onMessage("line", (message: MessageGenerateLines) => {
+      this.listen("line", (message: MessageGenerateLines) => {
         const player = this.players.get(message.sessionId);
         if (player !== undefined) {
           this.displayBubble(message.text, player, message.sessionId);
         }
       });
 
-      room.onMessage(
+      this.listen(
         "capybaraUpdate",
         (message: { x: number; y: number; state: string }) => {
           this.capybara?.syncServerState(message);
         },
       );
 
-      room.onMessage("enemyUpdate", (message: MessageEnemyUpdate) => {
+      this.listen("enemyUpdate", (message: MessageEnemyUpdate) => {
         this.enemies.get(message.id)?.syncState(message);
       });
 
-      room.onMessage("line", (message: MessageGenerateLines) => {
-        const player = this.players.get(message.sessionId);
-        if (player !== undefined) {
-          this.displayBubble(message.text, player, message.sessionId);
-        }
-      });
-
-      room.onMessage("roomReset", () => {
+      this.listen("roomReset", () => {
         this.resetGraphics();
 
         this.room.send("getMapInfo");
       });
 
-      room.onMessage("cablesUpdate", (cables: MessageCablesUpdate) => {
+      this.listen("cablesUpdate", (cables: MessageCablesUpdate) => {
         for (const cableUpdate of cables.cables) {
           const cable = this.cables.get(cableUpdate.cableId);
           if (cable !== undefined) {
@@ -345,7 +350,7 @@ export class Main extends Phaser.Scene {
         }
       });
 
-      room.onMessage("pauseToggled", (message: MessagePauseToggled) => {
+      this.listen("pauseToggled", (message: MessagePauseToggled) => {
         this.syncPauseState(message.isPaused);
       });
 

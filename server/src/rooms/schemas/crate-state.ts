@@ -62,15 +62,24 @@ export class CrateState extends Schema {
     this.crates.delete(id);
   }
 
-  onRoomDispose() {
+  clear() {
     this.crates.clear();
     this.usedIds.clear();
+    this.nextAvailableId = 0;
+    this.positionToCrateId.clear();
+    this.movedCrateIds.clear();
+    this.movedCrateDirections.clear();
   }
 
-  getCrateAt(x: number, y: number) {
+  onRoomDispose() {
+    this.clear();
+  }
+
+  getCrateAt(x: number, y: number): Crate | null {
     const key = this.getPositionKey(x, y);
     const crateId = this.positionToCrateId.get(key);
-    return crateId ? this.crates.get(crateId) : null;
+    if (crateId === undefined) return null;
+    return this.crates.get(crateId) ?? null;
   }
 
   moveCrateIndex(

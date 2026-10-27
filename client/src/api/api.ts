@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const URL = import.meta.env.VITE_PHASER_API;
+import { getApiBaseUrl } from "@/lib/runtime-config";
+
 const api = axios.create({
   method: "post",
-  baseURL: URL,
+  baseURL: getApiBaseUrl(),
 });
 
 export default api;

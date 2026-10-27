@@ -9,15 +9,26 @@ import { CharacterSelectForm } from "@/components/lobby/character-select-form";
 import { CharacterSelectorSol } from "@/components/lobby/character-selector-sol";
 import { CharacterSelectorVron } from "@/components/lobby/character-selector-vron";
 import { ReconnectingPanel } from "@/components/lobby/reconnecting-panel";
+import { IMAGE_ALERT_PATHS, INTRO_CHARACTERS } from "@/constants/global";
 import { useJoinOrCreateRoom } from "@/hooks/lobby/use-join-or-create-room";
 import { useReconnectionRedirect } from "@/hooks/lobby/use-reconnection-redirect";
 import { useRoomInviteLookup } from "@/hooks/lobby/use-room-invite-lookup";
+import { usePreloadImages } from "@/hooks/use-preloaded-image";
 
 import { IntroContainer } from "../components/intro-container";
 import { TitleHeader } from "../components/ui/title-header";
 import { NotFoundRoom } from "./not-found-room";
 
+const LOBBY_WARMUP_IMAGES = [
+  INTRO_CHARACTERS.SOL.imagePath,
+  INTRO_CHARACTERS.SOL.imageHighlightPath,
+  INTRO_CHARACTERS.VRON.imagePath,
+  INTRO_CHARACTERS.VRON.imageHighlightPath,
+  IMAGE_ALERT_PATHS.FAILED_OR_LOST,
+] as const;
+
 export function CharacterSelect() {
+  usePreloadImages(LOBBY_WARMUP_IMAGES);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const screenSequenceSlug = searchParams.get("sequence") ?? undefined;

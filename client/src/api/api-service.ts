@@ -1,34 +1,30 @@
 import type { CreateLevelInput } from "@capybara/shared";
 
+import { getApiToken } from "@/lib/runtime-config";
+
 import api from "./api";
 
 const ApiService = {
-  URL: import.meta.env.VITE_PHASER_API,
-
   headerWithAuth: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${import.meta.env.VITE_API_TOKEN}`,
+    Authorization: `Bearer ${getApiToken()}`,
   },
 
   async sendRoom(createLevelInput: CreateLevelInput) {
-    return await api
-      .post(
-        this.URL + "/api/admin/levels",
-        {
-          slug: createLevelInput.slug,
-          name: createLevelInput.name,
-          data: createLevelInput.data,
-          isPublished: createLevelInput.isPublished,
-        },
-        { headers: this.headerWithAuth },
-      )
-      .then((response) => {
-        return response;
-      });
+    return await api.post(
+      "/api/admin/levels",
+      {
+        slug: createLevelInput.slug,
+        name: createLevelInput.name,
+        data: createLevelInput.data,
+        isPublished: createLevelInput.isPublished,
+      },
+      { headers: this.headerWithAuth },
+    );
   },
   async updateRoom(slug: string, levelData: CreateLevelInput) {
     return await api.put(
-      this.URL + `/api/admin/levels/${slug}`,
+      `/api/admin/levels/${slug}`,
       {
         slug: levelData.slug,
         name: levelData.name,

@@ -17,6 +17,7 @@
     "export:levels:force": "tsx src/scripts/export-levels.ts --force",
     "loadtest": "tsx loadtest/example.ts --room game_room --numClients 2",
     "start": "tsx watch src/index.ts",
+    "start:prod": "node build/index.js",
     "test": "mocha -r tsx \"test/**/*.test.ts\" --exit --timeout 15000"
   },
   "dependencies": {

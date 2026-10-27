@@ -162,7 +162,7 @@ export class RoomState extends Schema {
     }
     return (
       this.getCellValue(x, y).startsWith("f") &&
-      this.crateState.getCrateAt(x, y) === null &&
+      !this.crateState.getCrateAt(x, y) &&
       this.doorState.isOpenOrEmptyAt(x, y)
     );
   }
@@ -877,13 +877,13 @@ export class RoomState extends Schema {
   }
 
   clearState() {
-    this.crateState.crates.clear();
+    this.crateState.clear();
     this.doorState.doors.clear();
-    this.buttonState.buttons.clear();
-    this.laserState.lasers.clear();
-    this.cableState.cables.clear();
-    this.wireState.wires.clear();
-    this.ventState.vents.clear();
+    this.buttonState.clear();
+    this.laserState.clear();
+    this.cableState.clear();
+    this.wireState.clear();
+    this.ventState.clear();
 
     this.grid.clear();
     this.startingPositions.clear();

@@ -1,22 +1,27 @@
 services:
   backend:
     build:
-      context: ./server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: server/Dockerfile
+    env_file:
+      - .env
     environment:
-      - PORT=2567
+      PORT: ${PORT:-2567}
+      NODE_ENV: production
     ports:
-      - "2567:2567"
+      - "${BACKEND_HOST_PORT:-2567}:2567"
     restart: unless-stopped
 
   frontend:
     build:
-      context: ./client
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: client/Dockerfile
       args:
-        - VITE_COLYSEUS_URL=http://localhost:2567
+        VITE_PHASER_API: ${VITE_PHASER_API:-}
+        VITE_COLYSEUS_URL: ${VITE_COLYSEUS_URL:-}
+        VITE_API_TOKEN: ${VITE_API_TOKEN:-}
     ports:
-      - "8080:80"
-    restart: unless-stopped
+      - "${FRONTEND_HOST_PORT:-8080}:80"
     depends_on:
       - backend
+    restart: unless-stopped

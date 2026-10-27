@@ -57,10 +57,16 @@ export class WireState extends Schema {
 
     this.wires.delete(id);
   }
-  onRoomDispose() {
+
+  clear() {
     this.wires.clear();
     this.usedIds.clear();
+    this.nextAvailableId = 0;
     this.positionToWireId.clear();
+  }
+
+  onRoomDispose() {
+    this.clear();
   }
   getWireAt(x: number, y: number) {
     const key = this.getPositionKey(x, y);

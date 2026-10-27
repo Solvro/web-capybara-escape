@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import RoomsApi from "@/api/rooms-api";
 
+import { getColyseusUrl } from "./runtime-config";
 import type {
   CreateRoomParams,
   JoinRoomParams,
@@ -11,11 +12,7 @@ import type {
 } from "./use-room";
 import { RoomContext } from "./use-room";
 
-const host = window.location.hostname;
-
-const url =
-  (import.meta.env.VITE_COLYSEUS_URL as string) || `http://${host}:2567`;
-const client = new Client(url);
+const client = new Client(getColyseusUrl());
 
 interface CachedReconnection {
   token: string;

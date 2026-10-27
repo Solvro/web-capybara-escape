@@ -46,8 +46,12 @@ export class ButtonState extends Schema {
     }
   }
 
-  onRoomDispose() {
+  clear() {
     this.buttons.clear();
     this.positionMap.clear();
+  }
+
+  onRoomDispose() {
+    this.clear();
   }
 }
