@@ -38,7 +38,7 @@ export class RoomState extends Schema {
   private capybaraPath: { x: number; y: number }[] = [];
   private capybaraVelocity: number = 500;
   private capybaraTimer: number = 0;
-  private enemyVelocity: number = 200;
+  private enemyVelocity: number = 1200;
   private enemyTimers = new Map<number, number>();
 
   loadRoomFromJson(jsonData: any) {
@@ -187,8 +187,7 @@ export class RoomState extends Schema {
     if (x < 0 || x >= this.width || y < 0 || y >= this.height) return false;
 
     const cell = this.getCellValue(x, y);
-
-    if (cell.startsWith("w")) return false;
+    if (!cell.startsWith("f")) return false;
 
     if (this.crateState.getCrateAt(x, y)) return false;
 

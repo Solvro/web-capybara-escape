@@ -1,11 +1,11 @@
 import { RoomState } from "../schemas/room-state";
 
 export class CollisionHandler {
-  public checkPlayerCollision(
-    playerPos: { x: number; y: number },
+  public checkHazardCollision(
+    position: { x: number; y: number },
     roomState: RoomState,
   ): boolean {
-    const { x, y } = playerPos;
+    const { x, y } = position;
 
     const hitEnemy = [...roomState.enemyState.enemies.values()].some((enemy) =>
       enemy.isAtPosition(x, y),
@@ -21,5 +21,12 @@ export class CollisionHandler {
     }
 
     return false;
+  }
+
+  public checkPlayerCollision(
+    playerPos: { x: number; y: number },
+    roomState: RoomState,
+  ): boolean {
+    return this.checkHazardCollision(playerPos, roomState);
   }
 }

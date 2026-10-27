@@ -580,19 +580,28 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private checkAllCollisions() {
     if (this.state.isGameOver) return;
 
-    for (const [
-      sessionId,
-      player,
-    ] of this.state.playerState.players.entries()) {
-      const hasCollided = this.collisionHandler.checkPlayerCollision(
-        { x: player.position.x, y: player.position.y },
-        this.state,
-      );
-
-      if (hasCollided) {
+    for (const player of this.state.playerState.players.values()) {
+      if (
+        this.collisionHandler.checkHazardCollision(
+          { x: player.position.x, y: player.position.y },
+          this.state,
+        )
+      ) {
         this.handleGameOver();
-        break;
+        return;
       }
+    }
+
+    const capybara = this.state.capybara;
+    if (
+      capybara &&
+      capybara.state !== "jump" &&
+      this.collisionHandler.checkHazardCollision(
+        { x: capybara.position.x, y: capybara.position.y },
+        this.state,
+      )
+    ) {
+      this.handleGameOver();
     }
   }
 }

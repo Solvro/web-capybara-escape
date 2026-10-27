@@ -33,7 +33,11 @@ export function PhaserContainer({ room }: PhaserContainerProps) {
   }, [room]);
 
   return (
-    <div id="game-container" ref={containerRef} className="h-full w-full" />
+    <div
+      id="game-container"
+      ref={containerRef}
+      className="flex h-full w-full items-center justify-center overflow-hidden"
+    />
   );
 }
 

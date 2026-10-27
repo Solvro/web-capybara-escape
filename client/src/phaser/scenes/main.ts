@@ -21,9 +21,10 @@ import { NameTag } from "@/phaser/ui/name-tag";
 import { SpeechBubble } from "@/phaser/ui/speech-bubble";
 import { Display } from "@/utils/display";
 
-import { CELL_SIZE, LAYER_NAMES, TILE_SIZE } from "../../constants/global";
+import { LAYER_NAMES, TILE_SIZE } from "../../constants/global";
 import type { LAYER_NAME } from "../../constants/global";
 import type { INetworkInterface } from "../../types/network-interface";
+import { getGameViewport } from "../../utils/game-viewport";
 import { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
 import { EnemyEntityAnimator } from "../animators/enemy-entity-animator";
 import { StateController } from "../animators/entity-animator";
@@ -204,12 +205,9 @@ export class Main extends Phaser.Scene {
       this.listen("mapInfo", (message: MessageMapInfo) => {
         this.syncPauseState(message.isPaused);
 
-        // Resize the canvas to the full map so the whole map is rendered.
-        // The on-screen size is then multiplied by the zoom (MAP_SCALER).
-        this.scale.resize(
-          message.width * CELL_SIZE,
-          message.height * CELL_SIZE,
-        );
+        const viewport = getGameViewport(message.width, message.height);
+        this.scale.resize(viewport.gameWidth, viewport.gameHeight);
+        this.cameras.main.setScroll(viewport.scrollX, viewport.scrollY);
 
         this.displayHandler.createMap(
           message.grid,
