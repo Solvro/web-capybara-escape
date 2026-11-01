@@ -26,9 +26,11 @@ import type { LAYER_NAME } from "../../constants/global";
 import type { INetworkInterface } from "../../types/network-interface";
 import { getGameViewport } from "../../utils/game-viewport";
 import { CapybaraEntityAnimator } from "../animators/capybara-entity-animator";
+import { CrateEntityAnimator } from "../animators/crate-entity-animator";
 import { EnemyEntityAnimator } from "../animators/enemy-entity-animator";
 import { StateController } from "../animators/entity-animator";
 import { PlayerEntityAnimator } from "../animators/player-entity-animator";
+import { BreakableCrate } from "../entities/breakable-crate";
 import { Capybara } from "../entities/capybara";
 import { Crate } from "../entities/crate";
 import { Enemy } from "../entities/enemy";
@@ -73,6 +75,7 @@ export class Main extends Phaser.Scene {
   private isPaused = false;
   private capybaraAnimator!: CapybaraEntityAnimator;
   private enemyAnimatorTemplate!: EnemyEntityAnimator;
+  private crateAnimatorTemplate!: CrateEntityAnimator;
 
   constructor() {
     super({ key: "Main" });
@@ -143,6 +146,12 @@ export class Main extends Phaser.Scene {
     );
     this.enemyAnimatorTemplate.preload(this);
 
+    this.crateAnimatorTemplate = new CrateEntityAnimator(
+      "textures/crate-tileset.png",
+      new StateController(),
+    );
+    this.crateAnimatorTemplate.preload(this);
+
     // player textures
     const playerSetups = [
       {
@@ -185,6 +194,7 @@ export class Main extends Phaser.Scene {
     }
     this.capybaraAnimator.register(this);
     this.enemyAnimatorTemplate.register(this);
+    this.crateAnimatorTemplate.register(this);
 
     // Input setup
     if (this.input.keyboard !== null) {
@@ -220,7 +230,11 @@ export class Main extends Phaser.Scene {
         }
 
         for (const crate of message.crates) {
-          this.spawnEntity(this.crates, Crate, crate, LAYER_NAMES.ENTITIES);
+          if (crate.isSteel) {
+            this.spawnEntity(this.crates, Crate, crate, LAYER_NAMES.ENTITIES);
+          } else {
+            this.addBreakableCrate(crate);
+          }
         }
         for (const button of message.buttons) {
           this.spawnEntity(
@@ -469,6 +483,37 @@ export class Main extends Phaser.Scene {
       this.capybaraAnimator,
     );
     this.displayHandler.add("entities", this.capybara);
+  }
+
+  private addBreakableCrate(crateInfo: {
+    crateId: number;
+    x: number;
+    y: number;
+    isSteel: boolean;
+  }) {
+    const existing = this.crates.get(crateInfo.crateId);
+    if (existing !== undefined) {
+      existing.destroy();
+    }
+
+    let crateAnimation = this.anims.get(
+      this.crateAnimatorTemplate.getAnimKey("burn-up"),
+    );
+    let deathTime = crateAnimation ? crateAnimation.duration : 1000;
+
+    const animator = new CrateEntityAnimator(
+      "textures/crate-tileset.png",
+      new StateController(),
+    );
+
+    const breakableCrate = new BreakableCrate(
+      this,
+      crateInfo,
+      animator,
+      deathTime,
+    );
+    this.crates.set(crateInfo.crateId, breakableCrate);
+    this.displayHandler.add(LAYER_NAMES.ENTITIES, breakableCrate);
   }
 
   private addEnemy(enemyInfo: { id: number; x: number; y: number }) {

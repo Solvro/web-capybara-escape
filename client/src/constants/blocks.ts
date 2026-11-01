@@ -39,6 +39,7 @@ export const ASSETS = {
   SOL_START: 101,
   VRON_START: 102,
   ENEMY_START: 103,
+  CRATE_START: 104,
 };
 
 export const ENTITY_SOURCES = {
@@ -46,6 +47,7 @@ export const ENTITY_SOURCES = {
   SOL: "/textures/sol/sol-tileset.png",
   VRON: "/textures/vron/vron-tileset.png",
   ENEMY: "/textures/enemy/evil-drone-tileset.png",
+  CRATE: "/textures/crate-tileset.png",
 };
 
 export interface EntityConfig {
@@ -89,6 +91,14 @@ export const ENTITY_MAPPING: Record<number, EntityConfig> = {
   },
   [ASSETS.ENEMY_START]: {
     src: ENTITY_SOURCES.ENEMY,
+    previewFrame: 0,
+    frameWidth: 24,
+    frameHeight: 24,
+    tilesetCols: 4,
+    floorAnchored: true,
+  },
+  [ASSETS.CRATE_START]: {
+    src: ENTITY_SOURCES.CRATE,
     previewFrame: 0,
     frameWidth: 24,
     frameHeight: 24,
