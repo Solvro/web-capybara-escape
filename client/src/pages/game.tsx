@@ -17,12 +17,24 @@ import { LoadingAnimatorWrapper } from "@/components/loading-animator-wrapper";
 import { QuestionScreen } from "@/components/lore/question-screen";
 import { PauseModal } from "@/components/pause-modal";
 import { PhaserContainer } from "@/components/phaser-container";
-import { IMAGE_ALERT_PATHS } from "@/constants/global";
+import { IMAGE_ALERT_PATHS, MONITOR_SCREEN_URL } from "@/constants/global";
+import { LORE_BACKGROUNDS, LORE_SPRITES } from "@/constants/lore-sprites";
 import { useLevelInfo } from "@/hooks/game/use-level-info";
 import { useQuestion } from "@/hooks/game/use-question";
 import { useQuestionDocument } from "@/hooks/questions/use-question-document";
-import { usePreloadedImage } from "@/hooks/use-preloaded-image";
+import {
+  usePreloadImages,
+  usePreloadedImage,
+} from "@/hooks/use-preloaded-image";
 import { useRoom } from "@/lib/use-room";
+
+const GAME_WARMUP_IMAGES = [
+  MONITOR_SCREEN_URL,
+  IMAGE_ALERT_PATHS.FAILED_OR_LOST,
+  IMAGE_ALERT_PATHS.LEVEL_COMPLETE,
+  LORE_BACKGROUNDS.server_room,
+  ...Object.values(LORE_SPRITES).map((sprite) => sprite.src),
+] as const;
 
 type EndGameState =
   | { kind: "gameOver"; message: string }
@@ -40,6 +52,7 @@ export function Game() {
   const levelInfo = useLevelInfo(room);
   const questionDocument = useQuestionDocument(question?.questionId ?? null);
   const isEndImageReady = usePreloadedImage(IMAGE_ALERT_PATHS.LEVEL_COMPLETE);
+  usePreloadImages(GAME_WARMUP_IMAGES);
   const navigate = useNavigate();
 
   useEffect(() => {

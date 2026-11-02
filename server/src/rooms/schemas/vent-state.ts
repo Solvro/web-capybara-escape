@@ -46,9 +46,15 @@ export class VentState extends Schema {
     this.vents.delete(id);
   }
 
-  onRoomDispose(): void {
+  clear(): void {
     this.vents.clear();
     this.usedIDs.clear();
+    this.nextAvailableId = 0;
+    this.positionToVentId.clear();
+  }
+
+  onRoomDispose(): void {
+    this.clear();
   }
 
   getVentAt(x: number, y: number): Vent | undefined {

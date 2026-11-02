@@ -33,12 +33,24 @@ Pomagają w tym odwieczni wyjadacze koła Sol oraz Vron, o których możesz się
 git clone https://github.com/Solvro/web-capybara-escape.git
 cd web-capybara-escape
 npm install
+cp server/.env.example server/.env.development
+cp client/.env.example client/.env.development
 npm run dev
 ```
 
 Pierwsze `npm install` instaluje zależności client i server. Narzędzia w root husky, prettier itd. również są instalowane oraz uruchamia się `prepare` - hooki Gita wymagają instalacji w tym właśnie katalogu. Front i backend startują razem dzięki `concurrently`.
 
 I to tyle, możesz testować lokalnie nasz domyślny poziom 🥱
+
+### Docker
+
+```bash
+cp .env.example .env   # Mongo + API URL
+docker compose up --build
+```
+
+- Frontend: `FRONTEND_HOST_PORT`
+- API / Colyseus: `http://localhost:2567` - ustaw `VITE_PHASER_API` i `VITE_COLYSEUS_URL` na **publiczny** adres tego backendu (przy HTTPS klient używa szyfrowanego `wss`)
 
 ## Skrypty w katalogu głównym
 
