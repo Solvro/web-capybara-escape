@@ -20,7 +20,7 @@ export const LAYER_ITEM_KEYS = {
   EMPTY_FLOOR: "empty-floor",
 
   LASER: "laser",
-  CRATE: "crate",
+  CRATE_START: "crate-start",
   STEEL_BOX: "steelBox",
   ENEMY: "enemy",
   EMPTY_ENTITIES: "empty-entities",
@@ -255,9 +255,9 @@ export const LAYER_ITEMS: Record<string, LayerItem[]> = {
   [LAYER_NAMES.ENTITIES]: [
     ...coloredLasers,
     {
-      key: LAYER_ITEM_KEYS.CRATE,
+      key: LAYER_ITEM_KEYS.CRATE_START,
       label: "Crate",
-      frame: ASSETS.CRATE,
+      frame: ASSETS.CRATE_START,
       layer: LAYER_NAMES.ENTITIES,
     },
     {
