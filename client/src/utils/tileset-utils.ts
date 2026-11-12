@@ -369,7 +369,7 @@ export const formatLevel = (
         formattedLevel.entities.players.push({ x, y });
       } else if (entityKey === LAYER_ITEM_KEYS.STEEL_BOX) {
         formattedLevel.entities.steelBoxes.push({ x, y });
-      } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.CRATE) {
+      } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.CRATE_START) {
         formattedLevel.entities.crates.push({ x, y });
       } else if (entityLayer?.[0] === LAYER_ITEM_KEYS.LASER) {
         const color = COLOR_LIST[Number.parseInt(entityLayer[1])];

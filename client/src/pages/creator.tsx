@@ -59,7 +59,7 @@ export function Creator() {
     `${LAYER_ITEM_KEYS.BUTTON}-0`,
   ];
   const entities = [
-    LAYER_ITEM_KEYS.CRATE,
+    LAYER_ITEM_KEYS.CRATE_START,
     LAYER_ITEM_KEYS.STEEL_BOX,
     LAYER_ITEM_KEYS.ENEMY,
     `${LAYER_ITEM_KEYS.LASER}-0-right`,
