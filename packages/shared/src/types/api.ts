@@ -29,3 +29,35 @@ export type LevelSummary = {
 export type ListLevelsOptions = {
   publishedOnly?: boolean;
 };
+
+export type ScreenType = "level" | "question";
+
+export type ScreenInput = {
+  sequence: number;
+  type: ScreenType;
+  levelSlug?: string;
+  questionId?: string;
+};
+
+export type CreateScreenSequenceInput = {
+  slug: string;
+  description?: string;
+  screens: ScreenInput[];
+};
+
+export type UpdateScreenSequenceInput = {
+  slug?: string;
+  description?: string;
+  screens?: ScreenInput[];
+};
+
+export type ScreenSequenceScreen = ScreenInput & { id: string };
+
+export type ScreenSequenceDto = {
+  id: string;
+  slug: string;
+  description?: string;
+  screens: ScreenSequenceScreen[];
+  createdAt: string;
+  updatedAt: string;
+};

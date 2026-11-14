@@ -258,6 +258,18 @@ export class ScreenSequenceRepository {
     const lookupSlug = updatePayload.slug ?? slug.trim();
     return this.getBySlug(lookupSlug);
   }
+
+  async deleteScreenSequence(slug: string) {
+    const db = await getMongoDb();
+    if (!db) throw new Error("MongoDB is not configured.");
+
+    assertValidSlug(slug);
+
+    const result = await db
+      .collection<ScreenSequence>(SCREEN_SEQUENCES_COLLECTION)
+      .deleteOne({ slug: slug.trim() });
+    return result.deletedCount > 0;
+  }
 }
 
 export const screenSequenceRepository = new ScreenSequenceRepository();
