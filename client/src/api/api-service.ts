@@ -11,17 +11,15 @@ const ApiService = {
   },
 
   async getLevels(): Promise<LevelSummary[]> {
-    const response = await api.get<{ levels: LevelSummary[] }>(
-      this.URL + "/api/levels",
-      { headers: this.headerWithAuth },
-    );
+    const response = await api.get<{ levels: LevelSummary[] }>("/api/levels", {
+      headers: this.headerWithAuth,
+    });
     return response.data.levels;
   },
   async getLevel(slug: string) {
-    const response = await api.get(
-      this.URL + `/api/levels/${encodeURIComponent(slug)}`,
-      { headers: this.headerWithAuth },
-    );
+    const response = await api.get(`/api/levels/${encodeURIComponent(slug)}`, {
+      headers: this.headerWithAuth,
+    });
     return response.data.level;
   },
 
