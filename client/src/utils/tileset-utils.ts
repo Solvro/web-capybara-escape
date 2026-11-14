@@ -572,7 +572,7 @@ export function parseLevel({
     set(p, ENT, i ? K.VRON_START : K.SOL_START),
   );
   entities.enemies.forEach((p) => set(p, ENT, K.ENEMY));
-  entities.crates.forEach((p) => set(p, ENT, K.CRATE));
+  entities.crates.forEach((p) => set(p, ENT, K.CRATE_START));
   entities.steelBoxes.forEach((p) => set(p, ENT, K.STEEL_BOX));
   entities.vents.forEach((p) =>
     set(p, FD, p.open ? K.VENT_OPEN : K.VENT_CLOSED),
