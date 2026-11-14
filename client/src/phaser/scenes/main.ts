@@ -213,6 +213,7 @@ export class Main extends Phaser.Scene {
     // Colyseus message handlers
     try {
       this.listen("mapInfo", (message: MessageMapInfo) => {
+        this.resetGraphics();
         this.syncPauseState(message.isPaused);
 
         const viewport = getGameViewport(message.width, message.height);
@@ -435,6 +436,7 @@ export class Main extends Phaser.Scene {
   }
 
   private addPlayer(playerSpawnInfo: PlayerType) {
+    this.removePlayer(playerSpawnInfo.sessionId);
     const isLocal = playerSpawnInfo.sessionId === this.room.sessionId;
     const index = Math.max(
       0,
