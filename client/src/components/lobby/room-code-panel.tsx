@@ -1,5 +1,5 @@
+import { CopyField } from "@/components/lobby/copy-field";
 import { Button } from "@/components/ui/button";
-import { CustomInput } from "@/components/ui/custom-input";
 
 interface RoomCodePanelProps {
   code: string;
@@ -20,20 +20,16 @@ export function RoomCodePanel({
     <div className="flex flex-col items-center gap-2 mt-8">
       <p className="text-lg text-white tomorrow-font">KOD POKOJU ORAZ LINK:</p>
 
-      <CustomInput
+      <CopyField
         value={code}
-        placeholder="Twój kod pokoju"
+        copiedMessage="Skopiowano kod!"
         className="w-64 mt-2"
-        setValue={() => {}}
-        disabled={true}
       />
 
-      <CustomInput
+      <CopyField
         value={link}
-        placeholder="Twój kod pokoju"
+        copiedMessage="Skopiowano link!"
         className="w-64 mt-2"
-        setValue={() => {}}
-        disabled={true}
       />
 
       <Button
